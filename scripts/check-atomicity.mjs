@@ -12,7 +12,7 @@ const js = walk('www/js').filter(f => f.endsWith('.js'));
 for (const p of js) {
   const s = readFileSync(p, 'utf8');
   const exports = (s.match(/^export /gm) || []).length;
-  const want = p.endsWith('/main.js') ? 0 : 1;
+  const want = p.endsWith('main.js') ? 0 : 1;
   if (exports !== want) bad.push(`${p}: export=${exports}, ожидается ${want}`);
   const lines = s.trimEnd().split('\n').length;
   if (lines > 45) bad.push(`${p}: ${lines} строк (>45)`);
@@ -30,7 +30,7 @@ for (const p of js) {
 // каждый модуль должен где-то импортироваться (main.js — точка входа)
 const imported = new Set();
 for (const p of js) for (const m of readFileSync(p, 'utf8').matchAll(/from '(\.[^']+)'/g)) imported.add(resolve(dirname(p), m[1]));
-for (const p of js) if (!p.endsWith('/main.js') && !imported.has(resolve(p))) bad.push(`${p}: не используется (никто не импортирует)`);
+for (const p of js) if (!p.endsWith('main.js') && !imported.has(resolve(p))) bad.push(`${p}: не используется (никто не импортирует)`);
 
 const java = walk('android/app/src/main/java').filter(f => f.endsWith('.java'));
 for (const p of java) {
