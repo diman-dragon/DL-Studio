@@ -5,7 +5,7 @@ const level = (v, [a, b]) => +(v >= a) + +(v >= b);
 const byAnswer = ({ think, correct, hinted, kind }, B) => {
   if (correct === null) return null;
   if (!correct) return 'again';
-  const k = kind === 'type' ? 2.5 : 1;
+  const k = kind?.endsWith('-type') ? 2.5 : 1;
   return hinted ? 'hard' : think < B.think[0] * k ? 'easy' : think < B.think[1] * k ? 'good' : 'hard';
 };
 /**

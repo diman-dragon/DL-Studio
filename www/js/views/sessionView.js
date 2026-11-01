@@ -23,7 +23,7 @@ export default async function sessionView() {
   if (state.quiz?.id !== card.id) state.quiz = makeQuiz(s, card, dir);
   const q = state.quiz, flipped = state.revealed || !!q?.result;
   const face = q?.kind === 'speak'
-    ? speakFace(card, flipped, state.speech?.id === card.id ? state.speech : null)
+    ? speakFace(card, flipped, state.speech?.id === card.id ? state.speech : null, q)
     : studyFace(card, flipped, dir, q);
   return head + progressBar(progressOf(s), `${card.pname} · ${card.dname}`) + face + `<div id="controls">${q?.kind === 'speak' ? studyControls() : q ? quizControls(q) : studyControls()}</div>`;
 }

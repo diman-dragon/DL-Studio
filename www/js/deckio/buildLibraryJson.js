@@ -5,7 +5,9 @@ import listDecksOfProject from '../repo/listDecksOfProject.js';
 import listCards from '../repo/listCards.js';
 const cardJson = c => ({
   front: c.front, back: c.back,
-  ...(c.example && { example: c.example }), ...(c.example_tr && { example_translation: c.example_tr })
+  ...(c.example && { example: c.example }), ...(c.example_tr && { example_translation: c.example_tr }),
+  ...(c.cloze && { cloze: c.cloze }), ...(c.cloze_answer && { cloze_answer: c.cloze_answer }),
+  ...(c.cloze_tr && { cloze_translation: c.cloze_tr })
 });
 export default async function buildLibraryJson() {
   const projects = [];

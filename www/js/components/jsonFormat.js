@@ -12,7 +12,10 @@ export default function jsonFormat() {
         "front": "изучаемое слово или фраза",
         "back": "перевод на нативный язык",
         "example": "необязательный пример",
-        "example_translation": "перевод примера"
+        "example_translation": "перевод примера",
+        "cloze": "I ___ a decision.",
+        "cloze_answer": "made",
+        "cloze_translation": "Я принял решение."
       }]
     }]
   }]

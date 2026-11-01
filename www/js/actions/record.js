@@ -9,6 +9,7 @@ import speechResult from '../components/speechResult.js';
 import fitFaces from '../dom/fitFaces.js';
 import buzz from '../dom/buzz.js';
 import toast from '../dom/toast.js';
+import spokenText from '../study/spokenText.js';
 /** Микрофон в «Говорить»: слушаем одну попытку, оцениваем сходство с текстом карточки, пишем попытку в базу (pronunciations). */
 export default async function record(d, el) {
   const card = state.session && currentCard(state.session);
@@ -20,7 +21,8 @@ export default async function record(d, el) {
   try {
     await prepareSpeech(card.tts);
     const r = await speechListen(card.tts);
-    const score = scoreSpeech(r, card.front), prev = state.speech?.id === card.id ? state.speech.attempts : 0;
+    const target = state.quiz?.kind === 'speak' ? state.quiz.answer : spokenText(card);
+    const score = scoreSpeech(r, target), prev = state.speech?.id === card.id ? state.speech.attempts : 0;
     await insertPronunciation(card.id, { engine: SPEECH.engine, transcript: r.text, score, audio: r.audio ?? null });
     state.speech = { id: card.id, heard: r.text, score, attempts: prev + 1 };
     box.innerHTML = speechResult(state.speech);

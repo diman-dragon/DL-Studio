@@ -9,5 +9,6 @@ public final class Migrate {
         if (from < 3) for (String sql : MigrateV3.SQL) db.execSQL(sql);
         if (from < 4) for (String sql : MigrateV4.SQL) db.execSQL(sql);
         if (from < 5) for (String sql : MigrateV5.SQL) db.execSQL(sql);
+        if (from < 6) for (String sql : MigrateV6.SQL) db.execSQL(sql);
     }
 }

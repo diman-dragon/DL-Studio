@@ -9,7 +9,7 @@ export default async function flip() {
   const showingBack = toggleFlip();
   buzz();
   trackFlip();
-  if (state.session?.mode === 'speak' && !state.speech) track.hinted = true;   // посмотрел ответ до попытки — это подсказка
+  if (state.quiz?.kind === 'speak' && !state.speech) track.hinted = true;   // посмотрел текст до попытки — это подсказка
   if (!showingBack || state.revealed) return;
   state.revealed = true;
   await autoSpeak('reveal');

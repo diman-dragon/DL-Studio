@@ -7,7 +7,7 @@ apply plugin: 'com.android.application'
 def appVersion = new JsonSlurper().parse(file('../../package.json')).version
 def parts = appVersion.tokenize('.').collect { it.replaceAll('\\D', '').toInteger() }
 def semCode = parts[0] * 10000 + (parts.size() > 1 ? parts[1] : 0) * 100 + (parts.size() > 2 ? parts[2] : 0)
-// Имя APK = имя проекта + версия: LingvaDesk-2.2.4-debug.apk / LingvaDesk-2.2.4-release.apk
+// Имя APK = имя проекта + версия: LingvaDesk-2.2.5-debug.apk / LingvaDesk-2.2.5-release.apk
 base { archivesName = "LingvaDesk-${appVersion}" }
 def runNumber = Math.min((System.getenv("GITHUB_RUN_NUMBER") ?: "0").toInteger(), 999)
 

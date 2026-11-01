@@ -103,14 +103,14 @@ test('калибровка: медленному читателю пороги �
 });
 
 test('оценка по ответу: верно — по времени, подсказка — трудно, неверно — снова, без ответа — нет', () => {
-  const g = o => inferGrade({ think: 2000, look: 0, dwell: 3000, flips: 0, revisit: false, away: false, kind: 'choice', correct: true, hinted: false, ...o }, { reps: 0 });
+  const g = o => inferGrade({ think: 2000, look: 0, dwell: 3000, flips: 0, revisit: false, away: false, kind: 'visual-choice', correct: true, hinted: false, ...o }, { reps: 0 });
   assert.equal(g({}), 'easy');
   assert.equal(g({ think: 5000 }), 'good');
   assert.equal(g({ think: 10000 }), 'hard');
   assert.equal(g({ hinted: true }), 'hard');
   assert.equal(g({ correct: false }), 'again');
   assert.equal(g({ correct: null }), null);
-  assert.equal(g({ kind: 'type', think: 8000 }), 'easy');         // ввод занимает дольше
+  assert.equal(g({ kind: 'visual-type', think: 8000 }), 'easy');  // ввод занимает дольше
   assert.equal(g({ think: 300, dwell: 400 }), 'easy');            // быстрый верный ответ не отбрасывается как «мелькнуло»
 });
 
@@ -128,23 +128,34 @@ test('вопросы: выбор — 4 разных варианта с отве
   const s = await startSession('all', 'srs');
   const card = currentCard(s);
   const c = makeQuiz(s, card, 'fwd', 'choice');
-  assert.equal(c.kind, 'choice');
+  assert.equal(c.kind.endsWith('-choice'), true);
   assert.equal(c.options.length, 4);
   assert.equal(new Set(c.options).size, 4);
   assert.ok(c.options.includes(card.back));
   assert.equal(makeQuiz(s, card, 'rev', 'choice').answer, card.front);
-  assert.equal(makeQuiz(s, card, 'fwd', 'type').kind, 'type');
+  assert.equal(makeQuiz(s, card, 'fwd', 'type').kind.endsWith('-type'), true);
   assert.equal(makeQuiz(s, card, 'fwd', 'flip'), null);
+});
+
+test('задания: аудио, пропуск в фразе и произношение имеют реальные ответы', async () => {
+  const card = { id: 1, front: 'make', back: 'делать', cloze: 'I ___ a decision.', cloze_answer: 'made', cloze_tr: 'Я принял решение.' };
+  const other = [2, 3, 4].map((id, i) => ({ id, front: `word${id}`, back: `слово${id}`, cloze: `We ___ ${id}.`, cloze_answer: `do${i}` }));
+  const s = { map: new Map([card, ...other].map(c => [c.id, c])) };
+  assert.equal(makeQuiz(s, card, 'fwd', 'audio-choice').answer, 'делать');
+  assert.equal(makeQuiz(s, card, 'fwd', 'audio-type').kind, 'audio-type');
+  assert.equal(makeQuiz(s, card, 'fwd', 'cloze-choice').answer, 'made');
+  assert.equal(makeQuiz(s, card, 'fwd', 'cloze-type').prompt, 'I ___ a decision.');
+  assert.equal(makeQuiz(s, card, 'fwd', 'speak').answer, 'I made a decision.');
 });
 
 test('статистика: столбики по дням и удержание', () => {
   const now = new Date(2026, 2, 10, 12).getTime(), day = 86400000;
-  const rows = [{ ts: now, grade: 'good', fresh: 0, mode: 'srs' }, { ts: now - 1000, grade: 'again', fresh: 0, mode: 'srs' }, { ts: now - day, grade: 'easy', fresh: 1, mode: 'srs' }, { ts: now - 40 * day, grade: 'good', fresh: 0, mode: 'srs' }, { ts: now, grade: 'again', fresh: 0, mode: 'listen' }];
+  const rows = [{ ts: now, grade: 'good', fresh: 0, mode: 'srs' }, { ts: now - 1000, grade: 'again', fresh: 0, mode: 'srs' }, { ts: now - day, grade: 'easy', fresh: 1, mode: 'srs' }, { ts: now - 40 * day, grade: 'good', fresh: 0, mode: 'srs' }];
   const bars = dayBars(rows, 14, now);
   assert.equal(bars.length, 14);
-  assert.deepEqual([bars.at(-1).n, bars.at(-2).n, bars.at(-1).today, bars.at(-1).label], [3, 1, true, '10']);
-  assert.equal(bars.reduce((a, b) => a + b.n, 0), 4);             // старое за окном не считается
-  assert.equal(retention(rows), 67);                              // изученных (интервальных) 3: без «снова» — 2; «На слух» не в счёт
+  assert.deepEqual([bars.at(-1).n, bars.at(-2).n, bars.at(-1).today, bars.at(-1).label], [2, 1, true, '10']);
+  assert.equal(bars.reduce((a, b) => a + b.n, 0), 3);             // старое за окном не считается
+  assert.equal(retention(rows), 67);                              // изученных (интервальных) 3: без «снова» — 2
   assert.equal(retention([{ ts: now, grade: 'good', fresh: 1, mode: 'srs' }]), null);
 });
 
@@ -154,7 +165,6 @@ test('статистика из базы: по колодам, трудные к
   for (let i = 0; i < 3; i++) await insertReview(a, 'again', {}, 0, 'srs', t);
   await insertReview(a, 'good', {}, 0, 'srs', t);
   await insertReview(b, 'good', { think: 2000, look: 1000 }, 1, 'srs', t);
-  await insertReview(b, 'good', {}, 0, 'listen', t);               // «На слух» в удержание и трудные не входит
   const deck = (await listAllDecks())[0].id;
   assert.deepEqual((await listDeckReviewStats(0)).map(r => [r.id, Number(r.n), Number(r.ok)]), [[deck, 5, 2]]);
   assert.deepEqual((await listHardCards(5)).map(c => [Number(c.n), c.dname]), [[3, 'Basics']]);

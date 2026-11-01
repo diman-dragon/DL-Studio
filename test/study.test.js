@@ -6,7 +6,6 @@ import importLibraryFromFile from './helpers/importLibraryFromFile.js';
 import insertCards from '../www/js/repo/insertCards.js';
 import insertDeck from '../www/js/repo/insertDeck.js';
 import insertProject from '../www/js/repo/insertProject.js';
-import insertReview from '../www/js/repo/insertReview.js';
 import listCardsInScope from '../www/js/repo/listCardsInScope.js';
 import listDeckStats from '../www/js/repo/listDeckStats.js';
 import listReviewsSince from '../www/js/repo/listReviewsSince.js';
@@ -29,7 +28,6 @@ test.beforeEach(async () => {
   projectId = (await listProjects())[0].id;
   deckId = (await listAllDecks())[0].id;
 });
-
 test('область учёбы: вся библиотека / проект / колода; у карточек есть голос и подписи; счётчики по каждой колоде', async () => {
   const p2 = await insertProject('Даты', 'ru-RU');
   const d2 = await insertDeck(p2, 'XX век');
@@ -87,20 +85,6 @@ test('новые карточки: дневной лимит считается 
   assert.deepEqual([count(c, deckId), count(c, d2)], [5, 0]);
 });
 
-test('«На слух»: давно не слушанные первыми; расписание не двигается, история пишется с режимом', async () => {
-  const all = await startSession('all', 'listen');
-  assert.equal(all.order.length, 8);
-  await insertReview(all.order[0], 'good', {}, 0, 'listen', 1000);
-  const s = await startSession('all', 'listen');
-  assert.equal(s.order.at(-1), all.order[0]);          // уже слушанная — в конце
-  const card = currentCard(s), before = { due: card.due, interval: card.interval, reps: card.reps };
-  await gradeCard(s, 'good', { think: 1500, look: 800, plays: 2, hinted: true });
-  assert.deepEqual({ due: card.due, interval: card.interval, reps: card.reps }, before);
-  const last = (await listReviewsSince(0)).at(-1);
-  assert.deepEqual([last.mode, last.grade, last.fresh, last.hinted, last.plays, last.think], ['listen', 'good', 0, 1, 2, 1500]);
-  assert.equal((await startSession('all', 'srs')).order.length, 8);   // интервальное повторение «На слух» не затронуто
-});
-
 test('restart: очередь и лимиты заново из базы', async () => {
   const s = await startSession('all', 'srs');
   await gradeCard(s, 'good'); await gradeCard(s, 'good');
@@ -127,10 +111,3 @@ test('план дня выполнен — учёба продолжается �
   assert.equal((await listReviewsSince(0)).length, s.log.length);   // всё записано в базу, в том числе сверх плана
 });
 
-test('«Карточки»: просто перевороты по кругу, без плана и без оценок', async () => {
-  const s = await startSession('all', 'cards');
-  assert.deepEqual([s.order.length, s.planTotal], [8, 0]);
-  assert.equal(progressOf(s).text, 'Карточка 1 из 8');
-  cyclePos(s, -1);
-  assert.equal(progressOf(s).text, 'Карточка 8 из 8');
-});
