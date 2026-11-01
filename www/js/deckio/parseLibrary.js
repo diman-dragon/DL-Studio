@@ -1,11 +1,10 @@
 import { DEFAULT_TTS } from '../constants/DEFAULT_TTS.js';
 import clean from '../util/clean.js';
-import { DIALOG } from '../constants/DIALOG.js';
 import isValidCard from './isValidCard.js';
 import normalizeCard from './normalizeCard.js';
 const parseDeckOf = d => {
   if (!clean(d?.name) || !Array.isArray(d.cards)) throw new Error('У колоды нет name или cards[]');
-  return { name: clean(d.name), kind: d.kind === DIALOG.kind ? DIALOG.kind : 'cards', cards: d.cards.filter(isValidCard).map(normalizeCard) };
+  return { name: clean(d.name), kind: 'cards', cards: d.cards.filter(isValidCard).map(normalizeCard) };
 };
 /** Файл всей библиотеки (lingvadesk-library v1): проекты → колоды → карточки. */
 export default function parseLibrary(j) {

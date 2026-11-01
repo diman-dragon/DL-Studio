@@ -7,6 +7,6 @@ import render from '../nav/render.js';
 export default function onVisibility() {
   if (document.hidden) return trackPause();
   syncIcon();
-  if (state.nav.v === 'settings') { state.voiceList = null; render(); }   // вернулись, например, со скачивания голосов — список обновляется
+  if (state.nav.v === 'settings') render();
   return trackResume();
 }

@@ -1,5 +1,4 @@
 import { state } from '../state/appState.js';
-import { DIALOG } from '../constants/DIALOG.js';
 import { BEHAVIOR } from '../constants/BEHAVIOR.js';
 import getDeckWithProject from '../repo/getDeckWithProject.js';
 import listCards from '../repo/listCards.js';
@@ -18,9 +17,9 @@ export default async function deckView() {
   const [deck, cards] = await Promise.all([getDeckWithProject(state.nav.id), listCards(state.nav.id)]);
   const due = cards.filter(c => c.due > 0 && c.due <= Date.now()).length, fresh = cards.filter(c => !c.due).length;
   const items = cards.map(c => entry({
-    act: 'editCard', id: c.id, title: (c.agains >= BEHAVIOR.leech ? '🐛 ' : '') + (deck.kind === DIALOG.kind && c.speaker ? `${DIALOG.marks[c.speaker]} ` : '') + c.front, sub: c.back, mark: cardMark(c), acts: itemActions('editCard', 'delCard', c.id)
+    act: 'editCard', id: c.id, title: (c.agains >= BEHAVIOR.leech ? '🐛 ' : '') + c.front, sub: c.back, mark: cardMark(c), acts: itemActions('editCard', 'delCard', c.id)
   }));
   const body = items.length ? pagedList(items) : emptyState({ icon: '🃏', title: 'Карточек нет', text: 'Добавьте первую карточку.' });
   return header(deck.name, { left: backButton('goProject', deck.language_id), right: layoutToggle() }) +
-    `<div class="sub">${deck.kind === DIALOG.kind ? '💬 Диалог · ' : ''}${deck.pname} · ${cards.length} ${deck.kind === DIALOG.kind ? 'реплик' : 'карточек'} · повторить ${due} · новых ${fresh}</div>` + body + row(button({ act: 'newCard', cls: 'p', label: deck.kind === DIALOG.kind ? '+ Реплика' : '+ Карточка' }), 'foot');
+    `<div class="sub">${deck.pname} · ${cards.length} карточек · повторить ${due} · новых ${fresh}</div>` + body + row(button({ act: 'newCard', cls: 'p', label: '+ Карточка' }), 'foot');
 }

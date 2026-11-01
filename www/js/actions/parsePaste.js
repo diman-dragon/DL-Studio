@@ -14,6 +14,6 @@ export default async function parsePaste() {
     toast(`Импорт: проектов ${s.projects}, колод ${s.decks}, новых карточек ${s.added}`);
     return go('library');
   }
-  state.importDraft = { name: r.name, format: r.format, cards: r.cards, dialog: !!r.dialog, lang: r.lang || '' };
+  state.importDraft = { name: r.name, format: r.format, cards: r.cards };
   return render();
 }

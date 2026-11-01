@@ -6,8 +6,8 @@ import render from './render.js';
 export default async function systemBack() {
   await ttsStop().catch(() => {});
   if (state.sheet) { state.sheet = null; return render(); }
-  if (await popBack() || state.nav.v === 'library') return;
-  state.nav = { v: 'library' };
+  if (await popBack() || state.nav.v === 'study') return;
+  state.nav = { v: 'study' };
   state.anim = 'view-in';
   state.page = 0;
   await render();

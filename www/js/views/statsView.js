@@ -5,8 +5,8 @@ import listDeckStats from '../repo/listDeckStats.js';
 import listDeckReviewStats from '../repo/listDeckReviewStats.js';
 import listHardCards from '../repo/listHardCards.js';
 import listDueSoon from '../repo/listDueSoon.js';
-import listPronunciationsSince from '../repo/listPronunciationsSince.js';
 import listWeakWords from '../repo/listWeakWords.js';
+import listPronunciationsSince from '../repo/listPronunciationsSince.js';
 import loadToday from '../study/loadToday.js';
 import dayStart from '../util/dayStart.js';
 import header from '../components/header.js';
@@ -17,7 +17,7 @@ import statSheet from '../components/statSheet.js';
 import PARAMS from '../stats/index.js';
 /**
  * Статистика: параметры — элементы списка / сетки, как в библиотеке и учёбе (значок, название, значение, пояснение), страницами.
- * Нажатие открывает подробное окно параметра (state.sheet = 'stat:<номер>'). Всё из истории повторений и попыток произношения в базе.
+ * Нажатие открывает подробное окно параметра (state.sheet = 'stat:<номер>'). Всё из истории интервальных повторений.
  */
 export default async function statsView() {
   const since = dayStart(-29);

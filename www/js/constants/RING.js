@@ -1,2 +1,2 @@
 /** Верхнеуровневые экраны по кругу: свайп с края последней страницы переходит к следующему. */
-export const RING = ['library', 'study', 'stats', 'settings'];
+export const RING = ['study', 'stats', 'library', 'settings'];

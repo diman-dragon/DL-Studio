@@ -1,5 +1,4 @@
 import { state } from '../state/appState.js';
-import { DIALOG } from '../constants/DIALOG.js';
 import esc from '../util/esc.js';
 import listProjects from '../repo/listProjects.js';
 import header from '../components/header.js';
@@ -18,8 +17,8 @@ export default async function importFormView() {
       row(button({ act: 'parsePaste', cls: 'p', label: 'Разобрать' }) + button({ act: 'importLibrary', label: 'Файл…' }) + button({ act: 'back', label: 'Отмена' }), 'foot');
   }
   const projects = await listProjects();
-  const sample = d.cards.slice(0, 3).map(c => `${d.dialog ? `${DIALOG.marks[c.speaker] || '·'} ` : ''}${esc(c.front)} — ${esc(c.back)}`).join('<br>');
-  return head + `<div class="muted note">Формат: ${esc(d.format)}<br>${d.dialog ? 'Найдено реплик' : 'Найдено карточек'}: <b>${d.cards.length}</b>${d.dialog ? '<br>Колода будет диалогом (роли 1–3)' : ''}</div><div class="preview">${sample}</div>` +
+  const sample = d.cards.slice(0, 3).map(c => `${esc(c.front)} — ${esc(c.back)}`).join('<br>');
+  return head + `<div class="muted note">Формат: ${esc(d.format)}<br>Найдено карточек: <b>${d.cards.length}</b></div><div class="preview">${sample}</div>` +
     selectField({ id: 'project', label: 'Проект', options: [['', '➕ Новый проект «Импорт»'], ...projects.map(p => [p.id, p.name])], value: projects[0]?.id ?? '' }) +
     labeledField({ id: 'name', label: 'Колода', value: d.name }) + formButtons({ save: 'confirmImport' });
 }

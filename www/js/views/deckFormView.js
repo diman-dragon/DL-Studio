@@ -1,5 +1,4 @@
 import { state } from '../state/appState.js';
-import { DIALOG } from '../constants/DIALOG.js';
 import getDeckWithProject from '../repo/getDeckWithProject.js';
 import listProjects from '../repo/listProjects.js';
 import header from '../components/header.js';
@@ -13,7 +12,6 @@ export default async function deckFormView() {
   const projectId = deck ? deck.language_id : state.nav.projectId;
   return header(id ? 'Колода' : 'Новая колода', { left: backButton('back') }) +
     labeledField({ id: 'name', label: 'Название', value: deck?.name ?? '', placeholder: 'Например, Договоры' }) +
-    selectField({ id: 'kind', label: 'Тип', options: [['cards', 'Обычная колода'], [DIALOG.kind, 'Диалог (сцена с ролями)']], value: deck?.kind ?? 'cards' }) +
     selectField({ id: 'project', label: 'Проект', options: projects.map(c => [c.id, c.name]), value: projectId }) +
     formButtons({ save: 'saveDeck', del: id ? 'delDeck' : '' });
 }

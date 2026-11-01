@@ -1,6 +1,6 @@
 import dbQuery from '../native/dbQuery.js';
 import dayStart from '../util/dayStart.js';
-/** Все колоды (kind — 'cards' | 'dialog') со счётчиками: total, due (пора повторить, уже изученные), fresh (новые), mature (интервал ≥ 21 дня), late (просрочено: срок был раньше сегодняшнего дня). */
+/** Все колоды со счётчиками интервального повторения. */
 export default function listDeckStats() {
   return dbQuery(
     'SELECT d.id,d.name,d.kind,l.id project_id,l.name pname,COUNT(c.id) total,COALESCE(SUM(c.due>0 AND c.due<=?),0) due,' +

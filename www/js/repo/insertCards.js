@@ -1,6 +1,6 @@
 import dbBatch from '../native/dbBatch.js';
 const SQL = 'INSERT INTO cards(deck_id,front,back,example,example_tr,ord,speaker) VALUES(?,?,?,?,?,?,?)';
-/** cards: [{front, back, example?, exampleTr?, speaker? (роль 1…3 в диалоге)}] — атомарно. */
+/** cards: [{front, back, example?, exampleTr?}] — атомарно. */
 export default function insertCards(deckId, cards, startOrd = 0) {
   return dbBatch(cards.map((c, i) => ({
     sql: SQL,

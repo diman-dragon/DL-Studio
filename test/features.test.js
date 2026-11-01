@@ -137,22 +137,6 @@ test('вопросы: выбор — 4 разных варианта с отве
   assert.equal(makeQuiz(s, card, 'fwd', 'flip'), null);
 });
 
-test('направление «вперемешку»: у карточки оно случайное, но стабильное в сессии', async () => {
-  state.prefs.dir = 'mix';
-  const s = await startSession('all', 'srs');
-  const seen = new Set();
-  for (const id of s.order) {
-    const card = s.map.get(id), d = cardDir(s, card);
-    assert.ok(d === 'fwd' || d === 'rev');
-    assert.equal(cardDir(s, card), d);
-    seen.add(d);
-  }
-  state.prefs.dir = 'rev';
-  assert.equal(cardDir(s, currentCard(s)), 'rev');
-  const l = await startSession('all', 'listen');
-  assert.equal(cardDir(l, currentCard(l)), 'fwd');                // «На слух»: всегда слово → перевод
-});
-
 test('статистика: столбики по дням и удержание', () => {
   const now = new Date(2026, 2, 10, 12).getTime(), day = 86400000;
   const rows = [{ ts: now, grade: 'good', fresh: 0, mode: 'srs' }, { ts: now - 1000, grade: 'again', fresh: 0, mode: 'srs' }, { ts: now - day, grade: 'easy', fresh: 1, mode: 'srs' }, { ts: now - 40 * day, grade: 'good', fresh: 0, mode: 'srs' }, { ts: now, grade: 'again', fresh: 0, mode: 'listen' }];

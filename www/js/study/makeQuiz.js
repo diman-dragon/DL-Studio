@@ -1,12 +1,10 @@
 import shuffle from '../util/shuffle.js';
-/**
- * Вопрос с выбором или вводом (настройка «Проверка»); null — обычный переворот или нечего выбирать.
- * Варианты — ответы других карточек области. dir — какая сторона отвечает: 'fwd' — перевод, 'rev' — слово.
- * «На слух» — всегда выбор из переводов (как в игре), независимо от настройки «Проверка»: слово звучит, надо выбрать верный перевод.
- */
-export default function makeQuiz(session, card, dirPref, checkPref) {
-  const listen = session.mode === 'listen', dir = listen ? 'fwd' : dirPref, check = listen ? 'choice' : (checkPref === 'mix' ? ['flip', 'choice', 'type', 'speak'][Math.floor(Math.random() * 4)] : checkPref);
-  if (check === 'flip' || session.mode === 'cards') return null;
+
+/** Случайное задание SRS: переворот, выбор, ввод или произношение. */
+export default function makeQuiz(session, card, dir, requested = null) {
+  // requested оставлен для чистых unit-тестов и совместимости API; интерфейс настройку больше не показывает.
+  const check = requested || ['flip', 'choice', 'type', 'speak'][Math.floor(Math.random() * 4)];
+  if (check === 'flip') return null;
   if (check === 'speak') return { id: card.id, kind: 'speak', result: null, hint: 0, typed: '' };
   const text = c => (dir === 'fwd' ? c.back : c.front);
   const answer = text(card), base = { id: card.id, answer, result: null, hint: 0, typed: '' };

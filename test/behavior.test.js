@@ -98,16 +98,6 @@ test('уход с карточки: вперёд — оценка по пове�
   assert.equal((await loadToday(t)).n, 1);              // в «сегодня» попала одна оценка — читаем из истории
 });
 
-test('«На слух»: оценка — после перевода; без перевода, с подсказкой и с переслушиванием', () => {
-  const g = o => inferGrade(sig({ listen: true, flips: 1, think: 2000, look: 2000, dwell: 4000, ...o }), fresh);
-  assert.equal(g({}), 'easy');
-  assert.equal(g({ hinted: true }), 'good');            // подсмотрел текст
-  assert.equal(g({ hinted: true, plays: 3 }), 'hard');  // подсмотрел и слушал много раз
-  assert.equal(g({ hinted: true, plays: 3, think: 5000 }), 'again');
-  assert.equal(g({ hinted: true, plays: 3, think: 9500, look: 6000 }), 'again');
-  assert.equal(inferGrade(sig({ listen: true, dwell: 5000 }), fresh), null);   // не перевернул — проверить нечем
-});
-
 test('серии дней и сегодня считаются из истории (ничего не хранится отдельно)', async () => {
   const at = (m, d, h = 12) => new Date(2026, m - 1, d, h).getTime();
   assert.equal(dayKey(0, at(3, 5)), '2026-03-05');

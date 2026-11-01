@@ -16,7 +16,6 @@ export default async function saveCard(d) {
   const card = Object.fromEntries(CARD_FIELDS.map(f => [f.key, readField(f.id)]));
   if (!card.front || !card.back) return toast('Заполните слово и перевод');
   const old = id ? await getCard(id) : null;
-  card.speaker = document.getElementById('spk') ? Number(readField('spk')) || 0 : old?.speaker ?? 0;
   if (id) {
     await updateCard(id, card);
     refreshCard(state.session, id, card);

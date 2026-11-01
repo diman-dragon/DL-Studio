@@ -13,9 +13,9 @@ export default async function studyHubView() {
   const top = header('Учёба', { right: layoutToggle() });
   if (!projects.length) return top + emptyState({ icon: '🧠', title: 'Начните с проекта', text: 'Создайте проект и добавьте карточки — здесь появится очередь повторений.', actions: row(button({ act: 'goLibrary', cls: 'p', label: 'Открыть библиотеку' })) });
   const items = projects.map(p => {
-    const late = Number(p.late || 0), lateClass = late ? 'late' : '';
-    const warning = late > 0 ? `<span class="overdue ${late > 0 ? 'overdue-hot' : ''}">${late > 0 ? '⚠' : ''} ${late} просрочено</span>` : '<span class="overdue ok">нет просрочки</span>';
-    const sub = `${p.cards} карточек · ${p.due} к повторению`;
+    const overdue = Number(p.overdue || 0), old = Number(p.late || 0), lateClass = overdue ? 'late' : '';
+    const warning = overdue ? `<span class="overdue ${old ? 'overdue-hot' : ''}">${old ? '⚠ ' : ''}${overdue} просрочено</span>` : '<span class="overdue ok">нет просрочки</span>';
+    const sub = `${p.cards} карточек · ${p.due} к повторению · ${overdue} просрочено`;
     return entry({ act: 'startStudy', id: `p:${p.id}`, title: p.name, sub, lead: avatar(p.name), mark: `<span class="project-stats ${lateClass}">${warning}</span>` });
   });
   return top + pagedList(items);
