@@ -4,15 +4,15 @@ export default function jsonFormat() {
   "version": 1,
   "native_language": "ru",
   "projects": [{
-    "name": "English",
-    "tts": "en-US",
+    "name": "Название проекта",
+    "tts": "код-языка",
     "decks": [{
-      "name": "Basics",
+      "name": "Название колоды",
       "cards": [{
-        "front": "apple",
-        "back": "яблоко",
-        "example": "I eat an apple.",
-        "example_translation": "Я каждый день ем яблоко."
+        "front": "изучаемое слово или фраза",
+        "back": "перевод на нативный язык",
+        "example": "необязательный пример",
+        "example_translation": "перевод примера"
       }]
     }]
   }]

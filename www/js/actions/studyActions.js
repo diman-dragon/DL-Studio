@@ -16,7 +16,8 @@ import speak from './speak.js';
 import play from './play.js';
 import showText from './showText.js';
 import record from './record.js';
+import cycleNativeLang from './cycleNativeLang.js';
 /** Учёба: запуск SRS, переворот, ответы, произношение и отмена оценки. */
 export default {
-  setPref, closeSheet, openStat, startStudy, flip, pick, check, hint, giveUp, undo, editSessionCard, skip, prev, restart, speak, play, showText, record
+  setPref, cycleNativeLang, closeSheet, openStat, startStudy, flip, pick, check, hint, giveUp, undo, editSessionCard, skip, prev, restart, speak, play, showText, record
 };

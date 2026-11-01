@@ -3,7 +3,7 @@ export const PREF_OPTIONS = {
   theme: [['auto', 'Системная'], ['light', 'Светлая'], ['dark', 'AMOLED']],
   font: [['s', 'Мелкий'], ['m', 'Средний'], ['l', 'Крупный']],
   anim: ONOFF,
-  nativeLang: [['ru', 'Русский'], ['en', 'English'], ['de', 'Deutsch'], ['fr', 'Français'], ['es', 'Español']],
+  nativeLang: [['system', 'Системный'], ['ru', 'Русский'], ['sr', 'Србски'], ['en', 'English']],
   haptic: ONOFF,
   autoplay: [['off', 'Выкл'], ['on', 'Вкл']],
   newPerDay: [['5', '5'], ['10', '10'], ['20', '20'], ['50', '50']],

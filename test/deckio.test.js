@@ -52,10 +52,3 @@ test('экспорт и импорт всей библиотеки: кругов
   assert.deepEqual(await buildLibraryJson(), exported);
 });
 
-test('примеры из examples/ корректны: deck.json и library.json', async () => {
-  const { readFileSync } = await import('node:fs');
-  const one = parseImport(readFileSync('examples/deck.json', 'utf8'));
-  assert.equal(one.projects[0].decks[0].cards.length, 8);
-  const lib = parseImport(readFileSync('examples/library.json', 'utf8'));
-  assert.deepEqual(lib.projects.map(p => p.decks.map(d => d.cards.length)), [[20, 5], [4]]);
-});

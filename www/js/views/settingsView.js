@@ -5,6 +5,7 @@ import button from '../components/button.js';
 import logoMark from '../components/logoMark.js';
 import pagedList from '../components/pagedList.js';
 import prefControl from '../components/prefControl.js';
+import nativeLanguageToggle from '../components/nativeLanguageToggle.js';
 import settingRow from '../components/settingRow.js';
 import settingsGroup from '../components/settingsGroup.js';
 import row from '../components/row.js';
@@ -16,7 +17,7 @@ import jsonFormat from '../components/jsonFormat.js';
 export default async function settingsView() {
   const look = settingRow('Тема', prefControl('theme'), 'AMOLED — чистый чёрный фон') + settingRow('Размер текста на карточках', prefControl('font')) +
     settingRow('Анимации', prefControl('anim')) + settingRow('Вибрация', prefControl('haptic'), 'Лёгкий отклик на свайп и переворот');
-  const study = settingRow('Нативный язык', prefControl('nativeLang'), 'Язык перевода карточек') +
+  const study = settingRow('Нативный язык', nativeLanguageToggle(), 'Сначала язык системы, затем Русский → Србски → English') +
     settingRow('Автоозвучка', prefControl('autoplay'), 'Произносить изучаемую сторону при появлении карточки') +
     settingRow('Задания', settingsTasks());
   const limits = settingRow('Новых карточек в день', prefControl('newPerDay'), 'Сколько новых карточек добавлять в план каждой колоды') +
