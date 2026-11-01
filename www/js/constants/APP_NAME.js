@@ -1,1 +1,1 @@
-export const APP_NAME = 'LingvaDesk';
+export const APP_NAME = 'DL-Studio';

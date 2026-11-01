@@ -74,6 +74,11 @@ button.ib[data-act^="del"]{color:var(--again)}
 .mark.due{background:var(--accent);color:var(--accent-t)}
 .mark.new{background:var(--surface2);color:var(--accent)}
 .mark.ok{color:var(--good)}
+.project-stats{font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.project-stats.late{background:rgba(224,123,0,.14);color:var(--hard)}
+.project-stats .overdue.ok{color:var(--good)}
+.project-stats .overdue-hot{color:var(--again);font-weight:800}
+.project-stats .overdue-hot:first-letter{font-size:15px}
 .gtile .acts{position:absolute;top:6px;right:6px}
 .gtile .mark{margin-top:2px}
 .badge{background:var(--accent);color:var(--accent-t);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:750;flex:none}
@@ -201,6 +206,7 @@ input.ans{margin:0 0 8px;font-size:17px;text-align:center}
 .bar span{font-size:10px;color:var(--muted)}
 .bar.today span{color:var(--accent);font-weight:700}
 .note{font-size:13px;margin-top:8px}
+.format-code{margin:0;background:var(--surface2);border-radius:12px;padding:10px;font:12px/1.35 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--text)}
 
 /* ===== Игра ===== */
 .ghud{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 6px;font-size:15px}

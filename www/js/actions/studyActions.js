@@ -1,4 +1,3 @@
-import toggleDir from './toggleDir.js';
 import setPref from './setPref.js';
 import startStudy from './startStudy.js';
 import openMode from './openMode.js';
@@ -19,14 +18,6 @@ import restart from './restart.js';
 import speak from './speak.js';
 import play from './play.js';
 import showText from './showText.js';
-import gamePick from './gamePick.js';
-import gameAgain from './gameAgain.js';
-import openGameKind from './openGameKind.js';
-import questPick from './questPick.js';
-import questCheck from './questCheck.js';
-import questGiveUp from './questGiveUp.js';
-import questNext from './questNext.js';
-import questAgain from './questAgain.js';
 import record from './record.js';
 import setVoice from './setVoice.js';
 import testVoice from './testVoice.js';
@@ -35,5 +26,5 @@ import installVoices from './installVoices.js';
 import checkSpeechLang from './checkSpeechLang.js';
 /** Учёба: настройки, запуск, карточка (переворот, листание, ответы, отмена), озвучка и режимы «На слух» и «Говорить». */
 export default {
-  toggleDir, setPref, openMode, openProjectDecks, pickScope, closeSheet, openStat, startStudy, flip, pick, check, hint, giveUp, undo, editSessionCard, skip, prev, restart, speak, play, showText, record, gamePick, gameAgain, openGameKind, questPick, questCheck, questGiveUp, questNext, questAgain, setVoice, testVoice, refreshVoices, installVoices, checkSpeechLang
+  setPref, openMode, openProjectDecks, pickScope, closeSheet, openStat, startStudy, flip, pick, check, hint, giveUp, undo, editSessionCard, skip, prev, restart, speak, play, showText, record, setVoice, testVoice, refreshVoices, installVoices, checkSpeechLang
 };

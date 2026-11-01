@@ -6,15 +6,11 @@ import studyDecksView from './studyDecksView.js';
 import sessionView from './sessionView.js';
 import settingsView from './settingsView.js';
 import statsView from './statsView.js';
-import gameView from './gameView.js';
-import gamesView from './gamesView.js';
-import dialogView from './dialogView.js';
-import questView from './questView.js';
 import importFormView from './importFormView.js';
 import projectFormView from './projectFormView.js';
 import deckFormView from './deckFormView.js';
 import cardFormView from './cardFormView.js';
 export default {
-  library: libraryView, project: projectView, deck: deckView, study: studyHubView, studyDecks: studyDecksView, session: sessionView, settings: settingsView, stats: statsView, game: gameView, games: gamesView, quest: questView, dialog: dialogView, importForm: importFormView,
+  library: libraryView, project: projectView, deck: deckView, study: studyHubView, studyDecks: studyDecksView, session: sessionView, settings: settingsView, stats: statsView, importForm: importFormView,
   projectForm: projectFormView, deckForm: deckFormView, cardForm: cardFormView
 };

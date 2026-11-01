@@ -5,8 +5,9 @@ import shuffle from '../util/shuffle.js';
  * «На слух» — всегда выбор из переводов (как в игре), независимо от настройки «Проверка»: слово звучит, надо выбрать верный перевод.
  */
 export default function makeQuiz(session, card, dirPref, checkPref) {
-  const listen = session.mode === 'listen', dir = listen ? 'fwd' : dirPref, check = listen ? 'choice' : checkPref;
+  const listen = session.mode === 'listen', dir = listen ? 'fwd' : dirPref, check = listen ? 'choice' : (checkPref === 'mix' ? ['flip', 'choice', 'type', 'speak'][Math.floor(Math.random() * 4)] : checkPref);
   if (check === 'flip' || session.mode === 'cards') return null;
+  if (check === 'speak') return { id: card.id, kind: 'speak', result: null, hint: 0, typed: '' };
   const text = c => (dir === 'fwd' ? c.back : c.front);
   const answer = text(card), base = { id: card.id, answer, result: null, hint: 0, typed: '' };
   if (check === 'type') return { ...base, kind: 'type' };

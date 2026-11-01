@@ -1,35 +1,22 @@
-import { DIALOG } from '../constants/DIALOG.js';
-import { MODE_INFO } from '../constants/MODE_INFO.js';
-import listDeckStats from '../repo/listDeckStats.js';
-import loadLimits from '../study/loadLimits.js';
-import loadToday from '../study/loadToday.js';
-import planInfo from '../study/planInfo.js';
+import listProjects from '../repo/listProjects.js';
 import header from '../components/header.js';
 import button from '../components/button.js';
-import statCard from '../components/statCard.js';
-import modeEntry from '../components/modeEntry.js';
+import entry from '../components/entry.js';
 import pagedList from '../components/pagedList.js';
 import layoutToggle from '../components/layoutToggle.js';
 import emptyState from '../components/emptyState.js';
 import row from '../components/row.js';
-const sum = (list, f) => list.reduce((a, x) => a + f(x), 0);
-/**
- * «Давай-ка поучим…»: режимы (интервальное повторение, карточки, на слух, игра, проверка произношения) — списком или сеткой, страницами,
- * как проекты и колоды. Нажатие на режим открывает экран колод режима (studyDecksView). План дня — повторить + новые в пределах лимита; когда он выполнен, учёба продолжается без лимита.
- * Все числа читаются из базы.
- */
+import avatar from '../components/avatar.js';
+/** Главный экран — только проекты. Нажатие на проект сразу запускает интервальное повторение по его карточкам. */
 export default async function studyHubView() {
-  const [decks, lim, today] = await Promise.all([listDeckStats(), loadLimits(), loadToday()]);
-  const top = header('Давай-ка поучим…', { right: layoutToggle() });
-  const total = sum(decks, d => Number(d.total));
-  if (!total) {
-    return top + emptyState({ icon: '🃏', title: 'Здесь пока нет карточек', text: 'Добавьте карточки в библиотеке.', actions: row(button({ act: 'goLibrary', cls: 'p', label: 'В библиотеку' })) });
-  }
-  const info = planInfo(decks, lim), left = sum(info, d => d.left), fresh = sum(info, d => d.fresh);
-  const stats = row(statCard(sum(info, d => Number(d.due)), 'к повторению') + statCard(fresh, 'новых') + statCard(today.n, 'сегодня') + statCard(today.current, 'дней подряд'), 'stats');
-  const plan = left ? `По плану на сегодня: ${left}` : today.n ? '✓ Дневной план выполнен — можно учить дальше' : '✓ На сегодня ничего не запланировано';
-  const sumsOf = (ds, inf) => ({ total: sum(ds, d => Number(d.total)), learned: sum(ds, d => Number(d.total) - Number(d.fresh)), left: sum(inf, d => d.left), late: sum(ds, d => Number(d.late)) });
-  const dlg = d => d.kind === DIALOG.kind, sums = sumsOf(decks, info), dsums = sumsOf(decks.filter(dlg), info.filter(dlg));   // «Диалоги» считают только сцены
-  const modes = pagedList(MODE_INFO.map(m => modeEntry(m, m.mode === 'dialog' ? dsums : sums)));
-  return top + stats + `<div class="plan${left ? '' : ' done'}">${plan}</div>${modes}`;
+  const projects = await listProjects();
+  const top = header('Учёба', { right: layoutToggle() });
+  if (!projects.length) return top + emptyState({ icon: '🧠', title: 'Начните с проекта', text: 'Создайте проект и добавьте карточки — здесь появится очередь повторений.', actions: row(button({ act: 'goLibrary', cls: 'p', label: 'Открыть библиотеку' })) });
+  const items = projects.map(p => {
+    const late = Number(p.late || 0), lateClass = late ? 'late' : '';
+    const warning = late > 0 ? `<span class="overdue ${late > 0 ? 'overdue-hot' : ''}">${late > 0 ? '⚠' : ''} ${late} просрочено</span>` : '<span class="overdue ok">нет просрочки</span>';
+    const sub = `${p.cards} карточек · ${p.due} к повторению`;
+    return entry({ act: 'startStudy', id: `p:${p.id}`, title: p.name, sub, lead: avatar(p.name), mark: `<span class="project-stats ${lateClass}">${warning}</span>` });
+  });
+  return top + pagedList(items);
 }

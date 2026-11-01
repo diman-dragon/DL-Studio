@@ -1,6 +1,6 @@
 {
   "appId": "com.example.lingocards",
-  "appName": "LingvaDesk",
+  "appName": "DL-Studio",
   "webDir": "www",
   "android": {
     "allowMixedContent": false,

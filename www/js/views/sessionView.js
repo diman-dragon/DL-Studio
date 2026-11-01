@@ -1,6 +1,5 @@
 import { state } from '../state/appState.js';
 import { MODE_SHORT } from '../constants/MODE_SHORT.js';
-import { DIR_LABELS } from '../constants/DIR_LABELS.js';
 import currentCard from '../study/currentCard.js';
 import cardDir from '../study/cardDir.js';
 import makeQuiz from '../study/makeQuiz.js';
@@ -25,12 +24,11 @@ const FACES = {
 export default async function sessionView() {
   const s = state.session, card = currentCard(s);
   const undo = s.undo ? button({ act: 'undo', cls: 'sm', label: '↶', aria: 'Отменить последнюю оценку' }) : '';
-  const dirBtn = s.mode !== 'srs' && s.mode !== 'cards' ? '' : button({ act: 'toggleDir', cls: 'sm', label: DIR_LABELS[state.prefs.dir][1] });
-  const head = header(MODE_SHORT[s.mode], { left: backButton('back'), right: undo + dirBtn });
+  const head = header(MODE_SHORT[s.mode], { left: backButton('back'), right: undo });
   if (!card) return head + studyFinishedView(s);
   const dir = cardDir(s, card);
   if (state.quiz?.id !== card.id) state.quiz = s.mode === 'speak' ? null : makeQuiz(s, card, dir, state.prefs.check);
   const q = state.quiz, flipped = state.revealed || !!q?.result;
-  return head + progressBar(progressOf(s), `${card.pname} · ${card.dname}`) +
-    FACES[s.mode](card, flipped, dir, q, state.speech?.id === card.id ? state.speech : null) + `<div id="controls">${q ? quizControls(q) : studyControls()}</div>`;
+  const face = q?.kind === 'speak' ? speakFace(card, flipped, state.speech?.id === card.id ? state.speech : null) : FACES[s.mode](card, flipped, dir, q, state.speech?.id === card.id ? state.speech : null);
+  return head + progressBar(progressOf(s), `${card.pname} · ${card.dname}`) + face + `<div id="controls">${q?.kind === 'speak' ? studyControls() : q ? quizControls(q) : studyControls()}</div>`;
 }

@@ -5,5 +5,5 @@ import trackAdd from './trackAdd.js';
 export default function trackSignals() {
   trackAdd();
   const { think, front, back, flips, revisit, away, correct, hinted, plays } = track;
-  return { think, look: back, dwell: front + back, flips, revisit, away, correct, hinted, plays, kind: state.quiz?.kind ?? null, listen: state.session?.mode === 'listen', speak: state.session?.mode === 'speak', score: state.speech?.score ?? null, attempts: state.speech?.attempts ?? 0 };
+  return { think, look: back, dwell: front + back, flips, revisit, away, correct, hinted, plays, kind: state.quiz?.kind ?? null, listen: state.session?.mode === 'listen', speak: state.session?.mode === 'speak' || state.quiz?.kind === 'speak', score: state.speech?.score ?? null, attempts: state.speech?.attempts ?? 0 };
 }
