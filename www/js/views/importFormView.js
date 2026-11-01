@@ -1,5 +1,4 @@
 import { state } from '../state/appState.js';
-import esc from '../util/esc.js';
 import listProjects from '../repo/listProjects.js';
 import header from '../components/header.js';
 import backButton from '../components/backButton.js';
@@ -8,6 +7,7 @@ import row from '../components/row.js';
 import labeledField from '../components/labeledField.js';
 import selectField from '../components/selectField.js';
 import formButtons from '../components/formButtons.js';
+import importPreview from '../components/importPreview.js';
 /** «Импорт» не нашего JSON: пока ничего не разобрано — вставка текста или выбор файла; потом — сводка, проект и колода. */
 export default async function importFormView() {
   const d = state.importDraft, head = header('Импорт', { left: backButton('back') });
@@ -17,8 +17,7 @@ export default async function importFormView() {
       row(button({ act: 'parsePaste', cls: 'p', label: 'Разобрать' }) + button({ act: 'importLibrary', label: 'Файл…' }) + button({ act: 'back', label: 'Отмена' }), 'foot');
   }
   const projects = await listProjects();
-  const sample = d.cards.slice(0, 3).map(c => `${esc(c.front)} — ${esc(c.back)}`).join('<br>');
-  return head + `<div class="muted note">Формат: ${esc(d.format)}<br>Найдено карточек: <b>${d.cards.length}</b></div><div class="preview">${sample}</div>` +
+  return head + importPreview(d) +
     selectField({ id: 'project', label: 'Проект', options: [['', '➕ Новый проект «Импорт»'], ...projects.map(p => [p.id, p.name])], value: projects[0]?.id ?? '' }) +
     labeledField({ id: 'name', label: 'Колода', value: d.name }) + formButtons({ save: 'confirmImport' });
 }

@@ -12,6 +12,7 @@ import itemActions from '../components/itemActions.js';
 import cardMark from '../components/cardMark.js';
 import emptyState from '../components/emptyState.js';
 import row from '../components/row.js';
+import deckSummary from '../components/deckSummary.js';
 /** Колода: карточки (метка срока, ✎ изменить, 🗑 удалить); тап по карточке — тоже правка. */
 export default async function deckView() {
   const [deck, cards] = await Promise.all([getDeckWithProject(state.nav.id), listCards(state.nav.id)]);
@@ -21,5 +22,5 @@ export default async function deckView() {
   }));
   const body = items.length ? pagedList(items) : emptyState({ icon: '🃏', title: 'Карточек нет', text: 'Добавьте первую карточку.' });
   return header(deck.name, { left: backButton('goProject', deck.language_id), right: layoutToggle() }) +
-    `<div class="sub">${deck.pname} · ${cards.length} карточек · повторить ${due} · новых ${fresh}</div>` + body + row(button({ act: 'newCard', cls: 'p', label: '+ Карточка' }), 'foot');
+    deckSummary({ project: deck.pname, cards: cards.length, due, fresh }) + body + row(button({ act: 'newCard', cls: 'p', label: '+ Карточка' }), 'foot');
 }

@@ -12,7 +12,7 @@ import dayStart from '../util/dayStart.js';
 import header from '../components/header.js';
 import pagedList from '../components/pagedList.js';
 import layoutToggle from '../components/layoutToggle.js';
-import entry from '../components/entry.js';
+import statEntry from '../components/statEntry.js';
 import statSheet from '../components/statSheet.js';
 import PARAMS from '../stats/index.js';
 /**
@@ -26,8 +26,6 @@ export default async function statsView() {
     listPronunciationsSince(since), listWeakWords(since, 6)]);
   const params = PARAMS.map(f => f({ rows, total, today, decks, perDeck, hard, dues, speech, weak, since7: dayStart(-6) }));
   const open = /^stat:(\d+)$/.exec(state.sheet ?? '')?.[1];
-  const items = params.map((p, i) => entry({
-    act: 'openStat', id: i, title: p.title, sub: p.sub, lead: `<span class="avatar ico">${p.icon}</span>`, acts: `<span class="badge">${p.value}</span>`
-  }));
+  const items = params.map((stat, index) => statEntry({ stat, index }));
   return header('Статистика', { right: layoutToggle() }) + pagedList(items) + (params[open] ? statSheet(params[open]) : '');
 }

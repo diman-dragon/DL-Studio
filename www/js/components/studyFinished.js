@@ -1,6 +1,6 @@
-import faceBox from '../components/faceBox.js';
-import button from '../components/button.js';
-import row from '../components/row.js';
+import faceBox from './faceBox.js';
+import button from './button.js';
+import row from './row.js';
 import sessionSummary from './sessionSummary.js';
 const DONE = 'Всё повторено! 🎉', NONE = 'Нет карточек', AGAIN = 'Обновить';
 export default function studyFinishedView(session) {

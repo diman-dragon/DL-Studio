@@ -1,5 +1,5 @@
 import { state } from '../state/appState.js';
-import quizControls from '../views/quizControls.js';
+import quizControls from '../components/quizControls.js';
 /** «Подсказка»: ещё одна буква ответа в поле; ответ с подсказкой оценивается как «трудно». */
 export default function hint() {
   const q = state.quiz;

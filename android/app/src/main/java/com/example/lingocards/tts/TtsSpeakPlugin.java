@@ -12,7 +12,7 @@ public class TtsSpeakPlugin extends AtomicPlugin {
 
     @Override protected JSObject handle(PluginCall c) throws Exception {
         boolean wait = Boolean.TRUE.equals(c.getBoolean("wait", false));
-        TtsSay.run(c.getString("text", ""), c.getString("lang", "en-US"), c.getString("voice", ""),
+        TtsSay.run(c.getString("text", ""), c.getString("lang", "en-US"),
             c.getFloat("rate", 1f), c.getFloat("pitch", 1f), wait ? c : null);
         return wait ? null : new JSObject();
     }

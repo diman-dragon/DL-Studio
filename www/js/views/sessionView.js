@@ -7,11 +7,11 @@ import header from '../components/header.js';
 import backButton from '../components/backButton.js';
 import button from '../components/button.js';
 import progressBar from '../components/progressBar.js';
-import studyFace from './studyFace.js';
-import speakFace from './speakFace.js';
-import studyControls from './studyControls.js';
-import quizControls from './quizControls.js';
-import studyFinishedView from './studyFinishedView.js';
+import studyFace from '../components/studyFace.js';
+import speakFace from '../components/speakFace.js';
+import studyControls from '../components/studyControls.js';
+import quizControls from '../components/quizControls.js';
+import studyFinishedView from '../components/studyFinished.js';
 
 /** Экран единственного режима — интервального повторения. */
 export default async function sessionView() {

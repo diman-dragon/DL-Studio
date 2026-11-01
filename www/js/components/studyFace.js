@@ -1,9 +1,9 @@
 import esc from '../util/esc.js';
 import { QUIZ_ASK } from '../constants/QUIZ_ASK.js';
-import flipFaces from '../components/flipFaces.js';
-import speakButton from '../components/speakButton.js';
-import exampleBlock from '../components/exampleBlock.js';
-import big from '../components/big.js';
+import flipFaces from './flipFaces.js';
+import speakButton from './speakButton.js';
+import exampleBlock from './exampleBlock.js';
+import big from './big.js';
 import quizVerdict from './quizVerdict.js';
 /**
  * Лицо — вопрос; оборот — вопрос, ответ, пример. Язык изучаемого слова — front. quiz — вопрос с выбором / вводом (тап не переворачивает).

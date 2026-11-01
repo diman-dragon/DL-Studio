@@ -4,8 +4,8 @@ import buzz from '../dom/buzz.js';
 import trackAnswer from './trackAnswer.js';
 import autoSpeak from './autoSpeak.js';
 import fitFaces from '../dom/fitFaces.js';
-import quizControls from '../views/quizControls.js';
-import quizVerdict from '../views/quizVerdict.js';
+import quizControls from '../components/quizControls.js';
+import quizVerdict from '../components/quizVerdict.js';
 /** Ответ дан: закрываем отсчёт времени, переворачиваем карточку к ответу, показываем итог и «Дальше». */
 export default async function finishQuiz(ok) {
   const q = state.quiz;

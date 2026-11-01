@@ -5,7 +5,7 @@ import prepareSpeech from '../study/prepareSpeech.js';
 import insertPronunciation from '../repo/insertPronunciation.js';
 import currentCard from '../study/currentCard.js';
 import scoreSpeech from '../study/scoreSpeech.js';
-import speechResult from '../views/speechResult.js';
+import speechResult from '../components/speechResult.js';
 import fitFaces from '../dom/fitFaces.js';
 import buzz from '../dom/buzz.js';
 import toast from '../dom/toast.js';

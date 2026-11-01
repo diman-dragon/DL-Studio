@@ -12,9 +12,7 @@ import com.example.lingocards.screen.KeepAwakePlugin;
 import com.example.lingocards.speech.SpeechListenPlugin;
 import com.example.lingocards.saf.SafSavePlugin;
 import com.example.lingocards.tts.TtsSpeakPlugin;
-import com.example.lingocards.tts.TtsInstallPlugin;
 import com.example.lingocards.tts.TtsStopPlugin;
-import com.example.lingocards.tts.TtsVoicesPlugin;
 import com.getcapacitor.Plugin;
 import java.util.Arrays;
 import java.util.List;
@@ -25,5 +23,5 @@ public final class PluginList {
         DbQueryPlugin.class, DbRunPlugin.class, DbBatchPlugin.class,
         SafOpenPlugin.class, SafSavePlugin.class,
         BackupCreatePlugin.class, BackupRestorePlugin.class,
-        TtsSpeakPlugin.class, TtsStopPlugin.class, TtsVoicesPlugin.class, TtsInstallPlugin.class, KeepAwakePlugin.class, SpeechListenPlugin.class, AnkiNotesPlugin.class, IconLevelPlugin.class);
+        TtsSpeakPlugin.class, TtsStopPlugin.class, KeepAwakePlugin.class, SpeechListenPlugin.class, AnkiNotesPlugin.class, IconLevelPlugin.class);
 }

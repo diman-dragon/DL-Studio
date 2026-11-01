@@ -9,7 +9,7 @@ export default function installBridge() {
   const db = new DatabaseSync(':memory:');
   db.exec('PRAGMA foreign_keys=ON');
   readFileSync(SCHEMA, 'utf8').match(/"(CREATE[^"]+)"/g).forEach(s => db.exec(s.slice(1, -1)));
-  const io = { picked: null, saved: null, spoken: null, said: [], voices: [], awake: null, listened: null, heard: null, icon: null, notes: [] };
+  const io = { picked: null, saved: null, spoken: null, said: [], awake: null, listened: null, heard: null, icon: null, notes: [] };
   const lastId = () => Number(db.prepare('SELECT last_insert_rowid() i').get().i);
   const handlers = {
     // как в Java: rawQuery принимает только строки
@@ -22,8 +22,6 @@ export default function installBridge() {
     BackupRestore: () => ({ safety: 'pre-restore-1.db' }),
     TtsSpeak: a => { io.spoken = a; io.said.push(a); return {}; },
     TtsStop: () => ({}),
-    TtsInstall: () => ({}),
-    TtsVoices: () => ({ voices: io.voices }),
     SpeechListen: a => { io.listened = a; if (io.heard instanceof Error) throw io.heard; return io.heard; },
     IconLevel: a => { io.icon = a; return { level: a.level ?? 0 }; },
     AnkiNotes: () => ({ notes: io.notes }),
