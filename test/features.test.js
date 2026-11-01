@@ -133,7 +133,7 @@ test('вопросы: выбор — 4 разных варианта с отве
   assert.equal(new Set(c.options).size, 4);
   assert.ok(c.options.includes(card.back));
   assert.equal(makeQuiz(s, card, 'rev', 'choice').answer, card.front);
-  assert.equal(makeQuiz(s, card, 'fwd', 'type').kind.endsWith('-type'), true);
+  assert.equal(makeQuiz(s, card, 'rev', 'type').kind.endsWith('-type'), true);
   assert.equal(makeQuiz(s, card, 'fwd', 'flip'), null);
 });
 
@@ -142,7 +142,7 @@ test('задания: аудио, пропуск в фразе и произно
   const other = [2, 3, 4].map((id, i) => ({ id, front: `word${id}`, back: `слово${id}`, cloze: `We ___ ${id}.`, cloze_answer: `do${i}` }));
   const s = { map: new Map([card, ...other].map(c => [c.id, c])) };
   assert.equal(makeQuiz(s, card, 'fwd', 'audio-choice').answer, 'делать');
-  assert.equal(makeQuiz(s, card, 'fwd', 'audio-type').kind, 'audio-type');
+  assert.equal(makeQuiz(s, card, 'fwd', 'audio-choice').kind, 'audio-choice');
   assert.equal(makeQuiz(s, card, 'fwd', 'cloze-choice').answer, 'made');
   assert.equal(makeQuiz(s, card, 'fwd', 'cloze-type').prompt, 'I ___ a decision.');
   assert.equal(makeQuiz(s, card, 'fwd', 'speak').answer, 'I made a decision.');
