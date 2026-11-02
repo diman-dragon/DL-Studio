@@ -7,5 +7,5 @@ export default async function restartSession(session) {
   session.map = new Map(cards.map(c => [c.id, c]));
   session.limits = await loadLimits();
   const { order, plan } = buildOrder(session.mode, cards, session.limits);
-  Object.assign(session, { order, plan: new Set(plan), planTotal: plan.length, total: order.length, pos: 0, log: [], tasks: {}, undo: null });
+  Object.assign(session, { order, plan: new Set(plan), planTotal: plan.length, total: order.length, pos: 0, log: [], tasks: {}, shown: {}, undo: null });
 }

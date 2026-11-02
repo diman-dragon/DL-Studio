@@ -52,22 +52,19 @@ test('листание по кругу в обе стороны', async () => {
   assert.equal(s.pos, 2);
 });
 
-test('интервальное повторение: оценка убирает карточку, «Снова» вернётся через 4 карточки и +10 минут', async () => {
+test('интервальное повторение: оценка убирает карточку из сессии, «Снова» не возвращается (расписание нужно следующему плану), +10 минут в базе', async () => {
   const s = await startSession('all', 'srs');
   assert.deepEqual([s.order.length, s.total], [8, 8]);
   await gradeCard(s, 'good');
   assert.equal(s.order.length, 7);
   const c = currentCard(s), before = Date.now();
   await gradeCard(s, 'again');
-  assert.equal(s.order.length, 7);
-  assert.equal(s.order[4], c.id);                      // через 4 карточки, а не в самый конец
+  assert.equal(s.order.length, 6);
+  assert.equal(s.order.includes(c.id), false);
   assert.ok(c.due >= before + 9.9 * 60000 && c.due <= Date.now() + 10.1 * 60000);
   assert.equal((await startSession('all', 'srs')).order.length, 6);   // good → завтра, again → через 10 минут: всё из базы
-  for (let i = 0; i < 4; i++) await gradeCard(s, 'easy');
-  assert.equal(currentCard(s).id, c.id);               // «Снова» вернулась
-  await gradeCard(s, 'good');
-  assert.equal(s.order.length, 2);
-  assert.equal(progressOf(s).text, 'Осталось 2 из 8 · по плану 2');
+  while (s.order.length) await gradeCard(s, 'good');
+  assert.equal(progressOf(s).text, 'Осталось 0 из 8 · ✓ план выполнен');
 });
 
 test('новые карточки: дневной лимит считается на каждую колоду отдельно, уже начатые сегодня учитываются', async () => {
@@ -78,7 +75,7 @@ test('новые карточки: дневной лимит считается 
   const count = (s, id) => [...s.plan].filter(x => s.map.get(x).deck_id === id).length;   // в плане дня
   const a = await per(2, {});
   assert.deepEqual([count(a, deckId), count(a, d2)], [2, 2]);
-  assert.equal(a.order.length, 12);                    // лимит не обрезает очередь: остальные идут после плана
+  assert.equal(a.order.length, 4);                     // очередь = план, сверх него карточек нет
   const b = await per(2, { [deckId]: 1 });
   assert.deepEqual([count(b, deckId), count(b, d2)], [1, 2]);
   const c = await per(5, { [d2]: 5 });
@@ -92,22 +89,13 @@ test('restart: очередь и лимиты заново из базы', async
   assert.deepEqual([s.order.length, s.total, s.pos, s.log.length], [6, 6, 0, 0]);
 });
 
-test('план дня выполнен — учёба продолжается без лимита, «Снова» остаётся в плане', async () => {
+test('сессия — строго по плану дня: сверх плана карточек нет, план выполнен — сессия закончена', async () => {
   const s = await startSession('all', 'srs', { perDay: 2, used: {}, max: 99 });
-  assert.deepEqual([s.planTotal, s.plan.size, s.order.length], [2, 2, 8]);
-  assert.equal(progressOf(s).text, 'Осталось 8 из 8 · по плану 2');
-  const first = currentCard(s);
+  assert.deepEqual([s.planTotal, s.plan.size, s.order.length], [2, 2, 2]);
+  assert.equal(progressOf(s).text, 'Осталось 2 из 2 · по плану 2');
   await gradeCard(s, 'again');
-  assert.deepEqual([s.plan.size, s.plan.has(first.id)], [2, true]);   // «снова» не закрывает план
   await gradeCard(s, 'good');
-  await gradeCard(s, 'good');
-  assert.equal(s.plan.size, 1);
-  while (s.plan.size) await gradeCard(s, 'good');
-  assert.match(progressOf(s).text, /✓ план выполнен/);
-  assert.ok(s.order.length > 0);                                   // дальше — карточки сверх плана
-  const extra = currentCard(s);
-  assert.equal(s.plan.has(extra.id), false);
-  await gradeCard(s, 'good');                                      // сверх плана оценивается так же
-  assert.equal((await listReviewsSince(0)).length, s.log.length);   // всё записано в базу, в том числе сверх плана
+  assert.deepEqual([s.order.length, s.plan.size, currentCard(s)], [0, 0, null]);
+  assert.equal((await listReviewsSince(0)).length, s.log.length);   // всё записано в базу
 });
 

@@ -7,6 +7,7 @@ import insertProject from '../www/js/repo/insertProject.js';
 import startSession from '../www/js/study/startSession.js';
 import currentCard from '../www/js/study/currentCard.js';
 import gradeCard from '../www/js/study/gradeCard.js';
+import quizPick from '../www/js/study/quizPick.js';
 import taskFor from '../www/js/study/taskFor.js';
 import cardDir from '../www/js/study/cardDir.js';
 import loadLimits from '../www/js/study/loadLimits.js';
@@ -79,7 +80,7 @@ test('у каждой колоды свои новые в день и свой �
   const s = await startSession('all', 'srs', limits);
   const inPlan = id => [...s.plan].filter(x => s.map.get(x).deck_id === id).length;
   assert.deepEqual([inPlan(a), inPlan(b)], [2, 3]);   // A — свои 2 новых; B — общие 5, но в плане не больше 3
-  assert.equal(s.order.length, 16);                    // очередь не обрезается
+  assert.equal(s.order.length, 5);                     // очередь = план
 });
 
 test('параметры колоды хранятся в settings и попадают в лимиты сессии; мусор игнорируется', async () => {
@@ -201,4 +202,29 @@ test('удаление колоды и проекта убирает их соб
   await deleteProject(p2);
   assert.deepEqual(Object.keys(await loadDeckPrefs()), [String(b)]);
   assert.ok((await (await import('../www/js/repo/listSettings.js')).default()).some(r => r.key === 'theme'));
+});
+
+test('показы заданий равномерны, ввод с клавиатуры — в 4 раза реже каждого другого', async () => {
+  const s = await startSession('all', 'srs');
+  const card = { id: 1, cloze: 'I ___ it.', cloze_answer: 'made' };
+  const n = { 'visual-choice': 0 };
+  for (let i = 0; i < 400; i++) { const k = quizPick(s, card, 'rev'); n[k] = (n[k] ?? 0) + 1; }
+  const choice = ['visual-choice', 'audio-choice', 'cloze-choice', 'speak'].map(k => n[k]);
+  assert.ok(Math.max(...choice) - Math.min(...choice) <= 1, JSON.stringify(n));
+  for (const k of ['visual-type', 'cloze-type']) assert.ok(Math.abs(n[k] * 4 - n['audio-choice']) <= 4, JSON.stringify(n));
+});
+
+test('ввод слова изучаемого языка предлагается только когда нужно написать его (направление rev); без пропуска нет cloze', async () => {
+  const s = await startSession('all', 'srs');
+  const seen = new Set();
+  for (let i = 0; i < 200; i++) seen.add(quizPick(s, { id: 2 }, 'fwd'));
+  assert.deepEqual([...seen].sort(), ['audio-choice', 'speak', 'visual-choice']);
+});
+
+test('старая очередь не продолжается: «Снова» не возвращается, сверх плана ничего нет', async () => {
+  const s = await startSession('all', 'srs', { perDay: 3, used: {}, max: 99 });
+  const ids = [...s.order];
+  for (let i = 0; i < ids.length; i++) await gradeCard(s, i === 0 ? 'again' : 'good');
+  assert.equal(s.order.length, 0);
+  assert.equal(new Set(s.log.map(l => l.id)).size, ids.length);   // каждая карточка плана — один раз
 });

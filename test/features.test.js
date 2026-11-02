@@ -71,7 +71,7 @@ test('интервальное повторение: просроченные п
   await updateCardSrs(dueId, { due: 1000, interval: 1, ease: 2.5, reps: 1 });
   const lim = (perDay, max) => startSession('all', 'srs', { perDay, used: {}, max });
   const a = await lim(2, 99);
-  assert.deepEqual([a.plan.size, a.order.length, a.order[0]], [3, 8, dueId]);   // план: просроченная + 2 новые; остальные — после плана
+  assert.deepEqual([a.plan.size, a.order.length, a.order[0]], [3, 3, dueId]);   // сессия — только план: просроченная + 2 новые
   assert.equal((await lim(0, 99)).plan.size, 1);                  // лимит новых исчерпан — в плане только просроченные
   assert.equal((await lim(5, 2)).plan.size, 2);                   // размер сессии
 });

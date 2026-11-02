@@ -24,8 +24,8 @@ export default async function gradeCard(session, grade, sig = {}) {
   }
   session.undo.review = await insertReview(card.id, grade, sig, fresh, session.mode);
   markStudied();
-  requeue(session, grade);
-  if (grade !== 'again') session.plan.delete(card.id);   // карточка плана пройдена; «снова» остаётся в плане
+  requeue(session);
+  session.plan.delete(card.id);   // карточка плана пройдена
   session.log.push({ id: card.id, grade });
   if (srs && grade === 'again') await checkLeech(session, card);
 }

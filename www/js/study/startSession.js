@@ -13,6 +13,6 @@ export default async function startSession(scope, mode, limits = NO_LIMITS) {
   const { order, plan } = buildOrder(mode, cards, limits);
   return {
     scope, mode, map: new Map(cards.map(c => [c.id, c])), order, plan: new Set(plan), planTotal: plan.length, pos: 0, total: order.length,
-    limits, calib: await loadCalibration(), log: [], dirs: {}, tasks: {}, undo: null
+    limits, calib: await loadCalibration(), log: [], dirs: {}, tasks: {}, shown: {}, undo: null
   };
 }
