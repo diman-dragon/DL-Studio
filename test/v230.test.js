@@ -7,6 +7,11 @@ import insertProject from '../www/js/repo/insertProject.js';
 import startSession from '../www/js/study/startSession.js';
 import currentCard from '../www/js/study/currentCard.js';
 import gradeCard from '../www/js/study/gradeCard.js';
+import makeQuiz from '../www/js/study/makeQuiz.js';
+import mistakesOf from '../www/js/study/mistakesOf.js';
+import retrySession from '../www/js/study/retrySession.js';
+import orderFresh from '../www/js/study/orderFresh.js';
+import listReviewsSince from '../www/js/repo/listReviewsSince.js';
 import quizPick from '../www/js/study/quizPick.js';
 import taskFor from '../www/js/study/taskFor.js';
 import cardDir from '../www/js/study/cardDir.js';
@@ -92,7 +97,7 @@ test('параметры колоды хранятся в settings и попад
   assert.deepEqual(prefs[a], { newPerDay: '3', pace: '1.3' });
   assert.equal(prefs[b], undefined);
   const limits = await loadLimits();
-  assert.deepEqual(limits.decks[a], { perDay: 3, max: undefined, pace: 1.3 });
+  assert.deepEqual(limits.decks[a], { perDay: 3, max: undefined, inOrder: false, pace: 1.3 });
 });
 
 test('темп колоды: «Чаще» сокращает, «Реже» удлиняет интервал; «Снова» и минимум в сутки не страдают', () => {
@@ -206,6 +211,7 @@ test('удаление колоды и проекта убирает их соб
 
 test('показы заданий равномерны, ввод с клавиатуры — в 4 раза реже каждого другого', async () => {
   const s = await startSession('all', 'srs');
+  for (const c of s.map.values()) c.cloze_answer = `w${c.id}`;
   const card = { id: 1, cloze: 'I ___ it.', cloze_answer: 'made' };
   const n = { 'visual-choice': 0 };
   for (let i = 0; i < 400; i++) { const k = quizPick(s, card, 'rev'); n[k] = (n[k] ?? 0) + 1; }
@@ -227,4 +233,47 @@ test('старая очередь не продолжается: «Снова» 
   for (let i = 0; i < ids.length; i++) await gradeCard(s, i === 0 ? 'again' : 'good');
   assert.equal(s.order.length, 0);
   assert.equal(new Set(s.log.map(l => l.id)).size, ids.length);   // каждая карточка плана — один раз
+});
+
+test('«Повторить ошибки»: круг по карточкам с «Снова», расписание и история не меняются', async () => {
+  const s = await startSession('all', 'srs', { perDay: 2, used: {}, max: 99 });
+  const ids = [...s.order];
+  await gradeCard(s, 'again'); await gradeCard(s, 'good'); await gradeCard(s, 'again'); await gradeCard(s, 'good');
+  assert.deepEqual(mistakesOf(s).sort(), [ids[0], ids[2]].sort());
+  const before = JSON.stringify([...s.map.values()].map(c => [c.id, c.due, c.interval, c.ease, c.reps]));
+  const reviews = (await listReviewsSince(0)).length;
+  retrySession(s);
+  assert.deepEqual([s.order.length, s.retry, s.log.length], [2, true, 0]);
+  await gradeCard(s, 'good'); await gradeCard(s, 'again');
+  assert.equal(JSON.stringify([...s.map.values()].map(c => [c.id, c.due, c.interval, c.ease, c.reps])), before);
+  assert.equal((await listReviewsSince(0)).length, reviews);
+  assert.equal(mistakesOf(s).length, 1);   // можно повторять, пока не останется ошибок
+});
+
+test('порядок новых карточек колоды «По порядку»: как добавлены; у остальных — вперемешку', async () => {
+  const cards = [...(await startSession('d:' + a, 'srs')).map.values()];
+  const shuffled = [...cards].reverse();
+  const out = orderFresh(shuffled, { decks: { [a]: { inOrder: true } } });
+  assert.deepEqual(out.map(c => c.ord), [...cards].map(c => c.ord).sort((x, y) => x - y));
+  assert.deepEqual(orderFresh(shuffled, { decks: {} }), shuffled);
+  const s = await startSession('all', 'srs', { perDay: 3, used: {}, max: 99, decks: { [a]: { inOrder: true } } });
+  const ofA = s.order.filter(id => s.map.get(id).deck_id === a).map(id => s.map.get(id).ord);
+  assert.deepEqual(ofA, [...ofA].sort((x, y) => x - y));
+});
+
+test('разброс интервалов: только от недели и до ±5 %, без него — как раньше', () => {
+  const card = { ease: 2.5, interval: 10, reps: 4, due: 1 };
+  assert.deepEqual([1, -1, 0].map(f => nextSrs(card, 'good', 0, 1, f).interval), [26, 24, 25]);
+  const young = { ease: 2.5, interval: 1, reps: 2, due: 1 };
+  assert.equal(nextSrs(young, 'good', 0, 1, 1).interval, nextSrs(young, 'good', 0, 1, -1).interval);
+});
+
+test('маленькая колода: выбор невозможен — обычная карточка (flip), пропуск вписывают; без распознавания речи нет «произношения»', async () => {
+  const s = { map: new Map([[1, { id: 1, front: 'a', back: 'а' }], [2, { id: 2, front: 'b', back: 'б' }]]), noSpeech: true };
+  const kinds = new Set();
+  for (let i = 0; i < 60; i++) kinds.add(quizPick(s, s.map.get(1), 'rev'));
+  assert.deepEqual([...kinds].sort(), ['flip', 'visual-type']);
+  assert.equal(makeQuiz(s, s.map.get(1), 'fwd', 'visual-choice'), null);
+  s.map.get(1).cloze_answer = 'x'; s.map.get(1).cloze = '_ x';
+  assert.equal(makeQuiz(s, s.map.get(1), 'fwd', 'cloze-choice').kind, 'cloze-type');
 });

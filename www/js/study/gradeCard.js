@@ -8,24 +8,25 @@ import requeue from './requeue.js';
 import checkLeech from './checkLeech.js';
 import markStudied from './markStudied.js';
 import paceOf from './paceOf.js';
+import randomFuzz from './randomFuzz.js';
 /**
- * Оценка карточки. Всё пишется в базу: запись истории (оценка, время, подсказка, прослушивания) и, в интервальном повторении, новое
- * расписание карточки (SM-2, темп — свой у каждой колоды). sig — сигналы поведения и произношения.
- * Перед изменениями запоминается снимок — «↶» (study/undoGrade) вернёт всё как было. Счётчик дня и серия считаются из истории.
+ * Оценка карточки. В базу пишется запись истории (оценка, время, подсказка, прослушивания) и новое расписание карточки (SM-2, темп — свой у колоды,
+ * небольшой разброс длинных интервалов). sig — сигналы поведения и произношения. В «повторе ошибок» (session.retry) ничего не пишется:
+ * расписание и история остаются как были. Перед изменениями запоминается снимок — «↶» (study/undoGrade) вернёт всё как было.
  */
 export default async function gradeCard(session, grade, sig = {}) {
   const card = currentCard(session);
   if (!card) return;
-  const srs = session.mode === 'srs', fresh = srs && isNewCard(card);
+  const live = !session.retry, fresh = live && isNewCard(card);
   session.undo = snapshotGrade(session, card);
-  if (srs) {
-    Object.assign(card, nextSrs(card, grade, Date.now(), paceOf(session, card)));
+  if (live) {
+    Object.assign(card, nextSrs(card, grade, Date.now(), paceOf(session, card), randomFuzz()));
     await updateCardSrs(card.id, card);
+    session.undo.review = await insertReview(card.id, grade, sig, fresh, session.mode);
+    markStudied();
   }
-  session.undo.review = await insertReview(card.id, grade, sig, fresh, session.mode);
-  markStudied();
   requeue(session);
   session.plan.delete(card.id);   // карточка плана пройдена
   session.log.push({ id: card.id, grade });
-  if (srs && grade === 'again') await checkLeech(session, card);
+  if (live && grade === 'again') await checkLeech(session, card);
 }

@@ -37,4 +37,5 @@ LingvaDesk — чистое офлайн-приложение для интер�
 - Замедленный повтор: `components/speakControls.js`, `slowButton.js`, `actions/replaySlow.js`, `tts/speakSlow.js`, `constants/SLOW.js`, `state/slowState.js`, `study/stopSlow.js`.
 - Повторение колоды: `constants/DECK_PREFS|DECK_TITLES|DECK_DEFAULTS`, `settings/loadDeckPrefs|saveDeckPref|deckPrefOf`, `study/loadLimits|deckLimits|takePlan|paceOf`, `srs/nextSrs` (параметр `pace`), экран `views/studyDecksView.js` (без правок: только запуск), правка параметров — форма колоды в библиотеке, плитки `components/deckPrefTiles.js`.
 - Настройки одним экраном: `views/settingsView.js`, `components/settingTiles|prefTile|dataButtons|settingsSheet`, `actions/cyclePref|cycleDeckPref|openSheet`, `util/nextOption.js`.
+- Повтор ошибок: `study/retrySession|mistakesOf`, `actions/retryMistakes`; задания: `study/quizPick|quizPool|checkSpeech`; порядок новых: `study/orderFresh`; разброс: `constants/FUZZ`, `study/randomFuzz`.
 - Слова не рвутся: `dom/fitWords.js` + `dom/wordBroken.js` (вызов из `dom/fitFaces`).

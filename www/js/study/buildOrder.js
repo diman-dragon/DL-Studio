@@ -1,6 +1,7 @@
 import shuffle from '../util/shuffle.js';
 import isNewCard from '../srs/isNewCard.js';
 import takePlan from './takePlan.js';
+import orderFresh from './orderFresh.js';
 import { NO_LIMITS } from '../constants/NO_LIMITS.js';
 /**
  * { order, plan } — очередь id и «план дня» (его начало). Очередь = план: сессия идёт строго по нему.
@@ -18,7 +19,7 @@ export default function buildOrder(mode, all, limits = NO_LIMITS) {
   }
   const now = Date.now();
   const due = cards.filter(c => c.due > 0 && c.due <= now).sort((a, b) => a.due - b.due);
-  const fresh = cards.filter(isNewCard);
+  const fresh = orderFresh(cards.filter(isNewCard), limits);
   const plan = ids(takePlan(due, fresh, limits));
   return { order: [...plan], plan };
 }

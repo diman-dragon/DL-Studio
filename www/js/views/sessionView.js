@@ -17,7 +17,7 @@ import studyFinishedView from '../components/studyFinished.js';
 export default async function sessionView() {
   const s = state.session, card = currentCard(s);
   const undo = s.undo ? button({ act: 'undo', cls: 'sm', label: '↶', aria: 'Отменить последнюю оценку' }) : '';
-  const head = header('Повторение', { left: backButton('back'), right: undo });
+  const head = header(s.retry ? 'Повтор ошибок' : 'Повторение', { left: backButton('back'), right: undo });
   if (!card) return head + studyFinishedView(s);
   const dir = cardDir(s, card);
   if (state.quiz?.id !== card.id) state.quiz = taskFor(s, card, dir);

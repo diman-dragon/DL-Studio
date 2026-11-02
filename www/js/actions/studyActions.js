@@ -18,8 +18,9 @@ import speak from './speak.js';
 import play from './play.js';
 import showText from './showText.js';
 import replaySlow from './replaySlow.js';
+import retryMistakes from './retryMistakes.js';
 import record from './record.js';
 /** Учёба: запуск SRS, переворот, ответы, произношение и отмена оценки. */
 export default {
-  cyclePref, cycleDeckPref, openSheet, closeSheet, openStat, startStudy, flip, pick, check, hint, giveUp, undo, editSessionCard, skip, prev, restart, speak, replaySlow, play, showText, record
+  cyclePref, cycleDeckPref, openSheet, closeSheet, openStat, startStudy, flip, pick, check, hint, giveUp, undo, editSessionCard, skip, prev, restart, speak, replaySlow, retryMistakes, play, showText, record
 };
