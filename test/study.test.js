@@ -64,7 +64,7 @@ test('интервальное повторение: оценка убирает
   assert.ok(c.due >= before + 9.9 * 60000 && c.due <= Date.now() + 10.1 * 60000);
   assert.equal((await startSession('all', 'srs')).order.length, 6);   // good → завтра, again → через 10 минут: всё из базы
   while (s.order.length) await gradeCard(s, 'good');
-  assert.equal(progressOf(s).text, 'Осталось 0 из 8 · ✓ план выполнен');
+  assert.equal(progressOf(s).text, '✓ План выполнен');
 });
 
 test('новые карточки: дневной лимит считается на каждую колоду отдельно, уже начатые сегодня учитываются', async () => {
@@ -92,7 +92,7 @@ test('restart: очередь и лимиты заново из базы', async
 test('сессия — строго по плану дня: сверх плана карточек нет, план выполнен — сессия закончена', async () => {
   const s = await startSession('all', 'srs', { perDay: 2, used: {}, max: 99 });
   assert.deepEqual([s.planTotal, s.plan.size, s.order.length], [2, 2, 2]);
-  assert.equal(progressOf(s).text, 'Осталось 2 из 2 · по плану 2');
+  assert.equal(progressOf(s).text, 'Осталось 2 из 2');
   await gradeCard(s, 'again');
   await gradeCard(s, 'good');
   assert.deepEqual([s.order.length, s.plan.size, currentCard(s)], [0, 0, null]);

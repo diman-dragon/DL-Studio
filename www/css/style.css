@@ -120,6 +120,8 @@ button.tile:active::after{color:var(--accent)}
 .data-grid button{padding:10px 4px;font-size:13px;line-height:1.2;overflow-wrap:anywhere}
 .form .tiles{margin-bottom:6px}.form h3{margin:8px 0 6px 2px}
 
+ul.help{margin:0;padding:0 0 0 18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px;line-height:1.4}
+
 /* ===== Озвучка на карточке: обычная в центре, два замедленных повтора по бокам ===== */
 .speak-row{display:flex;align-items:center;justify-content:center;gap:calc(14px*var(--fit,1));margin:2px 0}
 button.slow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;flex:none;width:calc(84px*var(--fit,1));white-space:nowrap;padding:calc(6px*var(--fit,1)) 2px;line-height:1.1;background:var(--surface2);border-color:transparent;border-radius:var(--r-md)}

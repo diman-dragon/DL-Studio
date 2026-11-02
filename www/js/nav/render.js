@@ -5,14 +5,15 @@ import views from '../views/index.js';
 import tabBar from '../components/tabBar.js';
 import layoutPager from '../pager/layoutPager.js';
 import fitFaces from '../dom/fitFaces.js';
+import helpSheet from '../components/helpSheet.js';
 import setAwake from '../native/setAwake.js';
 import { slow } from '../state/slowState.js';
-/** Экран + нижняя панель (всегда на месте) + постраничный вывод. Анимация проигрывается один раз. Во время учёбы экран не гаснет. */
+/** Экран + справка (если открыта) + нижняя панель (всегда на месте) + постраничный вывод. Анимация проигрывается один раз. Во время учёбы экран не гаснет. */
 export default async function render() {
   state.pager = { items: [], titles: [], fixed: false };
   const body = await views[state.nav.v]();
   const form = state.nav.v.endsWith('Form') ? ' form' : '';
-  appEl.innerHTML = `<div class="view ${state.anim}${form}">${body}</div>${tabBar(TAB_OF[state.nav.v] ?? '')}`;
+  appEl.innerHTML = `<div class="view ${state.anim}${form}">${body}</div>${state.sheet === 'help' ? helpSheet(state.nav.v) : ''}${tabBar(TAB_OF[state.nav.v] ?? '')}`;
   state.anim = '';
   layoutPager();
   fitFaces();

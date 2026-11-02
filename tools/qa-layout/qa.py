@@ -50,6 +50,11 @@ def run(vw, vh, font, shots):
             page.wait_for_timeout(250)
             for result in page.evaluate(CHECK): probs.append((label, result))
             if shots: page.screenshot(path=f'shots/{vw}x{vh}-{font}-{label}.png')
+            if not label.endswith('-help') and page.locator('button.info').count():   # справка ⓘ на каждом экране, кроме настроек
+                page.locator('button.info').first.click(); page.wait_for_timeout(250)
+                for result in page.evaluate(CHECK): probs.append((label + '-help', result))
+                if shots: page.screenshot(path=f'shots/{vw}x{vh}-{font}-{label}-help.png')
+                page.locator('button.sheet-close').click(); page.wait_for_timeout(250)
 
         def act(name, **data):
             selector = f'[data-act="{name}"]' + ''.join(f'[data-{key}="{value}"]' for key, value in data.items())
