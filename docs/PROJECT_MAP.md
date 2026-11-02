@@ -30,3 +30,11 @@ LingvaDesk — чистое офлайн-приложение для интер�
 - `deckio/` — импорт и экспорт.
 - `repo/` — SQL-запросы.
 - `native/` — мост Capacitor и Android-плагины.
+
+## Версия 2.3.0: что где
+- Задание карточки на сессию: `study/taskFor.js` (кэш `session.tasks`), сборка — `study/makeQuiz.js` + `quizAnswer/quizCheck/quizChoices/quizFamily`.
+- «На слух»: `components/audioPrompt.js`, `study/textLater.js` (кнопка через `BEHAVIOR.textAfter`), `actions/showText.js`.
+- Замедленный повтор: `components/speakControls.js`, `slowButton.js`, `actions/replaySlow.js`, `tts/speakSlow.js`, `constants/SLOW.js`, `state/slowState.js`, `study/stopSlow.js`.
+- Повторение колоды: `constants/DECK_PREFS|DECK_TITLES|DECK_DEFAULTS`, `settings/loadDeckPrefs|saveDeckPref|deckPrefOf`, `study/loadLimits|deckLimits|takePlan|paceOf`, `srs/nextSrs` (параметр `pace`), экран `views/studyDecksView.js` (без правок: только запуск), правка параметров — форма колоды в библиотеке, плитки `components/deckPrefTiles.js`.
+- Настройки одним экраном: `views/settingsView.js`, `components/settingTiles|prefTile|dataButtons|settingsSheet`, `actions/cyclePref|cycleDeckPref|openSheet`, `util/nextOption.js`.
+- Слова не рвутся: `dom/fitWords.js` + `dom/wordBroken.js` (вызов из `dom/fitFaces`).

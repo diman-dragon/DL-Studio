@@ -1,6 +1,5 @@
-import esc from '../util/esc.js';
 import flipFaces from './flipFaces.js';
-import speakButton from './speakButton.js';
+import speakControls from './speakControls.js';
 import exampleBlock from './exampleBlock.js';
 import big from './big.js';
 import speechPrompt from './speechPrompt.js';
@@ -11,7 +10,7 @@ import speechPrompt from './speechPrompt.js';
 export default function speakFace(c, flipped, speech = null, quiz = null) {
   const front = speechPrompt(c, speech, quiz);
   const phrase = quiz?.answer || c.front;
-  const back = `${big(phrase)}${big(c.back)}${speakButton(phrase, c.tts)}${exampleBlock(c)}` +
+  const back = `${big(phrase)}${big(c.back)}${speakControls(phrase, c.tts)}${exampleBlock(c)}` +
     '<div class="muted hint">Тап — вернуться · свайп влево — дальше, вправо — назад</div>';
   return flipFaces(front, back, flipped);
 }

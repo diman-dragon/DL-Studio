@@ -20,6 +20,18 @@ CHECK = """
     if (txt && e.scrollWidth>e.clientWidth+1 && cs.display!=='inline') out.push(['scroll-x',path(e),e.scrollWidth,e.clientWidth]);
     if (txt && cs.overflow==='hidden' && e.scrollHeight>e.clientHeight+1) out.push(['scroll-y',path(e),e.scrollHeight,e.clientHeight]);
   }
+  const rng = document.createRange();
+  for (const e of document.querySelectorAll('#app *')) {
+    if (!vis(e) || e.closest('svg') || e.closest('pre')) continue;
+    for (const n of e.childNodes) {
+      if (n.nodeType !== 3) continue;
+      for (const m of n.textContent.matchAll(/[^\\s-]+/g)) {
+        if (m[0].length < 4) continue;
+        rng.setStart(n, m.index); rng.setEnd(n, m.index + m[0].length);
+        if (rng.getClientRects().length > 1) { out.push(['word-break', path(e) + ' «' + m[0].slice(0, 24) + '»', m[0].length, 0]); break; }
+      }
+    }
+  }
   return out;
 }
 """
@@ -27,7 +39,7 @@ CHECK = """
 def run(vw, vh, font, shots):
     probs = []
     with sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=os.environ.get('CHROMIUM', '/opt/pw-browsers/chromium'), args=['--no-sandbox'])
+        browser = p.chromium.launch(executable_path=os.environ.get('CHROMIUM') or None, args=['--no-sandbox'])
         ctx = browser.new_context(viewport={'width': vw, 'height': vh}, device_scale_factor=1, has_touch=True, is_mobile=True)
         ctx.add_init_script(INIT)
         page = ctx.new_page(); errors = []
@@ -59,11 +71,14 @@ def run(vw, vh, font, shots):
             act('goLibrary'); pages(f'library-{layout}')
             act('goProject', id=1); pages(f'project-{layout}')
             act('goDeck', id=1); pages(f'deck-{layout}')
-        act('toggleLayout'); act('goSettings'); pages('settings', 6)
+        act('toggleLayout'); act('goSettings'); pages('settings', 1)
+        for sh in ('json', 'about'):
+            act('openSheet', id=sh); chk(f'sheet-{sh}'); page.locator('button.sheet-close').click(); page.wait_for_timeout(250)
         act('goLibrary'); act('newProject'); chk('project-form'); act('back')
         act('goProject', id=1); act('newDeck'); chk('deck-form'); act('back')
+        act('editDeck', id=1); chk('deck-form-edit'); act('back')
         act('goDeck', id=1); act('newCard'); chk('card-form'); act('back')
-        act('goStudy'); act('startStudy', id='p:1'); page.wait_for_timeout(300)
+        act('goStudy'); act('goStudyProject', id=1); pages('study-decks'); act('startStudy', id='d:1'); page.wait_for_timeout(300)
         for i in range(7):
             chk(f'srs-{i}')
             if page.locator('[data-act="giveUp"]').count(): act('giveUp')

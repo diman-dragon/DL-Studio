@@ -1,4 +1,6 @@
-import setPref from './setPref.js';
+import cyclePref from './cyclePref.js';
+import cycleDeckPref from './cycleDeckPref.js';
+import openSheet from './openSheet.js';
 import startStudy from './startStudy.js';
 import closeSheet from './closeSheet.js';
 import openStat from './openStat.js';
@@ -15,9 +17,9 @@ import restart from './restart.js';
 import speak from './speak.js';
 import play from './play.js';
 import showText from './showText.js';
+import replaySlow from './replaySlow.js';
 import record from './record.js';
-import cycleNativeLang from './cycleNativeLang.js';
 /** Учёба: запуск SRS, переворот, ответы, произношение и отмена оценки. */
 export default {
-  setPref, cycleNativeLang, closeSheet, openStat, startStudy, flip, pick, check, hint, giveUp, undo, editSessionCard, skip, prev, restart, speak, play, showText, record
+  cyclePref, cycleDeckPref, openSheet, closeSheet, openStat, startStudy, flip, pick, check, hint, giveUp, undo, editSessionCard, skip, prev, restart, speak, replaySlow, play, showText, record
 };

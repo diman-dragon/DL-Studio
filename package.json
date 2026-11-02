@@ -1,6 +1,6 @@
 {
   "name": "lingvadesk",
-  "version": "2.2.5",
+  "version": "2.3.1",
   "private": true,
   "description": "LingvaDesk — офлайн-карточки: язык → колода → карточка (Capacitor 6.2.0, Android)",
   "scripts": {

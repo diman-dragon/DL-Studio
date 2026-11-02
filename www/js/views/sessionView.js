@@ -1,7 +1,7 @@
 import { state } from '../state/appState.js';
 import currentCard from '../study/currentCard.js';
 import cardDir from '../study/cardDir.js';
-import makeQuiz from '../study/makeQuiz.js';
+import taskFor from '../study/taskFor.js';
 import progressOf from '../study/progressOf.js';
 import header from '../components/header.js';
 import backButton from '../components/backButton.js';
@@ -17,10 +17,10 @@ import studyFinishedView from '../components/studyFinished.js';
 export default async function sessionView() {
   const s = state.session, card = currentCard(s);
   const undo = s.undo ? button({ act: 'undo', cls: 'sm', label: '↶', aria: 'Отменить последнюю оценку' }) : '';
-  const head = header('Интервальное повторение', { left: backButton('back'), right: undo });
+  const head = header('Повторение', { left: backButton('back'), right: undo });
   if (!card) return head + studyFinishedView(s);
   const dir = cardDir(s, card);
-  if (state.quiz?.id !== card.id) state.quiz = makeQuiz(s, card, dir);
+  if (state.quiz?.id !== card.id) state.quiz = taskFor(s, card, dir);
   const q = state.quiz, flipped = state.revealed || !!q?.result;
   const face = q?.kind === 'speak'
     ? speakFace(card, flipped, state.speech?.id === card.id ? state.speech : null, q)

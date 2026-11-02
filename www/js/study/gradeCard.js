@@ -7,9 +7,10 @@ import snapshotGrade from './snapshotGrade.js';
 import requeue from './requeue.js';
 import checkLeech from './checkLeech.js';
 import markStudied from './markStudied.js';
+import paceOf from './paceOf.js';
 /**
  * Оценка карточки. Всё пишется в базу: запись истории (оценка, время, подсказка, прослушивания) и, в интервальном повторении, новое
- * расписание карточки (SM-2). sig — сигналы поведения и произношения.
+ * расписание карточки (SM-2, темп — свой у каждой колоды). sig — сигналы поведения и произношения.
  * Перед изменениями запоминается снимок — «↶» (study/undoGrade) вернёт всё как было. Счётчик дня и серия считаются из истории.
  */
 export default async function gradeCard(session, grade, sig = {}) {
@@ -18,7 +19,7 @@ export default async function gradeCard(session, grade, sig = {}) {
   const srs = session.mode === 'srs', fresh = srs && isNewCard(card);
   session.undo = snapshotGrade(session, card);
   if (srs) {
-    Object.assign(card, nextSrs(card, grade));
+    Object.assign(card, nextSrs(card, grade, Date.now(), paceOf(session, card)));
     await updateCardSrs(card.id, card);
   }
   session.undo.review = await insertReview(card.id, grade, sig, fresh, session.mode);

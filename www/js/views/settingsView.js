@@ -1,31 +1,9 @@
-import { APP_VERSION } from '../constants/APP_VERSION.js';
-import { APP_NAME } from '../constants/APP_NAME.js';
+import { state } from '../state/appState.js';
 import header from '../components/header.js';
-import button from '../components/button.js';
-import logoMark from '../components/logoMark.js';
-import pagedList from '../components/pagedList.js';
-import prefControl from '../components/prefControl.js';
-import nativeLanguageToggle from '../components/nativeLanguageToggle.js';
-import settingRow from '../components/settingRow.js';
-import settingsGroup from '../components/settingsGroup.js';
-import row from '../components/row.js';
-import settingsTasks from '../components/settingsTasks.js';
-import aboutBlock from '../components/aboutBlock.js';
-import jsonFormat from '../components/jsonFormat.js';
-
-/** Настройки новой модели: нативный язык, SRS, лимиты, формат JSON, данные и внешний вид. */
+import settingTiles from '../components/settingTiles.js';
+import dataButtons from '../components/dataButtons.js';
+import settingsSheet from '../components/settingsSheet.js';
+/** Настройки одним экраном: плитки-переключатели (нажатие — следующее значение по кругу), данные, нижние окна «Формат JSON» и «О приложении». */
 export default async function settingsView() {
-  const look = settingRow('Тема', prefControl('theme'), 'AMOLED — чистый чёрный фон') + settingRow('Размер текста на карточках', prefControl('font')) +
-    settingRow('Анимации', prefControl('anim')) + settingRow('Вибрация', prefControl('haptic'), 'Лёгкий отклик на свайп и переворот');
-  const study = settingRow('Нативный язык', nativeLanguageToggle(), 'Сначала язык системы, затем Русский → Србски → English') +
-    settingRow('Автоозвучка', prefControl('autoplay'), 'Произносить изучаемую сторону при появлении карточки') +
-    settingRow('Задания', settingsTasks());
-  const limits = settingRow('Новых карточек в день', prefControl('newPerDay'), 'Сколько новых карточек добавлять в план каждой колоды') +
-    settingRow('Карточек за сессию', prefControl('sessionMax'), 'Сначала идут просроченные и самые давние карточки');
-  const data = settingRow('Библиотека', row(button({ act: 'importLibrary', label: 'Файл' }) + button({ act: 'importPaste', label: 'Текст' }) + button({ act: 'exportLibrary', label: 'Экспорт' })), 'Импорт: JSON, CSV, TSV, TXT, Anki, Quizlet и Excel') +
-    settingRow('Резервная копия (.fcbak)', row(button({ act: 'backup', cls: 'p', label: 'Создать' }) + button({ act: 'restore', label: 'Восстановить' })), 'Перед восстановлением текущая база сохраняется') +
-    settingRow('Прогресс', button({ act: 'resetProgress', cls: 'd', label: 'Сбросить прогресс обучения' }), 'Карточки и колоды останутся');
-  const about = settingRow(APP_NAME, aboutBlock({ name: 'DL-Studio', version: APP_VERSION, logo: logoMark() }));
-  const pages = [['Вид', look], ['Учёба', study], ['Лимиты', limits], ['Формат JSON', settingRow('Формат проекта', jsonFormat(), 'front — изучаемый язык; back — перевод на нативный язык; example и example_translation — необязательные фразы')], ['Данные', data], ['О нас', about]];
-  return header('Настройки') + pagedList(pages.map(([title, rows]) => settingsGroup(title, rows)), { fixed: true, titles: pages.map(p => p[0]) });
+  return header('Настройки') + `<div class="settings">${settingTiles()}${dataButtons()}</div>` + settingsSheet(state.sheet);
 }
