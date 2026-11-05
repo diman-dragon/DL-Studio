@@ -1,13 +1,7 @@
-node_modules/
 android/.gradle/
 android/build/
 android/app/build/
-android/app/src/main/assets/public/
-android/app/src/main/assets/capacitor*.json
 android/local.properties
 *.iml
 .idea/
-.vscode/*
-!.vscode/extensions.json
 *.jks
-tools/qa-layout/shots/

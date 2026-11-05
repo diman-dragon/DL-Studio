@@ -1,7 +1,17 @@
 # История версий
 
-Версия повышается при каждом изменении: `package.json`, `www/js/constants/APP_VERSION.js` и значение по умолчанию в
-`android/app/build.gradle` меняются вместе (это проверяет `test/version.test.js`). В CI версия берётся из тега `vX.Y.Z`.
+Версия повышается при каждом изменении в `package.json` (из него `android/app/build.gradle` берёт `versionName` и `versionCode`)
+и в верхней записи этого файла.
+
+## 3.0.0
+**Нативный Android-порт: Kotlin + Jetpack Compose вместо WebView/Capacitor.** Данные, подпись и `applicationId` прежние — APK ставится поверх 2.x без потери данных.
+- **Данные:** та же БД `lingocards-clean.db`, схема v6 (`languages` = проекты, `decks.language_id`, `cards.example_tr`, `reviews.grade` TEXT) и те же миграции 1→6. Room убран: он сверял схему с другой (`project_id`, `native_language`, …) и со `fallbackToDestructiveMigration` стёр бы данные пользователя.
+- **Обновление поверх:** возвращены `applicationId com.example.lingocards` (в порте был `com.lingvadesk.app`), постоянный ключ `lingvadesk-debug.keystore`, `versionCode = версия × 1000 + номер запуска CI` (в порте — `30000`, меньше установленного), версия — из `package.json`, имя APK `LingvaDesk-<версия>-debug.apk`, `minSdk 22`, псевдонимы значка `com.example.lingocards.IconL0…3`.
+- **SRS:** алгоритм портирован из `srs/nextSrs.js` (оценки again/hard/good/easy, «мягкий» провал, темп колоды, разброс до ±5 %); в порте был числовой SM-2 с оценкой 0–5 и `reviews.grade` как число. Оценка по поведению — `srs/inferGrade` + `speechGrade`, сходство речи — `scoreSpeech`.
+- **Учёба:** план сессии по лимитам колод (новых в день, размер плана, порядок, темп), задания (переворот, выбор, ввод, на слух, пропуск, произношение), повтор ошибок, ↶ отмена, серии и «сегодня» из истории.
+- **Экраны:** Учёба → Статистика → Библиотека → Настройки; CRUD проектов/колод/карточек, параметры колоды, импорт/экспорт JSON, резервная копия `.fcbak` (совместима с 2.x), значок по уровню «тревоги».
+- **Исправлено в порте:** дубль `LingvaApplication` (папка `com/lingvadesk.app`), активность в манифесте указывала не на тот класс, ресиверу значка не было класса, `FAIL_ON_PROJECT_REPOS` + `allprojects { repositories }` ломали сборку, тема `Theme.AppCompat` без зависимости AppCompat, Java-плагины Capacitor без зависимости Capacitor, `StudyViewModel` считал SRS и не сохранял результат, `Review.look` = число просмотров вместо времени, экраны были заглушками.
+- Удалён весь мёртвый код: Java-плагины Capacitor, JS-тесты и инструменты (`test/`, `scripts/`, `tools/`), неиспользуемые методы репозитория, поля моделей (`Card.speaker`, `Deck.kind/created`, `DeckStat.mature`, `Review.mode`, …), ветка речи в `inferGrade`, настройка «Родной язык» (ничего её не читало), зависимости/разрешения (androidTest, tooling, `RECORD_AUDIO`), исходники `assets/`, устаревшие `ARCHITECTURE.md`/`DECISIONS.md`. Юнит-тесты домена — `android/app/src/test`.
 
 ## 2.4.0
 - **Повторить ошибки:** в конце сессии, если были «Снова», кнопка «Повторить ошибки (N)» — ещё один круг по этим карточкам. Расписание и история при этом не меняются; круг можно повторять, пока не останется ошибок (`study/retrySession`, `mistakesOf`).

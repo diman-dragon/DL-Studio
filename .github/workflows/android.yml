@@ -19,22 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22   # node:sqlite для интеграционных тестов
-
-      - name: Install npm deps
-        run: npm install
-
       - name: Read app version
         id: ver
         run: echo "v=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
-
-      - name: Check architecture rules
-        run: npm run check
-
-      - name: Unit + integration tests
-        run: npm test
 
       - uses: actions/setup-java@v4
         with:
@@ -46,10 +33,11 @@ jobs:
         with:
           gradle-version: 8.2.1
 
-      - name: Capacitor sync
-        run: npx cap sync android
+      - name: Unit tests
+        working-directory: android
+        run: gradle testDebugUnitTest --no-daemon
 
-      # Версия берётся из package.json, подпись — постоянный ключ из репозитория:
+      # Версия — из package.json, подпись — постоянный ключ из репозитория:
       # каждый APK устанавливается поверх предыдущего без удаления приложения.
       - name: Build debug APK
         working-directory: android
@@ -60,7 +48,6 @@ jobs:
           name: LingvaDesk-${{ steps.ver.outputs.v }}-debug
           path: android/app/build/outputs/apk/debug/*.apk
 
-      # ---- релиз по тегу vX.Y.Z (подпись: свои секреты, иначе постоянный ключ) ----
       - name: Decode release keystore
         if: startsWith(github.ref, 'refs/tags/v') && env.KEYSTORE_BASE64 != ''
         run: echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"

@@ -1,6 +1,6 @@
 # LingvaDesk
 
-Офлайн-приложение для изучения языков на флешкартах. Android, Capacitor 6.2.0 + нативные Java-плагины.
+Офлайн-приложение для изучения языков на флешкартах. Нативный Android (**Kotlin + Jetpack Compose**, версия 3.0.0), БД SQLite прежней схемы v6.
 Структура данных: **проект → колода → карточка** (проект — язык, даты, что угодно).
 
 ## Возможности
@@ -23,7 +23,7 @@
 2. **Actions → Android build → последний запуск → Artifacts → `LingvaDesk-<версия>-debug` (внутри `LingvaDesk-<версия>-debug.apk`)** (запускается на push, PR и вручную).
 3. Установка **поверх** предыдущей версии, без удаления — см. `docs/UPDATES.md`.
 
-CI: Node 22 → `npm install` → проверка архитектуры → тесты → JDK 17 → Gradle 8.2.1 → `cap sync` → `assembleDebug`.
+CI: JDK 17 → Gradle 8.2.1 → юнит-тесты → `assembleDebug`.
 Wrapper-jar не нужен: Gradle ставится в CI.
 
 ### Подписанный релиз (по желанию)
@@ -41,21 +41,12 @@ Wrapper-jar не нужен: Gradle ставится в CI.
 Затем `git tag v1.0.0 && git push --tags` — CI соберёт подписанный APK и приложит к GitHub Release.
 Храните keystore: без него обновления не встанут поверх установленной версии.
 
-## Локальный запуск (VS Code / Android Studio)
-Нужны Node 22+, JDK 17, Android Studio (SDK 34, эмулятор).
-```bash
-npm install
-npm test               # SRS, импорт/экспорт, обучение, сквозной UI-сценарий, index.html
-npm run check          # правила архитектуры
-npx cap sync android   # копирует www/ в Android-проект
-npx cap open android   # Android Studio → Run
-```
-Gradle wrapper создаст Android Studio; из консоли: `cd android && gradle wrapper --gradle-version 8.2.1`.
-Логику интерфейса можно править в VS Code (`www/js`), Java-плагины — в `android/app/src/main/java`.
+## Локальный запуск (Android Studio)
+Нужны JDK 17 и Android Studio (SDK 34). Откройте папку `android/`, дождитесь синхронизации, Run.
+Из консоли: `cd android && gradle wrapper --gradle-version 8.2.1 && ./gradlew testDebugUnitTest assembleDebug`.
+Версия берётся из `package.json` (меняйте её и верхнюю запись `CHANGELOG.md`). `applicationId` и ключ подписи не менять — см. `docs/UPDATES.md`.
 
 ## Документация
-- `docs/ARCHITECTURE.md` — структура, модель данных, обучение, backup
-- `docs/CONVENTIONS.md` — правила кода (один файл — одна функция, без дублирования)
-- `docs/FORMATS.md` — форматы библиотеки, колоды и `.fcbak` (примеры: `examples/library.json`, `examples/deck.json`)
+- `docs/CONVENTIONS.md` — правила кода (Kotlin)
+- `docs/FORMATS.md` — форматы библиотеки, колоды и `.fcbak`
 - `docs/UPDATES.md` — как обновляться поверх без потери данных
-- `docs/DECISIONS.md` — что взято из каждой версии проекта и как разрешены противоречия

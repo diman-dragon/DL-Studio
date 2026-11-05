@@ -1,3 +1,3 @@
 # Для Claude
-Перед любой работой прочитай `docs/PROJECT_MAP.md` (карта: где что и когда; это п. 1 конвенций `docs/CONVENTIONS.md`) — целиком проект не читай, открывай только нужные файлы из карты.
-После изменений: обнови карту (разделы 2, 3, 9), поднимай версию в трёх местах + `CHANGELOG.md`, запускай `npm test` и `npm run check`.
+Проект — нативный Android (Kotlin/Compose), версия в `package.json`. Домен (`domain/`) — чистый Kotlin без Android; его тесты — `android/app/src/test`.
+После изменений: поднимай версию в `package.json` + `CHANGELOG.md`, `applicationId`, ключ подписи и схему БД v6 (`data/local/LingvaDatabase.kt`) не менять без миграции.
