@@ -3,6 +3,10 @@
 Версия повышается при каждом изменении в `package.json` (из него `android/app/build.gradle` берёт `versionName` и `versionCode`)
 и в верхней записи этого файла.
 
+## 3.0.1
+### Исправления сборки
+- Исправлены ошибки компиляции Kotlin в импорте библиотеки и на экране «Учёба».
+
 ## 3.0.0
 **Нативный Android-порт: Kotlin + Jetpack Compose вместо WebView/Capacitor.** Данные, подпись и `applicationId` прежние — APK ставится поверх 2.x без потери данных.
 - **Данные:** та же БД `lingocards-clean.db`, схема v6 (`languages` = проекты, `decks.language_id`, `cards.example_tr`, `reviews.grade` TEXT) и те же миграции 1→6. Room убран: он сверял схему с другой (`project_id`, `native_language`, …) и со `fallbackToDestructiveMigration` стёр бы данные пользователя.

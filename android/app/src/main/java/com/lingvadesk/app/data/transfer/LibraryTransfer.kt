@@ -84,7 +84,8 @@ class LibraryTransfer @Inject constructor(
         try {
             for (i in 0 until projects.length()) {
                 val pj = projects.optJSONObject(i) ?: continue
-                val pname = pj.optString("name").trim().ifEmpty { continue }
+                val pname = pj.optString("name").trim()
+                if (pname.isEmpty()) continue
                 var pid = db.rawQuery("SELECT id FROM languages WHERE name = ?", arrayOf(pname)).use { if (it.moveToFirst()) it.getLong(0) else -1L }
                 if (pid < 0) {
                     pid = db.insertOrThrow("languages", null, ContentValues().apply { put("name", pname); put("tts", pj.optString("tts", "en-US").ifBlank { "en-US" }) }); p++
@@ -92,7 +93,8 @@ class LibraryTransfer @Inject constructor(
                 val decks = pj.optJSONArray("decks") ?: continue
                 for (j in 0 until decks.length()) {
                     val dj = decks.optJSONObject(j) ?: continue
-                    val dname = dj.optString("name").trim().ifEmpty { continue }
+                    val dname = dj.optString("name").trim()
+                    if (dname.isEmpty()) continue
                     var did = db.rawQuery("SELECT id FROM decks WHERE language_id = ? AND name = ?", arrayOf(pid.toString(), dname)).use { if (it.moveToFirst()) it.getLong(0) else -1L }
                     if (did < 0) {
                         did = db.insertOrThrow("decks", null, ContentValues().apply { put("language_id", pid); put("name", dname); put("created", System.currentTimeMillis()) }); d++
