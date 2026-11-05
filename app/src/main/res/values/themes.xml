@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Окно только держит фон до первого кадра Compose; сам интерфейс красит DlTheme -->
+    <style name="Theme.DlStudio" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+</resources>

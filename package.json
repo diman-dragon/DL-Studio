@@ -1,6 +1,0 @@
-{
-  "name": "lingvadesk",
-  "version": "3.0.1",
-  "private": true,
-  "description": "LingvaDesk — офлайн-карточки: проект → колода → карточка (нативный Android, Kotlin + Jetpack Compose)"
-}

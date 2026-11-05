@@ -1,0 +1,8 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "check (структура)", "type": "shell", "command": "node scripts/check.mjs", "group": "test" },
+    { "label": "test", "type": "shell", "command": "./gradlew testDebugUnitTest", "group": "test" },
+    { "label": "assembleDebug", "type": "shell", "command": "./gradlew assembleDebug", "group": "build" }
+  ]
+}

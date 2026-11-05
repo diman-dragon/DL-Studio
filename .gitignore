@@ -1,7 +1,6 @@
-android/.gradle/
-android/build/
-android/app/build/
-android/local.properties
-*.iml
+.gradle/
+build/
+local.properties
 .idea/
-*.jks
+*.iml
+.kotlin/
