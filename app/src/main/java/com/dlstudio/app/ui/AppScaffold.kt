@@ -1,5 +1,6 @@
 package com.dlstudio.app.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -13,6 +14,7 @@ import com.dlstudio.app.ui.components.Tabs
 import kotlinx.coroutines.launch
 
 /** Четыре экрана в `HorizontalPager` (свайп) + нижние вкладки; обе стороны управляют одним состоянием. */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppScaffold(state: AppState, vm: AppViewModel, onFolder: () -> Unit) {
     val pager = rememberPagerState { Tabs.all.size }

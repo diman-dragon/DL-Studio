@@ -1,5 +1,6 @@
 package com.dlstudio.app.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
@@ -7,6 +8,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 
 /** Системная «Назад»: с любого экрана — на первый (Учёба); на первом — выход из приложения. */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PagerBack(pager: PagerState) {
     val scope = rememberCoroutineScope()
