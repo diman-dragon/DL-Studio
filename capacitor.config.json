@@ -1,9 +1,0 @@
-{
-  "appId": "com.example.lingocards",
-  "appName": "DL-Studio",
-  "webDir": "www",
-  "android": {
-    "allowMixedContent": false,
-    "minWebViewVersion": 80
-  }
-}
