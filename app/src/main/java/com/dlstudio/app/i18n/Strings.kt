@@ -14,6 +14,7 @@ interface Strings {
     val previous: String; val next: String; val noCards: String; val statsOverview: String; val statsProjects: String; val statsDecks: String
     val statsCards: String; val statsStudied: String; val statsProgress: String; val statsEmpty: String; val speechVoice: String
     val speechRate: String; val speechPitch: String; val importFormat: String; val importPick: String; val importEmpty: String
+    val allDecks: String; val allCards: String; val chooseProject: String; val chooseDeck: String; val flipHint: String
     /** Тексты библиотеки по уровню: 0 — проект, 1 — колода, 2 — карточка. */
     fun addTitle(level: Int): String
     fun editTitle(level: Int): String

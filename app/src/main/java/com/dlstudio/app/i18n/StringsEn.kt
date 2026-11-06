@@ -13,6 +13,7 @@ object StringsEn : Strings {
     override val showAnswer = "Show translation"; override val hintButton = "Hint"; override val speak = "Speak"; override val previous = "Previous"; override val next = "Next"; override val noCards = "Add cards to your library to start studying here."
     override val statsOverview = "Study overview"; override val statsProjects = "Projects"; override val statsDecks = "Decks"; override val statsCards = "Cards"; override val statsStudied = "Studied"; override val statsProgress = "Library progress"; override val statsEmpty = "Your progress will appear here after the first card."
     override val speechVoice = "Android speech"; override val speechRate = "Speech rate"; override val speechPitch = "Voice pitch"
+    override val allDecks = "All decks"; override val allCards = "All cards"; override val chooseProject = "Choose a project"; override val chooseDeck = "Choose a deck"; override val flipHint = "Tap the card to flip it"
     override val importFormat = "One card per line: a word and its translation separated by “;”, a tab or “ - ”, for example “cat;кот”. CSV, TSV, TXT (including Anki and Quizlet exports) and JSON work. A first row “word;translation;deck” splits the cards into decks."
     override val importPick = "Choose file"; override val importEmpty = "No cards found in the file. Lines like “word;translation” are expected."
     override fun addTitle(level: Int) = listOf("New project", "New deck", "New card")[level]
