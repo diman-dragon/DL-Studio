@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.ui.theme.LocalStrings
-import com.dlstudio.app.ui.components.DlAction
 import com.dlstudio.app.ui.components.DlModal
 
 /** Создание/правка: название (у карточки — лицевая сторона) и, для карточки, обратная сторона. */
@@ -26,7 +25,7 @@ fun EditDialog(level: Int, node: LibNode?, onSave: (String, String, String, Stri
     var explanation by remember { mutableStateOf(node?.explanation.orEmpty()) }
     var example by remember { mutableStateOf(node?.example.orEmpty()) }
     val wide = Modifier.fillMaxWidth()
-    DlModal(if (node == null) s.addTitle(level) else s.editTitle(level), onDismiss) {
+    DlModal.Shell(if (node == null) s.addTitle(level) else s.editTitle(level), onDismiss) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(name, { name = it }, wide, singleLine = level < 2, label = { Text(s.nameLabel(level)) })
                 if (level == 2) OutlinedTextField(back, { back = it }, wide, label = { Text(s.cardBack) })
@@ -35,9 +34,9 @@ fun EditDialog(level: Int, node: LibNode?, onSave: (String, String, String, Stri
                 if (level == 2) OutlinedTextField(example, { example = it }, wide, label = { Text(s.cardExample) })
             }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            DlAction(s.cancel, onDismiss, outlined = true)
+            DlModal.Action(s.cancel, onDismiss, outlined = true)
             Spacer(Modifier.width(8.dp))
-            DlAction(s.save, { onSave(name.trim(), back.trim(), hint.trim(), explanation.trim(), example.trim()) }, enabled = name.isNotBlank())
+            DlModal.Action(s.save, { onSave(name.trim(), back.trim(), hint.trim(), explanation.trim(), example.trim()) }, enabled = name.isNotBlank())
         }
     }
 }

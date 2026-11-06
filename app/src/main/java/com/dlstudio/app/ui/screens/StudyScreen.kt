@@ -18,31 +18,16 @@ import com.dlstudio.app.library.LibraryViewModel
 import com.dlstudio.app.data.Prefs
 import com.dlstudio.app.ui.theme.LocalStrings
 
-private fun List<LibNode>.cards(depth: Int = 0): List<LibNode> = flatMap { node ->
-    if (depth >= 2) listOf(node) else node.children.cards(depth + 1)
-}
-
 @Composable
 fun StudyScreen(vm: LibraryViewModel = viewModel()) {
     val s = LocalStrings.current
     val state by vm.state.collectAsStateWithLifecycle()
+    fun List<LibNode>.cards(depth: Int = 0): List<LibNode> = flatMap { if (depth >= 2) listOf(it) else it.children.cards(depth + 1) }
     val cards = remember(state.items) { state.items.cards() }
-    var index by remember { mutableIntStateOf(0) }
-    var revealed by remember { mutableStateOf(false) }
-    var showHint by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-    val card = cards.getOrNull(index)
-    var tts by remember { mutableStateOf<TextToSpeech?>(null) }
-    DisposableEffect(Unit) {
-        val engine = TextToSpeech(context) { }
-        val prefs = Prefs(context)
-        engine.setSpeechRate(prefs.speechRate)
-        engine.setPitch(prefs.speechPitch)
-        tts = engine
-        onDispose { engine.stop(); engine.shutdown() }
-    }
-    LaunchedEffect(cards.size) { index = index.coerceIn(0, (cards.size - 1).coerceAtLeast(0)) }
-    LaunchedEffect(index) { revealed = false; showHint = false }
+    var index by remember { mutableIntStateOf(0) }; var revealed by remember { mutableStateOf(false) }; var showHint by remember { mutableStateOf(false) }
+    val context = LocalContext.current; val card = cards.getOrNull(index); var tts by remember { mutableStateOf<TextToSpeech?>(null) }
+    DisposableEffect(Unit) { val engine = TextToSpeech(context) { }; val prefs = Prefs(context); engine.setSpeechRate(prefs.speechRate); engine.setPitch(prefs.speechPitch); tts = engine; onDispose { engine.stop(); engine.shutdown() } }
+    LaunchedEffect(cards.size) { index = index.coerceIn(0, (cards.size - 1).coerceAtLeast(0)) }; LaunchedEffect(index) { revealed = false; showHint = false }
     Column(Modifier.fillMaxSize().padding(20.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text(s.tabStudy, style = MaterialTheme.typography.headlineMedium)
         if (card == null) {
@@ -60,8 +45,8 @@ fun StudyScreen(vm: LibraryViewModel = viewModel()) {
                         if (showHint && card.hint.isNotBlank()) Text(card.hint, color = MaterialTheme.colorScheme.primary, textAlign = TextAlign.Center)
                         Button({ revealed = true; vm.markStudied() }) { Text(s.showAnswer) }
                     } else {
-                        if (card.explanation.isNotBlank()) Detail("Пояснение", card.explanation)
-                        if (card.example.isNotBlank()) Detail("Пример", card.example)
+                        if (card.explanation.isNotBlank()) Column(Modifier.fillMaxWidth()) { Text("Пояснение", color = MaterialTheme.colorScheme.primary); Text(card.explanation) }
+                        if (card.example.isNotBlank()) Column(Modifier.fillMaxWidth()) { Text("Пример", color = MaterialTheme.colorScheme.primary); Text(card.example) }
                         OutlinedButton({ tts?.speak(card.back, TextToSpeech.QUEUE_FLUSH, null, "answer") }, enabled = card.back.isNotBlank()) { Text(s.speak) }
                     }
                 }
@@ -71,13 +56,5 @@ fun StudyScreen(vm: LibraryViewModel = viewModel()) {
                 Button({ index = (index + 1).coerceAtMost(cards.lastIndex) }, enabled = index < cards.lastIndex) { Text(s.next) }
             }
         }
-    }
-}
-
-@Composable
-private fun Detail(title: String, text: String) {
-    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(title, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-        Text(text, style = MaterialTheme.typography.bodyLarge)
     }
 }

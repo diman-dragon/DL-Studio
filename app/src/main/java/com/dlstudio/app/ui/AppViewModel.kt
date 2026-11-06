@@ -24,25 +24,13 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, folderName(app, prefs), prefs.speechRate, prefs.speechPitch))
     val state: StateFlow<AppState> = mutable.asStateFlow()
 
-    init {
-        // структура DL-Studio существует с первого запуска
-        viewModelScope.launch(Dispatchers.IO) { runCatching { ensureLayout(openParent(app, prefs)) } }
-    }
+    init { viewModelScope.launch(Dispatchers.IO) { runCatching { ensureLayout(openParent(app, prefs)) } } }
 
-    fun cycleTheme() {
-        prefs.theme = prefs.theme.cycleNext()
-        mutable.update { it.copy(theme = prefs.theme) }
-    }
+    fun cycleTheme() { prefs.theme = prefs.theme.cycleNext(); mutable.update { it.copy(theme = prefs.theme) } }
 
-    fun cycleLang() {
-        prefs.lang = prefs.lang.cycleNext()
-        mutable.update { it.copy(lang = prefs.lang) }
-    }
+    fun cycleLang() { prefs.lang = prefs.lang.cycleNext(); mutable.update { it.copy(lang = prefs.lang) } }
 
-    fun setAccent(accent: AccentColor) {
-        prefs.accent = accent
-        mutable.update { it.copy(accent = accent) }
-    }
+    fun setAccent(accent: AccentColor) { prefs.accent = accent; mutable.update { it.copy(accent = accent) } }
 
     fun pickFolder(tree: Uri) {
         if (mutable.value.status == StorageStatus.MOVING) return

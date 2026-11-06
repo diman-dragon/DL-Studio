@@ -10,8 +10,8 @@ import com.dlstudio.app.ui.theme.LocalStrings
 @Composable
 fun AboutDialog(onClose: () -> Unit) {
     val s = LocalStrings.current
-    DlModal("${s.aboutTitle} ${BuildConfig.VERSION_NAME}", onClose) {
+    DlModal.Shell("${s.aboutTitle} ${BuildConfig.VERSION_NAME}", onClose) {
         Text(s.aboutText)
-        androidx.compose.foundation.layout.Row(androidx.compose.ui.Modifier.fillMaxWidth(), horizontalArrangement = androidx.compose.foundation.layout.Arrangement.End) { DlAction(s.close, onClose) }
+        androidx.compose.foundation.layout.Row(androidx.compose.ui.Modifier.fillMaxWidth(), horizontalArrangement = androidx.compose.foundation.layout.Arrangement.End) { DlModal.Action(s.close, onClose) }
     }
 }

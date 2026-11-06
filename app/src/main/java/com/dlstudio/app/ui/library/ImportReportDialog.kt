@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Arrangement
 import com.dlstudio.app.library.ImportReport
-import com.dlstudio.app.ui.components.DlAction
 import com.dlstudio.app.ui.components.DlModal
 import com.dlstudio.app.ui.theme.LocalStrings
 
@@ -14,8 +13,8 @@ import com.dlstudio.app.ui.theme.LocalStrings
 @Composable
 fun ImportReportDialog(report: ImportReport, onClose: () -> Unit) {
     val s = LocalStrings.current
-    DlModal(onDismiss = onClose) {
+    DlModal.Shell(onDismiss = onClose) {
         Text(if (report.cards > 0) s.importDone(report.cards) else s.importEmpty)
-        Row(androidx.compose.ui.Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { DlAction(s.close, onClose) }
+        Row(androidx.compose.ui.Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { DlModal.Action(s.close, onClose) }
     }
 }

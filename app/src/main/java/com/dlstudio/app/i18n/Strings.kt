@@ -6,49 +6,14 @@ import com.dlstudio.app.settings.ThemeMode
 
 /** Все тексты интерфейса. Новый язык = новая реализация; забытая строка не соберётся. */
 interface Strings {
-    val tabStudy: String
-    val tabStats: String
-    val tabLibrary: String
-    val tabSettings: String
-    val stubHint: String
-    val settingTheme: String
-    val settingLanguage: String
-    val settingAccent: String
-    val settingFolder: String
-    val settingAbout: String
-    val folderDefault: String
-    val aboutTitle: String
-    val aboutText: String
-    val close: String
-    val viewCards: String
-    val viewList: String
-    val edit: String
-    val delete: String
-    val save: String
-    val cancel: String
-    val cardBack: String
-    val cardHint: String
-    val cardExplanation: String
-    val cardExample: String
-    val showAnswer: String
-    val hintButton: String
-    val speak: String
-    val previous: String
-    val next: String
-    val noCards: String
-    val statsOverview: String
-    val statsProjects: String
-    val statsDecks: String
-    val statsCards: String
-    val statsStudied: String
-    val statsProgress: String
-    val statsEmpty: String
-    val speechVoice: String
-    val speechRate: String
-    val speechPitch: String
-    val importFormat: String
-    val importPick: String
-    val importEmpty: String
+    val tabStudy: String; val tabStats: String; val tabLibrary: String; val tabSettings: String; val stubHint: String
+    val settingTheme: String; val settingLanguage: String; val settingAccent: String; val settingFolder: String; val settingAbout: String
+    val folderDefault: String; val aboutTitle: String; val aboutText: String; val close: String; val viewCards: String; val viewList: String
+    val edit: String; val delete: String; val save: String; val cancel: String; val cardBack: String; val cardHint: String
+    val cardExplanation: String; val cardExample: String; val showAnswer: String; val hintButton: String; val speak: String
+    val previous: String; val next: String; val noCards: String; val statsOverview: String; val statsProjects: String; val statsDecks: String
+    val statsCards: String; val statsStudied: String; val statsProgress: String; val statsEmpty: String; val speechVoice: String
+    val speechRate: String; val speechPitch: String; val importFormat: String; val importPick: String; val importEmpty: String
     /** Тексты библиотеки по уровню: 0 — проект, 1 — колода, 2 — карточка. */
     fun addTitle(level: Int): String
     fun editTitle(level: Int): String

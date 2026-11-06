@@ -16,25 +16,20 @@ import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.library.LibraryViewModel
 import com.dlstudio.app.ui.theme.LocalStrings
 
-private fun List<LibNode>.atDepth(depth: Int): List<LibNode> = if (depth == 0) this else flatMap { it.children.atDepth(depth - 1) }
-private fun List<LibNode>.cards(): List<LibNode> = atDepth(2)
-
 @Composable
 fun StatsScreen(vm: LibraryViewModel = viewModel()) {
     val s = LocalStrings.current
     val state by vm.state.collectAsStateWithLifecycle()
-    val projects = state.items.size
-    val decks = state.items.atDepth(1).size
-    val cards = state.items.cards().size
+    fun List<LibNode>.atDepth(depth: Int): List<LibNode> = if (depth == 0) this else flatMap { it.children.atDepth(depth - 1) }
+    val projects = state.items.size; val decks = state.items.atDepth(1).size; val cards = state.items.atDepth(2).size
     val studied = state.studiedCards.coerceAtMost(cards)
     val progress = if (cards == 0) 0f else studied.toFloat() / cards
+    @Composable fun statCard(label: String, value: String, modifier: Modifier) { Surface(modifier, shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surfaceVariant) { Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { Text(value, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary); Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) } } }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         Text(s.tabStats, style = MaterialTheme.typography.headlineMedium)
         Text(s.statsOverview, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            StatCard(s.statsProjects, projects.toString(), Modifier.weight(1f))
-            StatCard(s.statsDecks, decks.toString(), Modifier.weight(1f))
-            StatCard(s.statsCards, cards.toString(), Modifier.weight(1f))
+            statCard(s.statsProjects, projects.toString(), Modifier.weight(1f)); statCard(s.statsDecks, decks.toString(), Modifier.weight(1f)); statCard(s.statsCards, cards.toString(), Modifier.weight(1f))
         }
         Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp), color = MaterialTheme.colorScheme.surfaceVariant) {
             Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -49,15 +44,5 @@ fun StatsScreen(vm: LibraryViewModel = viewModel()) {
             }
         }
         if (cards == 0 || studied == 0) Text(s.statsEmpty, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
-
-@Composable
-private fun StatCard(label: String, value: String, modifier: Modifier = Modifier) {
-    Surface(modifier, shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surfaceVariant) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(value, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary)
-            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
     }
 }
