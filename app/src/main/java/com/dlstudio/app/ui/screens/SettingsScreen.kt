@@ -32,7 +32,7 @@ import com.dlstudio.app.ui.theme.LocalStrings
 
 /** Настройки: переключатели по тапу по кругу (тема, язык), выбор акцентного цвета, папка, «О нас». */
 @Composable
-fun SettingsScreen(state: AppState, onTheme: () -> Unit, onLang: () -> Unit, onAccent: (AccentColor) -> Unit, onFolder: () -> Unit, onSpeechRate: () -> Unit, onSpeechPitch: () -> Unit, onSpeechVoice: (String?) -> Unit) {
+fun SettingsScreen(state: AppState, onTheme: () -> Unit, onLang: () -> Unit, onAccent: (AccentColor) -> Unit, onFolder: () -> Unit, onSpeechRate: () -> Unit, onSpeechPitch: () -> Unit, onSpeechVoice: (String?) -> Unit, onDailyCards: () -> Unit, onReminders: () -> Unit, onReminderTime: () -> Unit) {
     val s = LocalStrings.current
     var about by remember { mutableStateOf(false) }; var chooseVoice by remember { mutableStateOf(false) }; var voices by remember { mutableStateOf(emptyList<Voice>()) }; var tts by remember { mutableStateOf<TextToSpeech?>(null) }
     val context = LocalContext.current
@@ -48,6 +48,9 @@ fun SettingsScreen(state: AppState, onTheme: () -> Unit, onLang: () -> Unit, onA
         SettingTile(s.speechVoice, state.speechVoiceName?.replace('_', ' ') ?: state.lang.label, { chooseVoice = true })
         SettingTile(s.speechRate, "${state.speechRate}×", onSpeechRate)
         SettingTile(s.speechPitch, "${state.speechPitch}×", onSpeechPitch)
+        SettingTile(s.dailyCards, "${state.dailyCards} за одну сессию", onDailyCards)
+        SettingTile(s.reminders, if (state.remindersEnabled) "Включены" else "Выключены", onReminders)
+        if (state.remindersEnabled) SettingTile(s.reminderTime, "%02d:%02d".format(state.reminderHour, state.reminderMinute), onReminderTime)
         StatusText(s.status(state.status), moving)
     }
     if (about) AboutDialog { about = false }

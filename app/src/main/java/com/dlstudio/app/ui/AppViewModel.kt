@@ -12,19 +12,19 @@ import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.cycleNext
 import com.dlstudio.app.storage.ensureLayout
+import com.dlstudio.app.study.StudyReminderScheduler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
 class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val prefs = Prefs(app)
-    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, folderName(app, prefs), prefs.speechRate, prefs.speechPitch, prefs.speechVoiceName))
+    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, folderName(app, prefs), prefs.speechRate, prefs.speechPitch, prefs.speechVoiceName, dailyCards = prefs.dailyCards, remindersEnabled = prefs.remindersEnabled, reminderHour = prefs.reminderHour, reminderMinute = prefs.reminderMinute))
     val state: StateFlow<AppState> = mutable.asStateFlow()
 
-    init { viewModelScope.launch(Dispatchers.IO) { runCatching { ensureLayout(openParent(app, prefs)) } } }
+    init { StudyReminderScheduler.sync(app, prefs); viewModelScope.launch(Dispatchers.IO) { runCatching { ensureLayout(openParent(app, prefs)) } } }
 
     fun cycleTheme() { prefs.theme = prefs.theme.cycleNext(); mutable.update { it.copy(theme = prefs.theme) } }
 
@@ -54,4 +54,7 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun setSpeechVoice(name: String?) { prefs.speechVoiceName = name; mutable.update { it.copy(speechVoiceName = name) } }
+    fun cycleDailyCards() { val next = listOf(10, 20, 30, 50).let { it[(it.indexOf(prefs.dailyCards) + 1) % it.size] }; prefs.dailyCards = next; mutable.update { it.copy(dailyCards = next) } }
+    fun toggleReminders() { prefs.remindersEnabled = !prefs.remindersEnabled; StudyReminderScheduler.sync(app, prefs); mutable.update { it.copy(remindersEnabled = prefs.remindersEnabled) } }
+    fun cycleReminderTime() { val next = listOf(8 to 0, 12 to 0, 18 to 0, 19 to 0, 21 to 0).let { it[(it.indexOf(prefs.reminderHour to prefs.reminderMinute) + 1) % it.size] }; prefs.reminderHour = next.first; prefs.reminderMinute = next.second; StudyReminderScheduler.sync(app, prefs); mutable.update { it.copy(reminderHour = next.first, reminderMinute = next.second) } }
 }

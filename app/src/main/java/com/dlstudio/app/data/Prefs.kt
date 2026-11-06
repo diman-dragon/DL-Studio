@@ -44,4 +44,9 @@ class Prefs(context: Context) {
     var speechVoiceName: String?
         get() = sp.getString("speechVoice", null)
         set(value) = sp.putPref("speechVoice", value)
+
+    var dailyCards: Int get() = sp.getInt("dailyCards", 20); set(value) { sp.edit().putInt("dailyCards", value).apply() }
+    var remindersEnabled: Boolean get() = sp.getBoolean("remindersEnabled", false); set(value) { sp.edit().putBoolean("remindersEnabled", value).apply() }
+    var reminderHour: Int get() = sp.getInt("reminderHour", 19); set(value) { sp.edit().putInt("reminderHour", value).apply() }
+    var reminderMinute: Int get() = sp.getInt("reminderMinute", 0); set(value) { sp.edit().putInt("reminderMinute", value).apply() }
 }

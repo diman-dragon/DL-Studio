@@ -21,9 +21,9 @@ fun AppScaffold(state: AppState, vm: AppViewModel, onFolder: () -> Unit) {
     val scope = rememberCoroutineScope()
     PagerBack(pager)
     Scaffold(bottomBar = {
-        BottomTabs(pager.currentPage) { scope.launch { pager.animateScrollToPage(it) } }
+        BottomTabs(pager.currentPage) { scope.launch { pager.scrollToPage(it) } }
     }) { padding ->
-        HorizontalPager(pager, Modifier.fillMaxSize().padding(padding)) { index ->
+        HorizontalPager(pager, Modifier.fillMaxSize().padding(padding), userScrollEnabled = false) { index ->
             AppPage(index, state, vm, onFolder)
         }
     }

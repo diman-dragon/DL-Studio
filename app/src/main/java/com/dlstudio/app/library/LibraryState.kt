@@ -9,5 +9,6 @@ data class LibraryState(
     val studiedCards: Int = 0,
     val stats: StudyStats = StudyStats(),
     val dueAt: Map<String, Long> = emptyMap(),
+    val todayCards: Set<String> = emptySet(),
     val report: ImportReport? = null
 )
