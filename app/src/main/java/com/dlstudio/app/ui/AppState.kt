@@ -15,8 +15,7 @@ data class AppState(
     val speechPitch: Float = 1f,
     val speechVoiceName: String? = null,
     val status: StorageStatus = StorageStatus.NONE,
-    val dailyCards: Int = 20,
+    val sessionSize: Int = 20,
     val remindersEnabled: Boolean = false,
-    val reminderHour: Int = 19,
-    val reminderMinute: Int = 0
+    val reminderHour: Int = 19
 )

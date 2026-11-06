@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.BorderStroke
 
 /** Плитка настроек: название сверху, значение под ним (после «/» разрешён перенос); тап — действие. */
 @Composable
@@ -23,6 +24,7 @@ fun SettingTile(title: String, value: String, onClick: () -> Unit, enabled: Bool
     Card(
         modifier = Modifier.fillMaxWidth().clip(shape).clickable(enabled = enabled, onClick = onClick),
         shape = shape,
+        border = BorderStroke(1.dp, colors.outlineVariant),
         colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant)
     ) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp), Arrangement.spacedBy(4.dp)) {

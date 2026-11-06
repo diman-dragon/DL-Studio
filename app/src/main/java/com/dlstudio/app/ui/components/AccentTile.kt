@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dlstudio.app.settings.AccentColor
+import androidx.compose.foundation.BorderStroke
 
 /** Плитка «Акцентный цвет»: ряд образцов и название выбранного цвета под ним. */
 @Composable
@@ -22,6 +23,7 @@ fun AccentTile(title: String, selected: AccentColor, name: (AccentColor) -> Stri
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(1.dp, colors.outlineVariant),
         colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant)
     ) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp), Arrangement.spacedBy(12.dp)) {

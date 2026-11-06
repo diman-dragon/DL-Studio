@@ -1,14 +1,20 @@
 package com.dlstudio.app.library
 
-/** Состояние экрана: всё дерево, открытый узел (путь из id), вид «карточки/список», загружено ли, итог импорта. */
+import com.dlstudio.app.study.CardState
+import com.dlstudio.app.study.StudyStats
+
+/**
+ * Состояние библиотеки: дерево, открытый узел (путь из id), вид, загрузка, расписание карточек и статистика.
+ * `failed` — база не открылась: правки отключены, чтобы не затереть сохранённое.
+ */
 data class LibraryState(
     val items: List<LibNode> = emptyList(),
     val path: List<String> = emptyList(),
     val grid: Boolean = true,
     val loaded: Boolean = false,
-    val studiedCards: Int = 0,
+    val failed: Boolean = false,
+    val states: Map<String, CardState> = emptyMap(),
     val stats: StudyStats = StudyStats(),
-    val dueAt: Map<String, Long> = emptyMap(),
-    val todayCards: Set<String> = emptySet(),
+    val today: Long = 0,
     val report: ImportReport? = null
 )

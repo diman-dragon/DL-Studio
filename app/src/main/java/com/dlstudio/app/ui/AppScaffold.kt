@@ -1,30 +1,34 @@
 package com.dlstudio.app.ui
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.dlstudio.app.ui.components.BottomTabs
-import com.dlstudio.app.ui.components.Tabs
-import kotlinx.coroutines.launch
 
-/** Четыре экрана в `HorizontalPager` (свайп) + нижние вкладки; обе стороны управляют одним состоянием. */
-@OptIn(ExperimentalFoundationApi::class)
+/** Четыре экрана и нижние вкладки. Экран строится только при входе; состояние лежит в моделях, поэтому ничего не теряется. */
 @Composable
 fun AppScaffold(state: AppState, vm: AppViewModel, onFolder: () -> Unit) {
-    val pager = rememberPagerState { Tabs.all.size }
-    val scope = rememberCoroutineScope()
-    PagerBack(pager)
-    Scaffold(bottomBar = {
-        BottomTabs(pager.currentPage) { scope.launch { pager.scrollToPage(it) } }
-    }) { padding ->
-        HorizontalPager(pager, Modifier.fillMaxSize().padding(padding), userScrollEnabled = false) { index ->
-            AppPage(index, state, vm, onFolder)
-        }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
+    BackHandler(enabled = tab != 0) { tab = 0 }
+    Scaffold(containerColor = MaterialTheme.colorScheme.background, bottomBar = { BottomTabs(tab) { tab = it } }) { padding ->
+        AnimatedContent(
+            targetState = tab,
+            modifier = Modifier.fillMaxSize().padding(padding),
+            transitionSpec = { fadeIn(tween(160)) togetherWith fadeOut(tween(90)) },
+            label = "screen"
+        ) { index -> AppPage(index, state, vm, onFolder) }
     }
 }

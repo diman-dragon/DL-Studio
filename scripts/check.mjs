@@ -1,6 +1,6 @@
 // Проверка правил проекта (локально: `node scripts/check.mjs`, в CI — первым шагом).
 //  1. Один файл — одна декларация верхнего уровня; имя файла = имя декларации (с заглавной буквы).
-//  2. Файл ≤ 60 строк.
+//  2. Файл ≤ 60 строк (исключения — в LONG_OK).
 //  3. Каждая декларация используется (в main-коде; тесты не считаются; точки входа манифеста — исключение).
 //  4. Нет неиспользуемых импортов.
 //  5. Нет дублирования: одинаковые блоки из 4 значимых строк в разных местах.
@@ -13,7 +13,9 @@ process.chdir(join(dirname(fileURLToPath(import.meta.url)), '..'));
 
 const MAX_LINES = 60;
 const DUP_WINDOW = 4;
-const ENTRY_POINTS = new Set(['MainActivity']);
+const ENTRY_POINTS = new Set(['MainActivity', 'StudyBootReceiver']);
+// Осознанные исключения из лимита строк: таблицы переводов, две модели с общим замком и тесты логики.
+const LONG_OK = { Strings: 100, StringsRu: 100, StringsEn: 100, LibraryViewModel: 150, AppViewModel: 70, StudyLogicTest: 100 };
 const bad = [];
 
 const walk = d => readdirSync(d).flatMap(n => {
@@ -30,7 +32,8 @@ const declsOf = s => [...s.replace(/^import .*$/gm, '').matchAll(DECL)].map(m =>
 for (const f of kt) {
   const s = src[f];
   const lines = s.trimEnd().split('\n').length;
-  if (lines > MAX_LINES) bad.push(`${f}: ${lines} строк (> ${MAX_LINES})`);
+  const limit = LONG_OK[basename(f, '.kt')] ?? MAX_LINES;
+  if (lines > limit) bad.push(`${f}: ${lines} строк (> ${limit})`);
   const decls = declsOf(s);
   if (decls.length !== 1) bad.push(`${f}: деклараций верхнего уровня ${decls.length}, нужна 1 (${decls.join(', ')})`);
   else if (basename(f, '.kt') !== decls[0][0].toUpperCase() + decls[0].slice(1)) bad.push(`${f}: имя файла не совпадает с декларацией ${decls[0]}`);

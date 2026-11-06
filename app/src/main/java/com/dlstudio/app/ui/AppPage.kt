@@ -6,13 +6,13 @@ import com.dlstudio.app.ui.screens.SettingsScreen
 import com.dlstudio.app.ui.screens.StatsScreen
 import com.dlstudio.app.ui.screens.StudyScreen
 
-/** Экран по номеру страницы свайпа (порядок как у `Tabs.all`). */
+/** Экран по номеру вкладки (порядок как у `Tabs.all`). */
 @Composable
 fun AppPage(index: Int, state: AppState, vm: AppViewModel, onFolder: () -> Unit) {
     when (index) {
-        0 -> StudyScreen()
+        0 -> StudyScreen(state.sessionSize, vm::speak)
         1 -> StatsScreen()
         2 -> LibraryScreen()
-        else -> SettingsScreen(state, vm::cycleTheme, vm::cycleLang, vm::setAccent, onFolder, vm::cycleSpeechRate, vm::cycleSpeechPitch, vm::setSpeechVoice, vm::cycleDailyCards, vm::toggleReminders, vm::cycleReminderTime)
+        else -> SettingsScreen(state, vm, onFolder)
     }
 }

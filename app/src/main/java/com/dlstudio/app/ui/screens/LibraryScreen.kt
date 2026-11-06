@@ -15,6 +15,8 @@ import com.dlstudio.app.library.childrenAt
 import com.dlstudio.app.library.findAt
 import com.dlstudio.app.ui.library.*
 import com.dlstudio.app.ui.theme.LocalStrings
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 
 /** Библиотека: проект → колода → карточка; создание, правка, удаление и импорт из файла на каждом уровне. */
 @Composable
@@ -36,9 +38,10 @@ fun LibraryScreen(vm: LibraryViewModel = viewModel()) {
             LibraryHeader(state.items.findAt(state.path)?.name ?: s.tabLibrary, level > 0, vm::up)
             ViewToggle(state.grid, vm::setGrid)
             Spacer(Modifier.height(14.dp))
-            if (state.loaded) LibraryContent(state.items.childrenAt(state.path), level, state.grid, actions)
+            if (state.failed) Text(s.libraryFailed, color = MaterialTheme.colorScheme.error)
+            else if (state.loaded) LibraryContent(state.items.childrenAt(state.path), level, state.grid, actions)
         }
-        if (state.loaded) LibraryActions(level, { dialog = LibDialog(null) }, { importing = true }, Modifier.align(Alignment.BottomEnd).padding(20.dp))
+        if (state.loaded && !state.failed) LibraryActions(level, { dialog = LibDialog(null) }, { importing = true }, Modifier.align(Alignment.BottomEnd).padding(20.dp))
     }
     LibraryDialogs(dialog, level, vm) { dialog = null }
     if (importing) ImportDialog(level, { importing = false; picker.launch(arrayOf("*/*")) }) { importing = false }

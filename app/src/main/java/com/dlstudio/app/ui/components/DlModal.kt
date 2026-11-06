@@ -1,6 +1,5 @@
 package com.dlstudio.app.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,11 +20,9 @@ import androidx.compose.ui.window.Dialog
 object DlModal {
     @Composable fun Shell(title: String? = null, onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
         Dialog(onDismissRequest = onDismiss) {
-            Box(Modifier.fillMaxWidth().padding(18.dp).background(Color.Black.copy(alpha = .30f), RoundedCornerShape(30.dp))) {
-                Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(26.dp), color = MaterialTheme.colorScheme.surface) {
-                    Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        if (title != null) Text(title, style = MaterialTheme.typography.headlineSmall); content()
-                    }
+            Surface(Modifier.fillMaxWidth().padding(8.dp), RoundedCornerShape(28.dp), MaterialTheme.colorScheme.surface, tonalElevation = 6.dp, shadowElevation = 12.dp, border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)) {
+                Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    if (title != null) Text(title, style = MaterialTheme.typography.headlineSmall); content()
                 }
             }
         }
