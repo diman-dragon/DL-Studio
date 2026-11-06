@@ -33,10 +33,6 @@ class Prefs(context: Context) {
         get() = sp.getBoolean("libraryGrid", true)
         set(value) { sp.edit().putBoolean("libraryGrid", value).apply() }
 
-    var studiedCards: Int
-        get() = sp.getInt("studiedCards", 0)
-        set(value) { sp.edit().putInt("studiedCards", value).apply() }
-
     var speechRate: Float
         get() = sp.getFloat("speechRate", 1f)
         set(value) { sp.edit().putFloat("speechRate", value).apply() }

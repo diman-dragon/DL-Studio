@@ -7,5 +7,7 @@ data class LibraryState(
     val grid: Boolean = true,
     val loaded: Boolean = false,
     val studiedCards: Int = 0,
+    val stats: StudyStats = StudyStats(),
+    val dueAt: Map<String, Long> = emptyMap(),
     val report: ImportReport? = null
 )

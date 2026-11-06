@@ -19,10 +19,11 @@ import kotlinx.coroutines.sync.withLock
 class LibraryViewModel(private val app: Application) : AndroidViewModel(app) {
     private val prefs = Prefs(app)
     private val lock = Mutex()
-    private val mutable = MutableStateFlow(LibraryState(grid = prefs.libraryGrid, studiedCards = prefs.studiedCards))
+    private var database: LibraryDatabase? = null
+    private val mutable = MutableStateFlow(LibraryState(grid = prefs.libraryGrid))
     val state: StateFlow<LibraryState> = mutable.asStateFlow()
 
-    init { viewModelScope.launch(Dispatchers.IO) { val items = runCatching { loadLibrary(openParent(app, prefs)) }.getOrDefault(emptyList()); mutable.update { it.copy(items = items, loaded = true) } } }
+    init { viewModelScope.launch(Dispatchers.IO) { val db = LibraryDatabase(app, openParent(app, prefs)); database = db; val items = runCatching { db.load() }.getOrDefault(emptyList()); mutable.update { it.copy(items = items, loaded = true, studiedCards = db.studied(), dueAt = db.dueAt(), stats = db.stats()) } } }
 
     fun enter(id: String) = mutable.update { it.copy(path = it.path + id) }; fun up() = mutable.update { it.copy(path = it.path.dropLast(1)) }
     fun setGrid(grid: Boolean) {
@@ -38,7 +39,8 @@ class LibraryViewModel(private val app: Application) : AndroidViewModel(app) {
             mutable.update { it.copy(report = report) }
         }
     }
-    fun closeReport() = mutable.update { it.copy(report = null) }; fun markStudied() { prefs.studiedCards += 1; mutable.update { it.copy(studiedCards = prefs.studiedCards) } }
+    fun closeReport() = mutable.update { it.copy(report = null) }
+    fun markStudied(cardId: String, faceMs: Long = 0, backMs: Long = 0, flips: Int = 1) { viewModelScope.launch(Dispatchers.IO) { database?.review(cardId, faceMs, backMs, flips); mutable.update { it.copy(studiedCards = database?.studied() ?: it.studiedCards, dueAt = database?.dueAt() ?: it.dueAt, stats = database?.stats() ?: it.stats) } } }
     fun add(name: String, back: String, hint: String = "", explanation: String = "", example: String = "") = change { it.items.addAt(it.path, LibNode(newId(), name, back, hint, explanation, example)) }
     fun edit(id: String, name: String, back: String, hint: String = "", explanation: String = "", example: String = "") = change { s -> s.items.editAt(s.path + id) { it.copy(name = name, back = back, hint = hint, explanation = explanation, example = example) } }
     fun remove(id: String) = change { s -> s.items.editAt(s.path + id) { null } }
@@ -47,7 +49,8 @@ class LibraryViewModel(private val app: Application) : AndroidViewModel(app) {
         val items = transform(mutable.value)
         mutable.update { it.copy(items = items) }
         viewModelScope.launch(Dispatchers.IO) {
-            lock.withLock { runCatching { saveLibrary(openParent(app, prefs), mutable.value.items) } }
+            lock.withLock { runCatching { database?.replaceTree(mutable.value.items); mutable.update { it.copy(stats = database?.stats() ?: it.stats, dueAt = database?.dueAt() ?: it.dueAt) } } }
         }
     }
+    override fun onCleared() { database?.close(); super.onCleared() }
 }
