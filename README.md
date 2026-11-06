@@ -11,6 +11,9 @@ Kotlin + Jetpack Compose. Версия — в `version.txt` (сейчас 0.0.3)
 ## VS Code
 Расширения предложатся автоматически. Задачи: `check`, `test`, `assembleDebug`.
 
+## Оформление
+Шрифты Inter / Inter Display (SIL OFL) лежат в `res/font`. Иконки нижней панели — Phosphor Icons (MIT), векторы в `res/drawable/ic_tab_*`. Любой текст показываем через стили `MaterialTheme.typography` (переносы по правилам включены), а подписи в одну строку — через `FitText`. Ориентация — только портретная.
+
 ## Сборка
 Push в GitHub → Actions → артефакт `DL-Studio-<версия>-debug` (APK).
 

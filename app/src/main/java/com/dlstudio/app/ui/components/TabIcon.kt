@@ -1,24 +1,33 @@
 package com.dlstudio.app.ui.components
 
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Canvas
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 
-/** Цветной значок вкладки: градиентная плитка с белым рисунком; выбранный крупнее и ярче. */
+/** Иконка вкладки 32dp: активная — залитая, крупнее, на цветной «ауре»; обычная — двухтонная. */
 @Composable
 fun TabIcon(tab: TabSpec, selected: Boolean) {
-    val scale by animateFloatAsState(if (selected) 1.15f else 1f, label = "tabScale")
-    val alpha by animateFloatAsState(if (selected) 1f else 0.6f, label = "tabAlpha")
-    Canvas(Modifier.size(34.dp).graphicsLayer { scaleX = scale; scaleY = scale; this.alpha = alpha }) {
-        drawRoundRect(brush = Brush.linearGradient(tab.colors), cornerRadius = CornerRadius(size.width * 0.3f))
-        tab.glyph(this, Color.White)
+    val k by animateFloatAsState(if (selected) 1f else 0f, spring(stiffness = Spring.StiffnessMediumLow), label = "tab")
+    val pill = RoundedCornerShape(20.dp)
+    Box(
+        Modifier.size(width = 68.dp, height = 42.dp).background(Brush.linearGradient(tab.colors), pill, alpha = 0.22f * k),
+        contentAlignment = Alignment.Center
+    ) {
+        GradientIcon(
+            res = if (selected) tab.fill else tab.duo,
+            colors = tab.colors,
+            modifier = Modifier.size(32.dp).graphicsLayer { scaleX = 1f + 0.12f * k; scaleY = 1f + 0.12f * k }
+        )
     }
 }

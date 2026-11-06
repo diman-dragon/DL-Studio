@@ -1,14 +1,15 @@
 package com.dlstudio.app.ui.components
 
 import androidx.compose.ui.graphics.Color
+import com.dlstudio.app.R
 import com.dlstudio.app.i18n.Strings
 
-/** Четыре вкладки по порядку свайпа: Учёба → Статистика → Библиотека → Настройки. */
+/** Четыре вкладки по порядку свайпа: Учёба → Статистика → Библиотека → Настройки (иконки Phosphor). */
 object Tabs {
     val all = listOf(
-        TabSpec(Strings::tabStudy, listOf(Color(0xFFFFA23D), Color(0xFFFF3D77)), { d, c -> d.glyphStudy(c) }),
-        TabSpec(Strings::tabStats, listOf(Color(0xFF29D3FF), Color(0xFF3D5AFE)), { d, c -> d.glyphStats(c) }),
-        TabSpec(Strings::tabLibrary, listOf(Color(0xFF9B6BFF), Color(0xFFE040FB)), { d, c -> d.glyphLibrary(c) }),
-        TabSpec(Strings::tabSettings, listOf(Color(0xFF2CE68A), Color(0xFF00B8D4)), { d, c -> d.glyphSettings(c) })
+        TabSpec(Strings::tabStudy, listOf(Color(0xFFFFB02E), Color(0xFFFF3D77)), R.drawable.ic_tab_study_fill, R.drawable.ic_tab_study_duo),
+        TabSpec(Strings::tabStats, listOf(Color(0xFF2EE6FF), Color(0xFF4A5BFF)), R.drawable.ic_tab_stats_fill, R.drawable.ic_tab_stats_duo),
+        TabSpec(Strings::tabLibrary, listOf(Color(0xFFA77BFF), Color(0xFFFF4FD8)), R.drawable.ic_tab_library_fill, R.drawable.ic_tab_library_duo),
+        TabSpec(Strings::tabSettings, listOf(Color(0xFF3DF08F), Color(0xFF00B4D8)), R.drawable.ic_tab_settings_fill, R.drawable.ic_tab_settings_duo)
     )
 }
