@@ -17,6 +17,25 @@ object StringsRu : Strings {
     override val aboutTitle = "DL Studio"
     override val aboutText = "Карточки для изучения языков. Работает без интернета."
     override val close = "Закрыть"
+    override val viewCards = "Карточки"
+    override val viewList = "Список"
+    override val edit = "Изменить"
+    override val delete = "Удалить"
+    override val save = "Сохранить"
+    override val cancel = "Отмена"
+    override val cardBack = "Обратная сторона"
+    override fun addTitle(level: Int) = listOf("Новый проект", "Новая колода", "Новая карточка")[level]
+    override fun editTitle(level: Int) = listOf("Изменить проект", "Изменить колоду", "Изменить карточку")[level]
+    override fun nameLabel(level: Int) = listOf("Название проекта", "Название колоды", "Лицевая сторона")[level]
+    override fun emptyText(level: Int) = listOf(
+        "Проектов пока нет. Создайте первый, например «Английский B1».",
+        "В проекте пока нет колод. Создайте первую.",
+        "В колоде пока нет карточек. Добавьте первую."
+    )[level]
+    override fun contentCount(level: Int, n: Int) =
+        if (level == 0) "$n ${ruPlural(n, "колода", "колоды", "колод")}" else "$n ${ruPlural(n, "карточка", "карточки", "карточек")}"
+    override fun deleteQuestion(level: Int, name: String) =
+        "Удалить ${listOf("проект", "колоду", "карточку")[level]} «$name»?" + if (level < 2) " Всё внутри тоже будет удалено." else ""
     override fun themeName(mode: ThemeMode) = if (mode == ThemeMode.DARK) "Тёмная (AMOLED)" else "Светлая"
     override fun status(status: StorageStatus) = when (status) {
         StorageStatus.NONE -> ""

@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 fun BottomTabs(selected: Int, onSelect: (Int) -> Unit) {
     Column(Modifier.background(MaterialTheme.colorScheme.background)) {
         HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
-        Row(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 10.dp)) {
+        Row(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 10.dp)) {
             Tabs.all.forEachIndexed { index, tab ->
                 TabItem(tab, selected == index, { onSelect(index) }, Modifier.weight(1f))
             }

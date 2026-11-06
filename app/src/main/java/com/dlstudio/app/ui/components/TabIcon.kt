@@ -11,23 +11,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.dlstudio.app.ui.library.PhIcon
 
-/** Иконка вкладки 32dp: активная — залитая, крупнее, на цветной «ауре»; обычная — двухтонная. */
+/** Крупная градиентная плитка 56dp с белой иконкой; активная больше, ярче и светится своим цветом. */
 @Composable
 fun TabIcon(tab: TabSpec, selected: Boolean) {
     val k by animateFloatAsState(if (selected) 1f else 0f, spring(stiffness = Spring.StiffnessMediumLow), label = "tab")
-    val pill = RoundedCornerShape(20.dp)
+    val shape = RoundedCornerShape(19.dp)
     Box(
-        Modifier.size(width = 68.dp, height = 42.dp).background(Brush.linearGradient(tab.colors), pill, alpha = 0.22f * k),
+        Modifier.size(56.dp)
+            .graphicsLayer { scaleX = 1f + 0.1f * k; scaleY = 1f + 0.1f * k; alpha = 0.72f + 0.28f * k }
+            .shadow((12 * k).dp, shape, ambientColor = tab.colors.last(), spotColor = tab.colors.last())
+            .background(Brush.linearGradient(tab.colors), shape),
         contentAlignment = Alignment.Center
-    ) {
-        GradientIcon(
-            res = if (selected) tab.fill else tab.duo,
-            colors = tab.colors,
-            modifier = Modifier.size(32.dp).graphicsLayer { scaleX = 1f + 0.12f * k; scaleY = 1f + 0.12f * k }
-        )
-    }
+    ) { PhIcon(if (selected) tab.fill else tab.duo, Color.White, 36.dp) }
 }

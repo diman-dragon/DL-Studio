@@ -22,4 +22,9 @@ class Prefs(context: Context) {
     var storageUri: String?
         get() = sp.getString("storage", null)
         set(value) = sp.putPref("storage", value)
+
+    /** Вид библиотеки: true — карточки, false — список. */
+    var libraryGrid: Boolean
+        get() = sp.getBoolean("libraryGrid", true)
+        set(value) { sp.edit().putBoolean("libraryGrid", value).apply() }
 }
