@@ -29,7 +29,7 @@ fun FitText(
     Text(
         text, modifier, color, size, style = style, maxLines = maxLines, softWrap = maxLines > 1,
         onTextLayout = {
-            if ((it.didOverflowWidth || it.didOverflowHeight) && size > minSize) size = maxOf(minSize, size * 0.92f)
+            if ((it.didOverflowWidth || it.didOverflowHeight) && size > minSize) size = (size.value * 0.92f).coerceAtLeast(minSize.value).sp
         }
     )
 }
