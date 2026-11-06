@@ -16,11 +16,11 @@ jobs:
       - name: Структура (атомарность, версия)
         run: node scripts/check.mjs
       - name: Тесты и сборка
-        run: chmod +x gradlew && ./gradlew testDebugUnitTest assembleDebug
+        run: chmod +x gradlew && ./gradlew testDebugUnitTest assembleRelease
       - name: Версия
         id: ver
         run: echo "v=$(cat version.txt)" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
-          name: DL-Studio-${{ steps.ver.outputs.v }}-debug
-          path: app/build/outputs/apk/debug/*.apk
+          name: DL-Studio-${{ steps.ver.outputs.v }}-release
+          path: app/build/outputs/apk/release/*.apk

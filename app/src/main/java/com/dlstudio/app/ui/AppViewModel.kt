@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 
 class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val prefs = Prefs(app)
-    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, folderName(app, prefs), prefs.speechRate, prefs.speechPitch))
+    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, folderName(app, prefs), prefs.speechRate, prefs.speechPitch, prefs.speechVoiceName))
     val state: StateFlow<AppState> = mutable.asStateFlow()
 
     init { viewModelScope.launch(Dispatchers.IO) { runCatching { ensureLayout(openParent(app, prefs)) } } }
@@ -52,4 +52,6 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
         prefs.speechPitch = next
         mutable.update { it.copy(speechPitch = next) }
     }
+
+    fun setSpeechVoice(name: String?) { prefs.speechVoiceName = name; mutable.update { it.copy(speechVoiceName = name) } }
 }

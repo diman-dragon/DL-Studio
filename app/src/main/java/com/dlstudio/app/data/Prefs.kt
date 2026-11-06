@@ -44,4 +44,8 @@ class Prefs(context: Context) {
     var speechPitch: Float
         get() = sp.getFloat("speechPitch", 1f)
         set(value) { sp.edit().putFloat("speechPitch", value).apply() }
+
+    var speechVoiceName: String?
+        get() = sp.getString("speechVoice", null)
+        set(value) = sp.putPref("speechVoice", value)
 }

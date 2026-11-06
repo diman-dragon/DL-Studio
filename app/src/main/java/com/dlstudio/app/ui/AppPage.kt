@@ -13,6 +13,6 @@ fun AppPage(index: Int, state: AppState, vm: AppViewModel, onFolder: () -> Unit)
         0 -> StudyScreen()
         1 -> StatsScreen()
         2 -> LibraryScreen()
-        else -> SettingsScreen(state, vm::cycleTheme, vm::cycleLang, vm::setAccent, onFolder, vm::cycleSpeechRate, vm::cycleSpeechPitch)
+        else -> SettingsScreen(state, vm::cycleTheme, vm::cycleLang, vm::setAccent, onFolder, vm::cycleSpeechRate, vm::cycleSpeechPitch, vm::setSpeechVoice)
     }
 }

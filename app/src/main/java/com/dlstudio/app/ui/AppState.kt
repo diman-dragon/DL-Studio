@@ -13,5 +13,6 @@ data class AppState(
     val folderName: String?,
     val speechRate: Float = 1f,
     val speechPitch: Float = 1f,
+    val speechVoiceName: String? = null,
     val status: StorageStatus = StorageStatus.NONE
 )
