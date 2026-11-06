@@ -1,33 +1,35 @@
 package com.dlstudio.app.ui.library
 
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.R
 import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.ui.components.AppIcon
 import com.dlstudio.app.ui.theme.LocalStrings
 
-/** Кнопка «⋮» с меню «Изменить / Удалить». */
+/** Всегда видимые собственные действия карточки: карандаш и корзина. */
 @Composable
 fun ItemMenu(node: LibNode, actions: ItemActions) {
     val s = LocalStrings.current
     val c = MaterialTheme.colorScheme
-    var open by remember { mutableStateOf(false) }
-    Box {
-        IconButton(onClick = { open = true }) { AppIcon(R.drawable.ic_more, c.onSurfaceVariant, 22.dp) }
-        DropdownMenu(open, { open = false }) {
-            DropdownMenuItem(
-                text = { Text(s.edit) },
-                leadingIcon = { AppIcon(R.drawable.ic_edit, c.onSurface, 20.dp) },
-                onClick = { open = false; actions.onEdit(node) }
-            )
-            DropdownMenuItem(
-                text = { Text(s.delete, color = c.error) },
-                leadingIcon = { AppIcon(R.drawable.ic_trash, c.error, 20.dp) },
-                onClick = { open = false; actions.onDelete(node) }
-            )
+    Row {
+        Surface(Modifier.size(42.dp).clickable(role = Role.Button) { actions.onEdit(node) }.semantics { contentDescription = s.edit }, shape = RoundedCornerShape(13.dp), color = c.surfaceVariant) {
+            Box(contentAlignment = Alignment.Center) { AppIcon(R.drawable.ic_edit, c.primary, 20.dp) }
+        }
+        Surface(Modifier.size(42.dp).clickable(role = Role.Button) { actions.onDelete(node) }.semantics { contentDescription = s.delete }, shape = RoundedCornerShape(13.dp), color = c.surfaceVariant) {
+            Box(contentAlignment = Alignment.Center) { AppIcon(R.drawable.ic_trash, c.error, 20.dp) }
         }
     }
 }

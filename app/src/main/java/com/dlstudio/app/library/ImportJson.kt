@@ -24,6 +24,9 @@ object ImportJson {
         "",
         o.optString("name").ifBlank { o.optString("front") },
         o.optString("back").ifBlank { o.optString("translation") },
+        o.optString("hint").ifBlank { o.optString("clue") },
+        o.optString("explanation").ifBlank { o.optString("definition") },
+        o.optString("example").ifBlank { o.optString("exampleSentence") },
         list(o.optJSONArray("items") ?: o.optJSONArray("decks") ?: o.optJSONArray("cards"))
     )
 }

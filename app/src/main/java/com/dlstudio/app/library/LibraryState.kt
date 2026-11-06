@@ -6,5 +6,6 @@ data class LibraryState(
     val path: List<String> = emptyList(),
     val grid: Boolean = true,
     val loaded: Boolean = false,
+    val studiedCards: Int = 0,
     val report: ImportReport? = null
 )

@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 
 class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val prefs = Prefs(app)
-    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, folderName(app, prefs)))
+    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, folderName(app, prefs), prefs.speechRate, prefs.speechPitch))
     val state: StateFlow<AppState> = mutable.asStateFlow()
 
     init {
@@ -51,5 +51,17 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
             val status = moveToFolder(app, prefs, tree)
             mutable.update { it.copy(folderName = folderName(app, prefs), status = status) }
         }
+    }
+
+    fun cycleSpeechRate() {
+        val next = listOf(.8f, 1f, 1.2f).let { values -> values[(values.indexOfFirst { it >= prefs.speechRate - .01f } + 1) % values.size] }
+        prefs.speechRate = next
+        mutable.update { it.copy(speechRate = next) }
+    }
+
+    fun cycleSpeechPitch() {
+        val next = listOf(.9f, 1f, 1.1f).let { values -> values[(values.indexOfFirst { it >= prefs.speechPitch - .01f } + 1) % values.size] }
+        prefs.speechPitch = next
+        mutable.update { it.copy(speechPitch = next) }
     }
 }

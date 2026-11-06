@@ -8,5 +8,8 @@ data class LibNode(
     val id: String,
     val name: String,
     val back: String = "",
+    val hint: String = "",
+    val explanation: String = "",
+    val example: String = "",
     val children: List<LibNode> = emptyList()
 )

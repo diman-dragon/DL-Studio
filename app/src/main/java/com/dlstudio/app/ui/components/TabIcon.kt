@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -21,12 +22,12 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun TabIcon(tab: TabSpec, selected: Boolean) {
     val k by animateFloatAsState(if (selected) 1f else 0f, spring(stiffness = Spring.StiffnessMediumLow), label = "tab")
-    val shape = RoundedCornerShape(19.dp)
+    val shape = RoundedCornerShape(22.dp)
     Box(
-        Modifier.size(56.dp)
-            .graphicsLayer { scaleX = 1f + 0.1f * k; scaleY = 1f + 0.1f * k; alpha = 0.72f + 0.28f * k }
-            .shadow((12 * k).dp, shape, ambientColor = tab.colors.last(), spotColor = tab.colors.last())
-            .background(Brush.linearGradient(tab.colors), shape),
+        Modifier.size(44.dp)
+            .graphicsLayer { scaleX = 1f + 0.06f * k; scaleY = 1f + 0.06f * k; alpha = 0.70f + 0.30f * k }
+            .shadow((8 * k).dp, shape, ambientColor = tab.colors.last(), spotColor = tab.colors.last())
+            .background(if (selected) Brush.linearGradient(tab.colors) else Brush.linearGradient(listOf(Color.Transparent, Color.Transparent)), shape),
         contentAlignment = Alignment.Center
-    ) { AppIcon(if (selected) tab.fill else tab.outline, Color.White, 32.dp) }
+    ) { AppIcon(if (selected) tab.fill else tab.outline, if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant, 25.dp) }
 }

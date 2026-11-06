@@ -27,7 +27,7 @@ import com.dlstudio.app.ui.theme.LocalStrings
 
 /** Настройки: переключатели по тапу по кругу (тема, язык), выбор акцентного цвета, папка, «О нас». */
 @Composable
-fun SettingsScreen(state: AppState, onTheme: () -> Unit, onLang: () -> Unit, onAccent: (AccentColor) -> Unit, onFolder: () -> Unit) {
+fun SettingsScreen(state: AppState, onTheme: () -> Unit, onLang: () -> Unit, onAccent: (AccentColor) -> Unit, onFolder: () -> Unit, onSpeechRate: () -> Unit, onSpeechPitch: () -> Unit) {
     val s = LocalStrings.current
     var about by remember { mutableStateOf(false) }
     val moving = state.status == StorageStatus.MOVING
@@ -38,6 +38,9 @@ fun SettingsScreen(state: AppState, onTheme: () -> Unit, onLang: () -> Unit, onA
         AccentTile(s.settingAccent, state.accent, s::accentName, onAccent)
         SettingTile(s.settingFolder, state.folderName?.let { "$it/${StorageLayout.ROOT}" } ?: s.folderDefault, onFolder, enabled = !moving)
         SettingTile(s.settingAbout, BuildConfig.VERSION_NAME, { about = true })
+        SettingTile(s.speechVoice, state.lang.label, {})
+        SettingTile(s.speechRate, "${state.speechRate}×", onSpeechRate)
+        SettingTile(s.speechPitch, "${state.speechPitch}×", onSpeechPitch)
         StatusText(s.status(state.status), moving)
     }
     if (about) AboutDialog { about = false }

@@ -11,5 +11,7 @@ data class AppState(
     val lang: AppLang,
     val accent: AccentColor,
     val folderName: String?,
+    val speechRate: Float = 1f,
+    val speechPitch: Float = 1f,
     val status: StorageStatus = StorageStatus.NONE
 )

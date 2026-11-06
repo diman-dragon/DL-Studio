@@ -16,10 +16,13 @@ object LibraryJson {
     }
 
     private fun obj(n: LibNode): JSONObject = JSONObject()
-        .put("id", n.id).put("name", n.name).put("back", n.back).put("items", array(n.children) as Any)
+        .put("id", n.id).put("name", n.name).put("back", n.back)
+        .put("hint", n.hint).put("explanation", n.explanation).put("example", n.example)
+        .put("items", array(n.children) as Any)
 
     private fun parse(a: JSONArray): List<LibNode> = List(a.length()) { i ->
         val o = a.getJSONObject(i)
-        LibNode(o.getString("id"), o.getString("name"), o.optString("back"), parse(o.optJSONArray("items") ?: JSONArray()))
+        LibNode(o.getString("id"), o.getString("name"), o.optString("back"), o.optString("hint"),
+            o.optString("explanation"), o.optString("example"), parse(o.optJSONArray("items") ?: JSONArray()))
     }
 }

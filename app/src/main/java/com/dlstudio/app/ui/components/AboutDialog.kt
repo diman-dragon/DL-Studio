@@ -1,8 +1,7 @@
 package com.dlstudio.app.ui.components
 
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import com.dlstudio.app.BuildConfig
 import com.dlstudio.app.ui.theme.LocalStrings
@@ -11,10 +10,8 @@ import com.dlstudio.app.ui.theme.LocalStrings
 @Composable
 fun AboutDialog(onClose: () -> Unit) {
     val s = LocalStrings.current
-    AlertDialog(
-        onDismissRequest = onClose,
-        title = { Text("${s.aboutTitle} ${BuildConfig.VERSION_NAME}") },
-        text = { Text(s.aboutText) },
-        confirmButton = { TextButton(onClick = onClose) { Text(s.close) } }
-    )
+    DlModal("${s.aboutTitle} ${BuildConfig.VERSION_NAME}", onClose) {
+        Text(s.aboutText)
+        androidx.compose.foundation.layout.Row(androidx.compose.ui.Modifier.fillMaxWidth(), horizontalArrangement = androidx.compose.foundation.layout.Arrangement.End) { DlAction(s.close, onClose) }
+    }
 }

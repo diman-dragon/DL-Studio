@@ -19,7 +19,7 @@ import kotlinx.coroutines.sync.withLock
 class LibraryViewModel(private val app: Application) : AndroidViewModel(app) {
     private val prefs = Prefs(app)
     private val lock = Mutex()
-    private val mutable = MutableStateFlow(LibraryState(grid = prefs.libraryGrid))
+    private val mutable = MutableStateFlow(LibraryState(grid = prefs.libraryGrid, studiedCards = prefs.studiedCards))
     val state: StateFlow<LibraryState> = mutable.asStateFlow()
 
     init {
@@ -45,8 +45,14 @@ class LibraryViewModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
     fun closeReport() = mutable.update { it.copy(report = null) }
-    fun add(name: String, back: String) = change { it.items.addAt(it.path, LibNode(newId(), name, back)) }
-    fun edit(id: String, name: String, back: String) = change { s -> s.items.editAt(s.path + id) { it.copy(name = name, back = back) } }
+    fun markStudied() {
+        prefs.studiedCards += 1
+        mutable.update { it.copy(studiedCards = prefs.studiedCards) }
+    }
+    fun add(name: String, back: String, hint: String = "", explanation: String = "", example: String = "") =
+        change { it.items.addAt(it.path, LibNode(newId(), name, back, hint, explanation, example)) }
+    fun edit(id: String, name: String, back: String, hint: String = "", explanation: String = "", example: String = "") =
+        change { s -> s.items.editAt(s.path + id) { it.copy(name = name, back = back, hint = hint, explanation = explanation, example = example) } }
     fun remove(id: String) = change { s -> s.items.editAt(s.path + id) { null } }
 
     private fun change(transform: (LibraryState) -> List<LibNode>) {

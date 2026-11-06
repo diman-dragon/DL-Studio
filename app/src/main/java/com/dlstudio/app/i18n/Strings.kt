@@ -27,6 +27,25 @@ interface Strings {
     val save: String
     val cancel: String
     val cardBack: String
+    val cardHint: String
+    val cardExplanation: String
+    val cardExample: String
+    val showAnswer: String
+    val hintButton: String
+    val speak: String
+    val previous: String
+    val next: String
+    val noCards: String
+    val statsOverview: String
+    val statsProjects: String
+    val statsDecks: String
+    val statsCards: String
+    val statsStudied: String
+    val statsProgress: String
+    val statsEmpty: String
+    val speechVoice: String
+    val speechRate: String
+    val speechPitch: String
     val importFormat: String
     val importPick: String
     val importEmpty: String

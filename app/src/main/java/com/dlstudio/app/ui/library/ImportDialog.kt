@@ -5,27 +5,27 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.ui.theme.LocalStrings
+import com.dlstudio.app.ui.components.DlAction
+import com.dlstudio.app.ui.components.DlModal
 
 /** Подсказка перед импортом: что получится на этом уровне, какой формат нужен и пример; «Выбрать файл» открывает выбор. */
 @Composable
 fun ImportDialog(level: Int, onPick: () -> Unit, onDismiss: () -> Unit) {
     val s = LocalStrings.current
     val colors = MaterialTheme.colorScheme
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(s.importTitle(level)) },
-        text = {
+    DlModal(s.importTitle(level), onDismiss) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(s.importOutcome(level))
                 Text(s.importFormat, color = colors.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
@@ -35,8 +35,10 @@ fun ImportDialog(level: Int, onPick: () -> Unit, onDismiss: () -> Unit) {
                     fontFamily = FontFamily.Monospace
                 )
             }
-        },
-        confirmButton = { TextButton(onPick) { Text(s.importPick) } },
-        dismissButton = { TextButton(onDismiss) { Text(s.cancel) } }
-    )
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            DlAction(s.cancel, onDismiss, outlined = true)
+            Spacer(Modifier.width(8.dp))
+            DlAction(s.importPick, onPick)
+        }
+    }
 }
