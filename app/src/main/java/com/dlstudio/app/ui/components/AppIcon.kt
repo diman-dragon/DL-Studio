@@ -1,4 +1,4 @@
-package com.dlstudio.app.ui.library
+package com.dlstudio.app.ui.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.size
@@ -10,8 +10,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-/** Иконка Phosphor нужного размера и цвета. */
+/** Иконка (Material Design Icons) нужного размера и цвета. */
 @Composable
-fun PhIcon(@DrawableRes res: Int, tint: Color, size: Dp = 24.dp) {
+fun AppIcon(@DrawableRes res: Int, tint: Color, size: Dp = 24.dp) {
     Icon(painterResource(res), contentDescription = null, modifier = Modifier.size(size), tint = tint)
 }

@@ -10,5 +10,5 @@ object LevelLook {
         listOf(Color(0xFFFFB02E), Color(0xFFFF3D77)),
         listOf(Color(0xFF2EE6FF), Color(0xFF4A5BFF))
     )
-    val icons = listOf(R.drawable.ic_ph_graduation_cap, R.drawable.ic_ph_stack, R.drawable.ic_ph_note)
+    val icons = listOf(R.drawable.ic_lv_project, R.drawable.ic_lv_deck, R.drawable.ic_lv_card)
 }

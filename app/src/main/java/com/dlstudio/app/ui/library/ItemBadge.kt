@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import com.dlstudio.app.ui.components.AppIcon
 
 /** Градиентная плитка уровня с белой иконкой. */
 @Composable
@@ -18,5 +19,5 @@ fun ItemBadge(level: Int, size: Dp) {
     Box(
         Modifier.size(size).background(Brush.linearGradient(LevelLook.colors[level]), shape),
         contentAlignment = Alignment.Center
-    ) { PhIcon(LevelLook.icons[level], Color.White, size * 0.56f) }
+    ) { AppIcon(LevelLook.icons[level], Color.White, size * 0.56f) }
 }

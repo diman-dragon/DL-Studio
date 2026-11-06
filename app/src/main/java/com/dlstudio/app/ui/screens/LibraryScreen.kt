@@ -1,6 +1,8 @@
 package com.dlstudio.app.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,12 +16,14 @@ import com.dlstudio.app.library.findAt
 import com.dlstudio.app.ui.library.*
 import com.dlstudio.app.ui.theme.LocalStrings
 
-/** Библиотека: проект → колода → карточка; создание, правка, удаление на каждом уровне. */
+/** Библиотека: проект → колода → карточка; создание, правка, удаление и импорт из файла на каждом уровне. */
 @Composable
 fun LibraryScreen(vm: LibraryViewModel = viewModel()) {
     val s = LocalStrings.current
     val state by vm.state.collectAsStateWithLifecycle()
     var dialog by remember { mutableStateOf<LibDialog?>(null) }
+    var importing by remember { mutableStateOf(false) }
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) vm.importFile(uri) }
     val level = state.path.size
     val actions = ItemActions(
         onOpen = { node -> if (level < 2) { vm.enter(node.id) } else { dialog = LibDialog(node) } },
@@ -34,7 +38,9 @@ fun LibraryScreen(vm: LibraryViewModel = viewModel()) {
             Spacer(Modifier.height(14.dp))
             if (state.loaded) LibraryContent(state.items.childrenAt(state.path), level, state.grid, actions)
         }
-        if (state.loaded) AddButton(level, s.addTitle(level), { dialog = LibDialog(null) }, Modifier.align(Alignment.BottomEnd).padding(20.dp))
+        if (state.loaded) LibraryActions(level, { dialog = LibDialog(null) }, { importing = true }, Modifier.align(Alignment.BottomEnd).padding(20.dp))
     }
     LibraryDialogs(dialog, level, vm) { dialog = null }
+    if (importing) ImportDialog(level, { importing = false; picker.launch(arrayOf("*/*")) }) { importing = false }
+    state.report?.let { ImportReportDialog(it, vm::closeReport) }
 }

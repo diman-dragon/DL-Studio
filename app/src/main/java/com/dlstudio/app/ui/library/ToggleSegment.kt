@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.dlstudio.app.ui.components.AppIcon
 import com.dlstudio.app.ui.components.FitText
 
 /** Одна половина переключателя вида: иконка и подпись; выбранная заливается цветом темы. */
@@ -30,7 +31,7 @@ fun ToggleSegment(label: String, @DrawableRes icon: Int, selected: Boolean, onCl
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        PhIcon(icon, fg, 20.dp)
+        AppIcon(icon, fg, 20.dp)
         Spacer(Modifier.width(8.dp))
         FitText(label, MaterialTheme.typography.labelLarge, color = fg, minSize = 11.sp)
     }

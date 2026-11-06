@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import com.dlstudio.app.ui.library.PhIcon
 
 /** Крупная градиентная плитка 56dp с белой иконкой; активная больше, ярче и светится своим цветом. */
 @Composable
@@ -29,5 +28,5 @@ fun TabIcon(tab: TabSpec, selected: Boolean) {
             .shadow((12 * k).dp, shape, ambientColor = tab.colors.last(), spotColor = tab.colors.last())
             .background(Brush.linearGradient(tab.colors), shape),
         contentAlignment = Alignment.Center
-    ) { PhIcon(if (selected) tab.fill else tab.duo, Color.White, 36.dp) }
+    ) { AppIcon(if (selected) tab.fill else tab.outline, Color.White, 32.dp) }
 }

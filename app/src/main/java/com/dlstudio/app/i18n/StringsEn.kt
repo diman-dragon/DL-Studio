@@ -1,5 +1,6 @@
 package com.dlstudio.app.i18n
 
+import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
 
@@ -11,6 +12,7 @@ object StringsEn : Strings {
     override val stubHint = "Coming soon"
     override val settingTheme = "Theme"
     override val settingLanguage = "App language"
+    override val settingAccent = "Accent color"
     override val settingFolder = "Storage folder"
     override val settingAbout = "About"
     override val folderDefault = "App folder"
@@ -24,6 +26,9 @@ object StringsEn : Strings {
     override val save = "Save"
     override val cancel = "Cancel"
     override val cardBack = "Back side"
+    override val importFormat = "One card per line: a word and its translation separated by “;”, a tab or “ - ”, for example “cat;кот”. CSV, TSV, TXT (including Anki and Quizlet exports) and JSON work. A first row “word;translation;deck” splits the cards into decks."
+    override val importPick = "Choose file"
+    override val importEmpty = "No cards found in the file. Lines like “word;translation” are expected."
     override fun addTitle(level: Int) = listOf("New project", "New deck", "New card")[level]
     override fun editTitle(level: Int) = listOf("Edit project", "Edit deck", "Edit card")[level]
     override fun nameLabel(level: Int) = listOf("Project name", "Deck name", "Front side")[level]
@@ -36,6 +41,14 @@ object StringsEn : Strings {
         if (level == 0) "$n ${if (n == 1) "deck" else "decks"}" else "$n ${if (n == 1) "card" else "cards"}"
     override fun deleteQuestion(level: Int, name: String) =
         "Delete the ${listOf("project", "deck", "card")[level]} “$name”?" + if (level < 2) " Everything inside will be deleted too." else ""
+    override fun importTitle(level: Int) = listOf("Import project from file", "Import deck from file", "Import cards from file")[level]
+    override fun importOutcome(level: Int) = listOf(
+        "The file becomes a new project named after the file, with decks and cards inside.",
+        "The file becomes a new deck in this project.",
+        "The cards from the file are added to this deck."
+    )[level]
+    override fun importDone(n: Int) = "Added $n ${if (n == 1) "card" else "cards"}"
+    override fun accentName(accent: AccentColor) = listOf("Violet", "Blue", "Teal", "Green", "Amber", "Pink", "Red")[accent.ordinal]
     override fun themeName(mode: ThemeMode) = if (mode == ThemeMode.DARK) "Dark (AMOLED)" else "Light"
     override fun status(status: StorageStatus) = when (status) {
         StorageStatus.NONE -> ""

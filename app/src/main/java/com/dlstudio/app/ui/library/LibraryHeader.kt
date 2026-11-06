@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dlstudio.app.R
+import com.dlstudio.app.ui.components.AppIcon
 import com.dlstudio.app.ui.components.FitText
 
 /** Заголовок: название открытого узла; внутри проекта или колоды слева стрелка «назад». */
@@ -16,7 +17,7 @@ import com.dlstudio.app.ui.components.FitText
 fun LibraryHeader(title: String, canGoUp: Boolean, onUp: () -> Unit) {
     Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
         if (canGoUp) {
-            IconButton(onClick = onUp) { PhIcon(R.drawable.ic_ph_caret_left, MaterialTheme.colorScheme.onBackground, 26.dp) }
+            IconButton(onClick = onUp) { AppIcon(R.drawable.ic_back, MaterialTheme.colorScheme.onBackground, 30.dp) }
         }
         FitText(title, MaterialTheme.typography.headlineMedium, Modifier.weight(1f), minSize = 18.sp)
     }

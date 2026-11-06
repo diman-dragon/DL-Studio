@@ -1,5 +1,6 @@
 package com.dlstudio.app.i18n
 
+import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
 
@@ -11,6 +12,7 @@ object StringsRu : Strings {
     override val stubHint = "Раздел в разработке"
     override val settingTheme = "Тема"
     override val settingLanguage = "Язык приложения"
+    override val settingAccent = "Акцентный цвет"
     override val settingFolder = "Папка хранения"
     override val settingAbout = "О нас"
     override val folderDefault = "Папка приложения"
@@ -24,6 +26,9 @@ object StringsRu : Strings {
     override val save = "Сохранить"
     override val cancel = "Отмена"
     override val cardBack = "Обратная сторона"
+    override val importFormat = "Одна карточка в строке: слово и перевод через «;», табуляцию или « - », например «cat;кот». Подходят CSV, TSV, TXT (в том числе экспорт Anki и Quizlet) и JSON. Первая строка «слово;перевод;колода» разложит карточки по колодам."
+    override val importPick = "Выбрать файл"
+    override val importEmpty = "В файле не нашлось карточек. Нужны строки вида «слово;перевод»."
     override fun addTitle(level: Int) = listOf("Новый проект", "Новая колода", "Новая карточка")[level]
     override fun editTitle(level: Int) = listOf("Изменить проект", "Изменить колоду", "Изменить карточку")[level]
     override fun nameLabel(level: Int) = listOf("Название проекта", "Название колоды", "Лицевая сторона")[level]
@@ -36,6 +41,14 @@ object StringsRu : Strings {
         if (level == 0) "$n ${ruPlural(n, "колода", "колоды", "колод")}" else "$n ${ruPlural(n, "карточка", "карточки", "карточек")}"
     override fun deleteQuestion(level: Int, name: String) =
         "Удалить ${listOf("проект", "колоду", "карточку")[level]} «$name»?" + if (level < 2) " Всё внутри тоже будет удалено." else ""
+    override fun importTitle(level: Int) = listOf("Импорт проекта из файла", "Импорт колоды из файла", "Импорт карточек из файла")[level]
+    override fun importOutcome(level: Int) = listOf(
+        "Файл станет новым проектом: название — по имени файла, внутри будут колоды и карточки.",
+        "Файл станет новой колодой в этом проекте.",
+        "Карточки из файла добавятся в эту колоду."
+    )[level]
+    override fun importDone(n: Int) = "Добавлено: $n ${ruPlural(n, "карточка", "карточки", "карточек")}"
+    override fun accentName(accent: AccentColor) = listOf("Фиолетовый", "Синий", "Бирюзовый", "Зелёный", "Янтарный", "Розовый", "Красный")[accent.ordinal]
     override fun themeName(mode: ThemeMode) = if (mode == ThemeMode.DARK) "Тёмная (AMOLED)" else "Светлая"
     override fun status(status: StorageStatus) = when (status) {
         StorageStatus.NONE -> ""

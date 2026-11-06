@@ -8,6 +8,7 @@ import com.dlstudio.app.data.Prefs
 import com.dlstudio.app.data.folderName
 import com.dlstudio.app.data.moveToFolder
 import com.dlstudio.app.data.openParent
+import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.cycleNext
 import com.dlstudio.app.storage.ensureLayout
@@ -20,7 +21,7 @@ import kotlinx.coroutines.launch
 
 class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val prefs = Prefs(app)
-    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, folderName(app, prefs)))
+    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, folderName(app, prefs)))
     val state: StateFlow<AppState> = mutable.asStateFlow()
 
     init {
@@ -36,6 +37,11 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     fun cycleLang() {
         prefs.lang = prefs.lang.cycleNext()
         mutable.update { it.copy(lang = prefs.lang) }
+    }
+
+    fun setAccent(accent: AccentColor) {
+        prefs.accent = accent
+        mutable.update { it.copy(accent = accent) }
     }
 
     fun pickFolder(tree: Uri) {

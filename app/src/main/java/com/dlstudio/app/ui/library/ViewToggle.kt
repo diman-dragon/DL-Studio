@@ -21,7 +21,7 @@ fun ViewToggle(grid: Boolean, onChange: (Boolean) -> Unit) {
         Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant).padding(4.dp)
     ) {
-        ToggleSegment(s.viewCards, R.drawable.ic_ph_squares_four, grid, { onChange(true) }, Modifier.weight(1f))
-        ToggleSegment(s.viewList, R.drawable.ic_ph_rows, !grid, { onChange(false) }, Modifier.weight(1f))
+        ToggleSegment(s.viewCards, R.drawable.ic_view_grid, grid, { onChange(true) }, Modifier.weight(1f))
+        ToggleSegment(s.viewList, R.drawable.ic_view_list, !grid, { onChange(false) }, Modifier.weight(1f))
     }
 }

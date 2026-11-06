@@ -14,6 +14,6 @@ import com.dlstudio.app.ui.theme.LocalStrings
 fun AppRoot(vm: AppViewModel, onFolder: () -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
     CompositionLocalProvider(LocalStrings provides stringsFor(state.lang)) {
-        DlTheme(dark = state.theme == ThemeMode.DARK) { AppScaffold(state, vm, onFolder) }
+        DlTheme(dark = state.theme == ThemeMode.DARK, accent = state.accent) { AppScaffold(state, vm, onFolder) }
     }
 }

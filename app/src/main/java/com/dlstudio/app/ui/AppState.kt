@@ -1,5 +1,6 @@
 package com.dlstudio.app.ui
 
+import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
@@ -8,6 +9,7 @@ import com.dlstudio.app.settings.ThemeMode
 data class AppState(
     val theme: ThemeMode,
     val lang: AppLang,
+    val accent: AccentColor,
     val folderName: String?,
     val status: StorageStatus = StorageStatus.NONE
 )

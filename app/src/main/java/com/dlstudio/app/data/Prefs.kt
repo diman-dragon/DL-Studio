@@ -1,6 +1,7 @@
 package com.dlstudio.app.data
 
 import android.content.Context
+import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.settings.ThemeMode
 import java.util.Locale
@@ -17,6 +18,10 @@ class Prefs(context: Context) {
     var lang: AppLang
         get() = sp.getEnum("lang", systemLang)
         set(value) = sp.putPref("lang", value.name)
+
+    var accent: AccentColor
+        get() = sp.getEnum("accent", AccentColor.VIOLET)
+        set(value) = sp.putPref("accent", value.name)
 
     /** Дерево SAF, которое выбрал пользователь; null — папка приложения по умолчанию. */
     var storageUri: String?
