@@ -23,7 +23,7 @@ import androidx.core.widget.doAfterTextChanged
 fun CardWriteField(value: String, onValueChange: (String) -> Unit, placeholder: String, isRussian: Boolean, enabled: Boolean, borderColor: Color, onDone: () -> Unit, modifier: Modifier = Modifier) {
     val cs = MaterialTheme.colorScheme; val shape = RoundedCornerShape(16.dp)
     Box(modifier.height(54.dp).clip(shape).background(cs.surface).border(1.5.dp, borderColor, shape).padding(horizontal = 14.dp), Alignment.CenterStart) {
-        AndroidView(Modifier.fillMaxWidth(), factory = { ctx ->
+        AndroidView(modifier = Modifier.fillMaxWidth(), factory = { ctx: android.content.Context ->
             EditText(ctx).apply {
                 background = null; isSingleLine = true; imeOptions = EditorInfo.IME_ACTION_DONE
                 imeHintLocales = LocaleList.forLanguageTags(if (isRussian) "ru" else "en")
@@ -31,7 +31,7 @@ fun CardWriteField(value: String, onValueChange: (String) -> Unit, placeholder: 
                 doAfterTextChanged { if (it != null && it.toString() != value) onValueChange(it.toString()) }
                 setOnEditorActionListener { _, a, _ -> if (a == EditorInfo.IME_ACTION_DONE) { onDone(); true } else false }
             }
-        }, update = { view ->
+        }, update = { view: EditText ->
             view.isEnabled = enabled; view.hint = placeholder
             view.imeHintLocales = LocaleList.forLanguageTags(if (isRussian) "ru" else "en")
             if (view.text.toString() != value) view.setText(value)
