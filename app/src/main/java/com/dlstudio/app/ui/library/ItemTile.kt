@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.library.LibNode
+import com.dlstudio.app.ui.components.StudyPlayButton
 import androidx.compose.foundation.border
 
 /** Плитка сетки: крупная иконка уровня, меню в углу, название и подпись внизу. */
@@ -26,6 +27,9 @@ fun ItemTile(node: LibNode, level: Int, actions: ItemActions) {
             ItemBadge(level, 52.dp)
             ItemMenu(node, actions)
         }
-        ItemText(node, level, Modifier.padding(end = 10.dp))
+        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.Bottom) {
+            ItemText(node, level, Modifier.weight(1f).padding(end = 10.dp))
+            if (cards(node, level) > 0) StudyPlayButton({ actions.onStudy(node) }, Modifier.padding(end = 10.dp))
+        }
     }
 }

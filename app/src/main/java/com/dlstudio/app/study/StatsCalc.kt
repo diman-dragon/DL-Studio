@@ -23,6 +23,8 @@ object StatsCalc {
             averageFaceMs = if (answers == 0) 0 else face / answers,
             accuracy = if (answers == 0) 0 else (recalled * 100.0 / answers).roundToInt(),
             streakDays = Streak.count(activeDays, today),
+            yesterdayReviews = window[window.lastIndex - 1]?.count ?: 0,
+            yesterdayAccuracy = window[window.lastIndex - 1]?.let { if (it.count == 0) 0 else (it.recalled * 100.0 / it.count).roundToInt() } ?: 0,
             reviewsByDay = window.map { it?.count ?: 0 },
             intervalBuckets = listOf(1, 2, 7, 30).mapIndexed { i, from ->
                 states.count { it.intervalDays >= from && (i == 3 || it.intervalDays < listOf(2, 7, 30)[i]) }

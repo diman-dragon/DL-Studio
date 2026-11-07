@@ -87,19 +87,19 @@ class StudyLogicTest {
         var s = StudySession.start("s", cards.take(3), 0)
         val order = s.queue.map { it.id }
         s = s.goTo(1, 100); s = s.goTo(2, 200); s = s.goTo(1, 300)
-        val (a, first) = s.flip(2_300)!!.let { it.first to it.second }
+        val (a, first) = s.flip("c2", 2_300)
         assertEquals(Grade.KNOW, first!!.grade); assertEquals("c2", first.cardId)
-        val (b, none) = a.flip(3_000)
-        assertNull(none); val (c, again) = b.flip(4_000)
+        val (b, none) = a.flip("c2", 3_000)
+        assertNull(none); val (c, again) = b.flip("c2", 4_000)
         assertNull(again); assertTrue("c2" in c.flipped)
         assertEquals(order, c.queue.map { it.id }); assertEquals(1, c.finished)
     }
 
     @Test fun hintAndBackAndForthKeepBehaviorGrade() {
         val s = StudySession.start("s", cards.take(2), 0).useHint()
-        val (n, rec) = s.flip(2_000)
+        val (n, rec) = s.flip("c1", 2_000)
         assertEquals(Grade.HARD, rec!!.grade)
-        assertEquals(1, n.hard); assertNull(StudySession.start("s", emptyList(), 0).flip(5).second)
+        assertEquals(1, n.hard); assertNull(StudySession.start("s", emptyList(), 0).flip("c1", 5).second)
     }
 
     @Test fun restoreKeepsPositionAndGrades() {
@@ -107,5 +107,34 @@ class StudyLogicTest {
         val s = StudySession.restore(saved, cards.take(3), 5)
         assertEquals(2, s.index); assertEquals(mapOf("c1" to Grade.KNOW), s.grades)
         assertEquals(3, s.goTo(99, 6).index)
+    }
+
+    @Test fun tapFlipsTappedCardEvenIfIndexLags() {
+        val s = StudySession.start("s", cards.take(3), 0)
+        val (n, rec) = s.flip("c3", 10)
+        assertEquals("c3", rec!!.cardId); assertTrue("c3" in n.flipped && "c1" !in n.flipped); assertEquals(2, n.index)
+    }
+
+    @Test fun yesterdayStatsAndForecast() {
+        val s = StatsCalc.compute(3, listOf(st(11), st(11), st(14)), mapOf(9L to DayAgg(4, 0, 3)), setOf(9L), 10)
+        assertEquals(4, s.yesterdayReviews); assertEquals(75, s.yesterdayAccuracy)
+        assertEquals(listOf(2, 0, 0, 1, 0, 0, 0), Forecast.next(listOf(st(11), st(11), st(14), st(10)), 10))
+    }
+
+    @Test fun motivationPicksByPriority() {
+        assertEquals(MotivationKind.EMPTY, Motivation.pick(StudyStats()).first)
+        assertEquals(MotivationKind.START, Motivation.pick(StudyStats(totalCards = 5, newCards = 5)).first)
+        val base = StudyStats(totalCards = 9, studiedCards = 5)
+        assertEquals(MotivationKind.DONE_TODAY, Motivation.pick(base.copy(todayReviews = 3)).first)
+        assertEquals(MotivationKind.STREAK to 4, Motivation.pick(base.copy(streakDays = 4, dueCards = 2)))
+        assertEquals(MotivationKind.CATCH_UP to 2, Motivation.pick(base.copy(overdueCards = 2, dueCards = 2)))
+        assertEquals(MotivationKind.KEEP, Motivation.pick(base).first)
+    }
+
+    @Test fun shuffleNeverRepeatsPreviousOrder() {
+        val prev = cards.map { it.id }
+        repeat(50) { assertTrue(Shuffle.differentOrder(cards, prev, kotlin.random.Random(it)).map { c -> c.id } != prev) }
+        assertEquals(2, Shuffle.differentOrder(cards.take(2), listOf("c1", "c2")).size)
+        assertEquals(listOf("c2", "c1"), Shuffle.differentOrder(cards.take(2), listOf("c1", "c2")).map { it.id })
     }
 }

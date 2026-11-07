@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.library.LibNode
+import com.dlstudio.app.ui.components.StudyPlayButton
 import androidx.compose.foundation.border
 
 /** Строка списка: плитка уровня, название с подписью, меню. */
@@ -24,6 +25,7 @@ fun ItemRow(node: LibNode, level: Int, actions: ItemActions) {
     ) {
         ItemBadge(level, 48.dp)
         ItemText(node, level, Modifier.weight(1f))
+        if (cards(node, level) > 0) StudyPlayButton({ actions.onStudy(node) })
         ItemMenu(node, actions)
     }
 }

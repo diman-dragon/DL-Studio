@@ -14,7 +14,8 @@ data class StudySession(
     val index: Int = 0,
     val flipped: Set<String> = emptySet(),
     val hinted: Set<String> = emptySet(),
-    val grades: Map<String, Grade> = emptyMap()
+    val grades: Map<String, Grade> = emptyMap(),
+    val random: Boolean = false
 ) {
     val total: Int get() = queue.size
     val finished: Int get() = grades.size
@@ -28,21 +29,27 @@ data class StudySession(
 
     fun useHint(): StudySession = current?.let { copy(hinted = hinted + it.id) } ?: this
 
-    /** Тап по карточке: показать перевод или вернуться к слову. Запись для базы — только при первом показе перевода. */
-    fun flip(now: Long): Pair<StudySession, Answer?> {
-        val card = current ?: return this to null
-        if (card.id in flipped) return copy(flipped = flipped - card.id) to null
-        val shown = copy(flipped = flipped + card.id)
+    /**
+     * Тап по карточке `cardId`: показать перевод или вернуться к слову. Переворачивается именно та карточка,
+     * по которой тапнули (индекс страницы мог ещё не обновиться). Запись для базы — только при первом показе перевода.
+     */
+    fun flip(cardId: String, now: Long): Pair<StudySession, Answer?> {
+        val at = queue.indexOfFirst { it.id == cardId }
+        if (at < 0) return this to null
+        val card = queue[at]
+        val base = if (at == index) this else copy(index = at, shownAt = now - AutoGrade.GAVE_UP_MS)
+        if (card.id in flipped) return base.copy(flipped = flipped - card.id) to null
+        val shown = base.copy(flipped = flipped + card.id)
         if (card.id in grades) return shown to null
-        val faceMs = (now - shownAt).coerceAtLeast(0)
+        val faceMs = (now - base.shownAt).coerceAtLeast(0)
         val grade = AutoGrade.of(faceMs, card.id in hinted)
         return shown.copy(grades = grades + (card.id to grade)) to Answer(card.id, grade, faceMs, 0)
     }
 
     companion object {
-        fun start(id: String, cards: List<LibNode>, now: Long) = StudySession(id, cards, now)
+        fun start(id: String, cards: List<LibNode>, now: Long, random: Boolean = false) = StudySession(id, cards, now, random = random)
 
         fun restore(saved: SavedSession, cards: List<LibNode>, now: Long) =
-            StudySession(saved.id, cards, now, saved.position.coerceIn(0, cards.size), grades = saved.grades.filterKeys { id -> cards.any { it.id == id } })
+            StudySession(saved.id, cards, now, saved.position.coerceIn(0, cards.size), grades = saved.grades.filterKeys { id -> cards.any { it.id == id } }, random = saved.random)
     }
 }

@@ -12,6 +12,8 @@ data class StudyStats(
     val averageFaceMs: Long = 0,
     val accuracy: Int = 0,
     val streakDays: Int = 0,
+    val yesterdayReviews: Int = 0,
+    val yesterdayAccuracy: Int = 0,
     val reviewsByDay: List<Int> = List(StatsCalc.DAYS) { 0 },
     val intervalBuckets: List<Int> = List(4) { 0 }
 )

@@ -1,5 +1,6 @@
 package com.dlstudio.app.i18n
 
+import com.dlstudio.app.study.MotivationKind
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
@@ -21,6 +22,16 @@ interface Strings {
     val sectionData: String
     val tapToFlip: String
     val tapToContinue: String
+    val yesterdayTitle: String
+    val yesterdayEmpty: String
+    val streakTitle: String
+    val forecastTitle: String
+    val projectsTitle: String
+    val doneWord: String
+    val newRound: String
+    val learn: String
+    fun reviewsCount(n: Int): String
+    fun motivation(kind: MotivationKind, n: Int): String
     val startStudy: String
     val studyAll: String
     val nothingDue: String

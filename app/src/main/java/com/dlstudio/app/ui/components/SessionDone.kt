@@ -23,7 +23,7 @@ import com.dlstudio.app.ui.theme.LocalAccent
 import com.dlstudio.app.ui.theme.LocalStrings
 import com.dlstudio.app.ui.theme.gradientColors
 
-/** Итог сессии: отметка, сводка ответов и возврат к списку. */
+/** Итог сессии; в режиме «Учить» из библиотеки сообщает, что сейчас начнётся новый круг в другом порядке. */
 @Composable
 fun SessionDone(session: StudySession, onBack: () -> Unit) {
     val s = LocalStrings.current
@@ -33,9 +33,10 @@ fun SessionDone(session: StudySession, onBack: () -> Unit) {
         }
         Text(s.sessionDone, Modifier.padding(top = 24.dp), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
         Text(
-            s.sessionSummary(session.know, session.hard, session.again), Modifier.padding(top = 8.dp, bottom = 28.dp),
+            s.sessionSummary(session.know, session.hard, session.again), Modifier.padding(top = 8.dp, bottom = 12.dp),
             style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center
         )
+        if (session.random) Text(s.newRound, Modifier.padding(bottom = 20.dp), color = MaterialTheme.colorScheme.primary, textAlign = TextAlign.Center)
         GradientButton(s.backToList, onBack)
     }
 }

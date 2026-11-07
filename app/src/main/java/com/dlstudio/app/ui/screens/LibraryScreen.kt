@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.library.LibraryViewModel
 import com.dlstudio.app.library.childrenAt
 import com.dlstudio.app.library.findAt
@@ -20,7 +21,7 @@ import androidx.compose.material3.Text
 
 /** Библиотека: проект → колода → карточка; создание, правка, удаление и импорт из файла на каждом уровне. */
 @Composable
-fun LibraryScreen(vm: LibraryViewModel = viewModel()) {
+fun LibraryScreen(vm: LibraryViewModel = viewModel(), onStudy: (List<LibNode>) -> Unit = {}) {
     val s = LocalStrings.current
     val state by vm.state.collectAsStateWithLifecycle()
     var dialog by remember { mutableStateOf<LibDialog?>(null) }
@@ -30,7 +31,8 @@ fun LibraryScreen(vm: LibraryViewModel = viewModel()) {
     val actions = ItemActions(
         onOpen = { node -> if (level < 2) { vm.enter(node.id) } else { dialog = LibDialog(node) } },
         onEdit = { dialog = LibDialog(it) },
-        onDelete = { dialog = LibDialog(it, delete = true) }
+        onDelete = { dialog = LibDialog(it, delete = true) },
+        onStudy = { node -> onStudy(if (level == 0) node.children.flatMap { it.children } else node.children) }
     )
     BackHandler(enabled = level > 0, onBack = vm::up)
     Box(Modifier.fillMaxSize()) {

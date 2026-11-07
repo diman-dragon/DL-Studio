@@ -1,5 +1,6 @@
 package com.dlstudio.app.i18n
 
+import com.dlstudio.app.study.MotivationKind
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
@@ -20,6 +21,24 @@ object StringsEn : Strings {
     override val sectionSpeech = "Speech"
     override val sectionStudy = "Study"
     override val sectionData = "Data"
+    override val yesterdayTitle = "Yesterday"
+    override val yesterdayEmpty = "No study yesterday"
+    override val streakTitle = "Streak"
+    override val forecastTitle = "Next 7 days"
+    override val projectsTitle = "Projects"
+    override val doneWord = "done"
+    override val newRound = "Round complete. Starting a new one in a different order…"
+    override val learn = "Study"
+    override fun reviewsCount(n: Int) = "$n ${if (n == 1) "review" else "reviews"}"
+    override fun motivation(kind: MotivationKind, n: Int) = when (kind) {
+        MotivationKind.EMPTY -> "Add your first cards in the library and we will begin."
+        MotivationKind.START -> "The first session matters most. Five minutes is enough."
+        MotivationKind.DONE_TODAY -> "${reviewsCount(n)} done today. Plan complete, keep it up!"
+        MotivationKind.STREAK -> "Streak: $n ${if (n == 1) "day" else "days"}. One session today keeps it alive."
+        MotivationKind.CATCH_UP -> "$n overdue. Clear them today and your memory will thank you."
+        MotivationKind.MATURE -> "$n ${if (n == 1) "card" else "cards"} learned. Every day makes you stronger."
+        MotivationKind.KEEP -> "Small steps every day add up to big results."
+    }
     override val tapToContinue = "Swipe to move between cards"
     override val tapToFlip = "Tap to see the translation"
     override val startStudy = "Start"

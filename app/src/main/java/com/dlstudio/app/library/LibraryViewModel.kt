@@ -114,17 +114,18 @@ class LibraryViewModel(private val app: Application) : AndroidViewModel(app) {
         change { db -> db.reviews.forget(db.nodes.delete(id)) }
     }
 
-    private fun change(op: (LibraryDatabase) -> Unit) {
+    private fun change(refresh: Boolean = true, op: (LibraryDatabase) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            lock.withLock { database?.let { db -> runCatching { db.write { op(db) } }; refreshDerived(db) } }
+            lock.withLock { database?.let { db -> runCatching { db.write { op(db) } }; if (refresh) refreshDerived(db) } }
             schedulePush()
         }
     }
 
     /** Состав и порядок карточек сессии пишется в базу сразу и больше не меняется. */
-    fun startSession(id: String, cardIds: List<String>) { change { db -> db.sessions.start(id, System.currentTimeMillis(), cardIds) } }
+    fun startSession(id: String, cardIds: List<String>, random: Boolean = false) { change(refresh = false) { db -> db.sessions.start(id, System.currentTimeMillis(), cardIds, random) } }
 
-    fun savePosition(id: String, position: Int) { change { db -> db.sessions.position(id, position) } }
+    /** Позиция в сессии: только запись, без пересчёта статистики — иначе каждый свайп перерисовывал бы экраны. */
+    fun savePosition(id: String, position: Int) { change(refresh = false) { db -> db.sessions.position(id, position) } }
 
     /** Записывает ответ: журнал и новое расписание карточки; один раз за показ (см. `StudySession`). */
     fun grade(answer: Answer) {

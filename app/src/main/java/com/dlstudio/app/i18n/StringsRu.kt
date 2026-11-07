@@ -1,5 +1,6 @@
 package com.dlstudio.app.i18n
 
+import com.dlstudio.app.study.MotivationKind
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
@@ -21,6 +22,24 @@ object StringsRu : Strings {
     override val sectionSpeech = "Озвучка"
     override val sectionStudy = "Учёба"
     override val sectionData = "Данные"
+    override val yesterdayTitle = "Вчера"
+    override val yesterdayEmpty = "Вчера занятий не было"
+    override val streakTitle = "Серия"
+    override val forecastTitle = "Ближайшие 7 дней"
+    override val projectsTitle = "Проекты"
+    override val doneWord = "сделано"
+    override val newRound = "Круг пройден. Начинаем новый, порядок будет другим…"
+    override val learn = "Учить"
+    override fun reviewsCount(n: Int) = "$n ${ruPlural(n, "повтор", "повтора", "повторов")}"
+    override fun motivation(kind: MotivationKind, n: Int) = when (kind) {
+        MotivationKind.EMPTY -> "Добавьте первые карточки в библиотеке, и начнём."
+        MotivationKind.START -> "Первая сессия самая важная. Хватит и пяти минут."
+        MotivationKind.DONE_TODAY -> "Сегодня уже ${reviewsCount(n)}. План выполнен, так держать!"
+        MotivationKind.STREAK -> "Серия: $n ${ruPlural(n, "день", "дня", "дней")}. Одна сессия сегодня сохранит её."
+        MotivationKind.CATCH_UP -> "Просрочено: $n. Разберите их сегодня, и память скажет спасибо."
+        MotivationKind.MATURE -> "Выучено $n ${ruPlural(n, "карточка", "карточки", "карточек")}. Каждый день делает вас сильнее."
+        MotivationKind.KEEP -> "Маленькие шаги каждый день дают большой результат."
+    }
     override val tapToContinue = "Листайте карточки свайпом"
     override val tapToFlip = "Нажмите, чтобы увидеть перевод"
     override val startStudy = "Начать"
