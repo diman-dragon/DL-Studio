@@ -32,7 +32,7 @@ fun StudyDashboard(lib: LibraryState, sessionSize: Int, study: StudyViewModel, o
     val all = remember(lib.items) { StudyScope.cards(lib.items, null, null) }
     val projects = remember(lib.items, lib.states, lib.today) {
         lib.items.map { project ->
-            StudyProjectSummary(project.name, CardCounts.of(StudyScope.cards(lib.items, project.id, null), lib.states, lib.today))
+            project.name to CardCounts.of(StudyScope.cards(lib.items, project.id, null), lib.states, lib.today)
         }
     }
     val forecast = remember(lib.states, lib.today) { Forecast.next(lib.states.values, lib.today) }

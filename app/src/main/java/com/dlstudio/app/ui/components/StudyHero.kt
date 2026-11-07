@@ -1,14 +1,8 @@
 package com.dlstudio.app.ui.components
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,16 +14,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.study.CardCounts
 import com.dlstudio.app.ui.theme.LocalStrings
-
-data class StudyProjectSummary(val name: String, val counts: CardCounts)
-
 @Composable
-fun StudyHero(counts: CardCounts, sessionSize: Int, doneToday: Int, onStart: () -> Unit, onExtra: () -> Unit) =
-    StudyHero(counts, emptyList(), sessionSize, doneToday, onStart, onExtra)
-
-/** Плитка «Сегодня»: план сессии, кнопка старта и кольцо выполнения дня; когда всё сделано — предложение позаниматься сверх плана. */
-@Composable
-fun StudyHero(counts: CardCounts, projects: List<StudyProjectSummary>, sessionSize: Int, doneToday: Int, onStart: () -> Unit, onExtra: () -> Unit) {
+fun StudyHero(counts: CardCounts, projects: List<Pair<String, CardCounts>>, sessionSize: Int, doneToday: Int, onStart: () -> Unit, onExtra: () -> Unit) {
     val s = LocalStrings.current
     val planned = minOf(sessionSize, counts.due + counts.fresh)
     val progress = if (doneToday + planned == 0) 0f else doneToday.toFloat() / (doneToday + planned)
@@ -55,9 +41,7 @@ fun StudyHero(counts: CardCounts, projects: List<StudyProjectSummary>, sessionSi
                     color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.titleMedium
                 )
             }
-            Box(Modifier.clip(RoundedCornerShape(24.dp)).background(MaterialTheme.colorScheme.primary).padding(4.dp)) {
-                StudyRing(progress, "$doneToday", s.doneWord)
-            }
+            Box(Modifier.clip(RoundedCornerShape(24.dp)).background(MaterialTheme.colorScheme.primary).padding(4.dp)) { StudyRing(progress, "$doneToday", s.doneWord) }
         }
         if (projects.isNotEmpty()) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -66,8 +50,8 @@ fun StudyHero(counts: CardCounts, projects: List<StudyProjectSummary>, sessionSi
                         Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.surface).padding(horizontal = 14.dp, vertical = 11.dp),
                         Arrangement.SpaceBetween, Alignment.CenterVertically
                     ) {
-                        Text(project.name, Modifier.weight(1f), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
-                        Text("${project.counts.due} ${s.due} · ${project.counts.fresh} ${s.freshWord}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(project.first, Modifier.weight(1f), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+                        Text("${project.second.due} ${s.due} · ${project.second.fresh} ${s.freshWord}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
