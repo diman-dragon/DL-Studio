@@ -25,23 +25,27 @@ import com.dlstudio.app.study.StudySession
 import com.dlstudio.app.study.StudyViewModel
 import com.dlstudio.app.ui.theme.LocalStrings
 
-/** Дашборд «Учёба»: план на сегодня, мотивация, серия, итог вчерашнего дня, прогноз и проекты. */
+/** Дашборд «Учёба»: план на сегодня, мотивация, серия, итог вчерашнего дня и прогноз. */
 @Composable
 fun StudyDashboard(lib: LibraryState, sessionSize: Int, study: StudyViewModel, onSession: (StudySession) -> Unit) {
     val s = LocalStrings.current
     val all = remember(lib.items) { StudyScope.cards(lib.items, null, null) }
+    val projects = remember(lib.items, lib.states, lib.today) {
+        lib.items.map { project ->
+            StudyProjectSummary(project.name, CardCounts.of(StudyScope.cards(lib.items, project.id, null), lib.states, lib.today))
+        }
+    }
     val forecast = remember(lib.states, lib.today) { Forecast.next(lib.states.values, lib.today) }
     val (kind, n) = Motivation.pick(lib.stats)
     fun start(extra: Boolean) { study.begin(SessionPicker.pick(all, lib.states, lib.today, sessionSize, extra))?.let(onSession) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), Arrangement.spacedBy(14.dp)) {
         ScreenHeader(s.tabStudy)
-        StudyHero(CardCounts.of(all, lib.states, lib.today), sessionSize, lib.stats.todayReviews, { start(false) }, { start(true) })
+        StudyHero(CardCounts.of(all, lib.states, lib.today), projects, sessionSize, lib.stats.todayReviews, { start(false) }, { start(true) })
         MotivationBanner(s.motivation(kind, n))
         Row(Modifier.fillMaxWidth().height(IntrinsicSize.Max), Arrangement.spacedBy(12.dp)) {
             StreakCard(lib.stats, lib.today, Modifier.weight(1f))
             YesterdayCard(lib.stats, Modifier.weight(1f))
         }
         StatsChartCard(s.forecastTitle) { StatsBarChart(forecast, forecast.indices.map { s.weekdays[DayMath.weekday(lib.today + 1 + it)] }) }
-        DashProjects(lib) { study.openProject(it.id) }
     }
 }
