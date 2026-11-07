@@ -16,13 +16,18 @@ import androidx.compose.ui.unit.dp
 import com.dlstudio.app.study.StudySession
 import kotlinx.coroutines.delay
 
-/**
- * Сессия: карточки листаются свайпом вперёд и назад, порядок не меняется; последняя страница — итог.
- * Тап по карточке показывает перевод. В режиме «Учить» из библиотеки после последней карточки через паузу начинается новый круг. Кнопок оценки нет: оценка выводится из поведения.
- */
+/** Сессия: карточки листаются свайпом, ниже карточки варианты ответа. */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun StudySessionView(session: StudySession, onFlip: (String) -> Unit, onHint: () -> Unit, onPage: (Int) -> Unit, onNextRound: () -> Unit, onClose: () -> Unit, onSpeak: (String) -> Unit) {
+fun StudySessionView(
+    session: StudySession,
+    onFlip: (String) -> Unit,
+    onHint: () -> Unit,
+    onPage: (Int) -> Unit,
+    onNextRound: () -> Unit,
+    onClose: () -> Unit,
+    onSpeak: (String) -> Unit
+) {
     key(session.id) {
         val pager = rememberPagerState(initialPage = session.index) { session.total + 1 }
         LaunchedEffect(pager) { snapshotFlow { pager.currentPage }.collect { onPage(it) } }
@@ -32,7 +37,7 @@ fun StudySessionView(session: StudySession, onFlip: (String) -> Unit, onHint: ()
             HorizontalPager(pager, Modifier.weight(1f), pageSpacing = 16.dp, key = { it }) { page ->
                 val card = session.queue.getOrNull(page)
                 if (card == null) SessionDone(session, onClose)
-                else StudyFlashCard(card, card.id in session.flipped, card.id in session.hinted, { onFlip(card.id) }, onHint, onSpeak, Modifier.fillMaxSize())
+                else StudyCardPage(card, page, session, pager.currentPage == page, onFlip, onHint, onSpeak)
             }
         }
     }

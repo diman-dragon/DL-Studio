@@ -39,6 +39,9 @@ interface Strings {
     val practiceMore: String
     val sessionDone: String
     val backToList: String
+    val checkAnswer: String
+    val listenPrompt: String
+    val writePrompt: String
     val todayTitle: String
     val freshWord: String
     val statsNew: String

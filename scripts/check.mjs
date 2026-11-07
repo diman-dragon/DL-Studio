@@ -19,7 +19,7 @@ const LONG_OK = { Strings: 100, StringsRu: 100, StringsEn: 100, LibraryViewModel
 const bad = [];
 
 const walk = d => readdirSync(d).flatMap(n => {
-  const p = join(d, n);
+  const p = join(d, n).replace(/\\/g, '/');
   return statSync(p).isDirectory() ? walk(p) : [p];
 });
 const kt = ['app/src/main', 'app/src/test'].flatMap(walk).filter(f => f.endsWith('.kt'));
