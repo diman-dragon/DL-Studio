@@ -35,7 +35,4 @@ object Sm2 {
         }
         return CardState(interval, ease, old.reps + 1, old.lapses, today + interval, today)
     }
-
-    /** Через сколько дней карточка вернётся при этой оценке (0 — сегодня); для подписей на кнопках. */
-    fun daysUntilDue(prev: CardState?, grade: Grade, today: Long): Int = (next(prev, grade, today).dueDay - today).toInt()
 }

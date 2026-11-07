@@ -20,9 +20,7 @@ object StringsEn : Strings {
     override val sectionSpeech = "Speech"
     override val sectionStudy = "Study"
     override val sectionData = "Data"
-    override val gradeAgain = "Again"
-    override val gradeHard = "Hard"
-    override val gradeKnow = "Know"
+    override val tapToContinue = "Swipe to move between cards"
     override val tapToFlip = "Tap to see the translation"
     override val startStudy = "Start"
     override val studyAll = "Whole library"
@@ -47,7 +45,6 @@ object StringsEn : Strings {
     override val statsReviewsTitle = "Reviews, 14 days"
     override val weekdays = listOf("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
     override fun reminderDue(n: Int) = "$n ${if (n == 1) "card" else "cards"} to review"
-    override fun interval(days: Int) = when { days <= 0 -> "today"; days < 30 -> "${days}d"; days < 365 -> "${days / 30}mo"; else -> "1y" }
     override fun sessionProgress(done: Int, total: Int) = "$done of $total"
     override fun sessionSummary(know: Int, hard: Int, again: Int) = "Know: $know · Hard: $hard · Again: $again"
     override fun addTitle(level: Int) = listOf("New project", "New deck", "New card")[level]

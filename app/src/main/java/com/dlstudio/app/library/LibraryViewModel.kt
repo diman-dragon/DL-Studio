@@ -41,7 +41,8 @@ class LibraryViewModel(private val app: Application) : AndroidViewModel(app) {
         database = db
         val items = db?.let { runCatching { it.nodes.load() }.getOrNull() }
         if (db == null || items == null) { mutable.update { it.copy(loaded = true, failed = true) }; return }
-        mutable.update { it.copy(items = items, loaded = true, failed = false, path = emptyList()) }
+        val resume = runCatching { db.sessions.latest() }.getOrNull()
+        mutable.update { it.copy(items = items, loaded = true, failed = false, path = emptyList(), resume = resume) }
         refreshDerived(db)
     }
 
@@ -119,6 +120,11 @@ class LibraryViewModel(private val app: Application) : AndroidViewModel(app) {
             schedulePush()
         }
     }
+
+    /** Состав и порядок карточек сессии пишется в базу сразу и больше не меняется. */
+    fun startSession(id: String, cardIds: List<String>) { change { db -> db.sessions.start(id, System.currentTimeMillis(), cardIds) } }
+
+    fun savePosition(id: String, position: Int) { change { db -> db.sessions.position(id, position) } }
 
     /** Записывает ответ: журнал и новое расписание карточки; один раз за показ (см. `StudySession`). */
     fun grade(answer: Answer) {

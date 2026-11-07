@@ -19,10 +19,8 @@ interface Strings {
     val sectionSpeech: String
     val sectionStudy: String
     val sectionData: String
-    val gradeAgain: String
-    val gradeHard: String
-    val gradeKnow: String
     val tapToFlip: String
+    val tapToContinue: String
     val startStudy: String
     val studyAll: String
     val nothingDue: String
@@ -46,7 +44,6 @@ interface Strings {
     val statsReviewsTitle: String
     val weekdays: List<String>
     fun reminderDue(n: Int): String
-    fun interval(days: Int): String
     fun sessionProgress(done: Int, total: Int): String
     fun sessionSummary(know: Int, hard: Int, again: Int): String
     /** Тексты библиотеки по уровню: 0 — проект, 1 — колода, 2 — карточка. */

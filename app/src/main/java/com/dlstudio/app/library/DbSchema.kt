@@ -17,6 +17,8 @@ object DbSchema {
         db.execSQL("CREATE TABLE IF NOT EXISTS nodes(id TEXT PRIMARY KEY,parent_id TEXT,type INTEGER,name TEXT,back TEXT,hint TEXT,explanation TEXT,example TEXT)")
         db.execSQL("CREATE TABLE IF NOT EXISTS reviews(id INTEGER PRIMARY KEY AUTOINCREMENT,card_id TEXT,seen_at INTEGER,face_ms INTEGER,back_ms INTEGER)")
         db.execSQL("CREATE TABLE IF NOT EXISTS card_state(card_id TEXT PRIMARY KEY,interval_days INTEGER,ease REAL,reps INTEGER,lapses INTEGER,due_day INTEGER,last_day INTEGER)")
+        db.execSQL("CREATE TABLE IF NOT EXISTS study_sessions(id TEXT PRIMARY KEY,started_at INTEGER,scope_id TEXT,all_decks INTEGER,position INTEGER)")
+        db.execSQL("CREATE TABLE IF NOT EXISTS study_session_cards(session_id TEXT,position INTEGER,card_id TEXT,PRIMARY KEY(session_id,position))")
         val old = db.version < VERSION
         if (old) addReviewColumns(db)
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_nodes_parent ON nodes(parent_id)")

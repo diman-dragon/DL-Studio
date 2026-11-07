@@ -21,9 +21,7 @@ object StringsRu : Strings {
     override val sectionSpeech = "Озвучка"
     override val sectionStudy = "Учёба"
     override val sectionData = "Данные"
-    override val gradeAgain = "Не знал"
-    override val gradeHard = "Трудно"
-    override val gradeKnow = "Знал"
+    override val tapToContinue = "Листайте карточки свайпом"
     override val tapToFlip = "Нажмите, чтобы увидеть перевод"
     override val startStudy = "Начать"
     override val studyAll = "Вся библиотека"
@@ -48,7 +46,6 @@ object StringsRu : Strings {
     override val statsReviewsTitle = "Повторы за 14 дней"
     override val weekdays = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс")
     override fun reminderDue(n: Int) = "К повтору: $n ${ruPlural(n, "карточка", "карточки", "карточек")}"
-    override fun interval(days: Int) = when { days <= 0 -> "сегодня"; days < 30 -> "$days д"; days < 365 -> "${days / 30} мес"; else -> "1 г" }
     override fun sessionProgress(done: Int, total: Int) = "$done из $total"
     override fun sessionSummary(know: Int, hard: Int, again: Int) = "Знал: $know · Трудно: $hard · Не знал: $again"
     override fun addTitle(level: Int) = listOf("Новый проект", "Новая колода", "Новая карточка")[level]

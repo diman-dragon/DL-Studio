@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.R
 import com.dlstudio.app.library.LibNode
+import com.dlstudio.app.ui.theme.LocalStrings
 
 /** Обратная сторона: перевод, пояснение, пример, озвучка. */
 @Composable
@@ -22,6 +23,7 @@ fun FlashBack(card: LibNode, onSpeak: (String) -> Unit) {
     Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(8.dp), Alignment.CenterHorizontally) {
         if (card.explanation.isNotBlank()) Text(card.explanation, color = muted, textAlign = TextAlign.Center)
         if (card.example.isNotBlank()) Text(card.example, color = muted, textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyMedium)
+        Text(LocalStrings.current.tapToContinue, style = MaterialTheme.typography.labelMedium, color = muted)
         FixedIconAction(R.drawable.ic_volume, { onSpeak(card.back.ifBlank { card.name }) }, iconTint = MaterialTheme.colorScheme.primary, containerColor = MaterialTheme.colorScheme.primaryContainer)
     }
 }

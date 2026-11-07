@@ -1,6 +1,7 @@
 package com.dlstudio.app.library
 
 import com.dlstudio.app.study.CardState
+import com.dlstudio.app.study.SavedSession
 import com.dlstudio.app.study.StudyStats
 
 /**
@@ -16,5 +17,6 @@ data class LibraryState(
     val states: Map<String, CardState> = emptyMap(),
     val stats: StudyStats = StudyStats(),
     val today: Long = 0,
-    val report: ImportReport? = null
+    val report: ImportReport? = null,
+    val resume: SavedSession? = null
 )

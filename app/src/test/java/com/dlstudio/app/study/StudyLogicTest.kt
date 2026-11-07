@@ -27,19 +27,6 @@ class StudyLogicTest {
         assertEquals(3, SessionPicker.pick(cards, states, 10, 3, extra = true).size)
     }
 
-    @Test fun sessionRequeuesAgainAndCountsOnce() {
-        var s = StudySession.start(cards.take(2), 0)
-        assertNull(s.answer(Grade.KNOW, 5))
-        s = s.flip(1000)
-        val (n, rec) = s.answer(Grade.AGAIN, 3000)!!
-        assertEquals(1000L, rec.faceMs); assertEquals(2000L, rec.backMs)
-        assertEquals(3, n.queue.size); assertEquals(1, n.again)
-        var cur = n
-        repeat(1) { cur = cur.flip(0).answer(Grade.KNOW, 0)!!.first }
-        val last = cur.flip(0).answer(Grade.HARD, 0)!!.first
-        assertTrue(last.done); assertEquals(2, last.finished)
-    }
-
     @Test fun dayNumberFloorsBeforeEpochAndKeepsTimezone() {
         val utc = TimeZone.getTimeZone("UTC")
         assertEquals(-1L, DayMath.dayNumber(-1, utc))
@@ -84,5 +71,41 @@ class StudyLogicTest {
         assertEquals(6, StudyScope.cards(tree, null, null).size)
         assertEquals(4, StudyScope.cards(tree, "p1", null).size)
         assertEquals(2, StudyScope.cards(tree, "p1", "d2").size)
+    }
+
+    @Test fun behaviorGradeRules() {
+        assertEquals(Grade.AGAIN, AutoGrade.of(300, false))
+        assertEquals(Grade.KNOW, AutoGrade.of(2_000, false))
+        assertEquals(Grade.HARD, AutoGrade.of(8_000, false))
+        assertEquals(Grade.HARD, AutoGrade.of(2_000, true))
+        assertEquals(Grade.AGAIN, AutoGrade.of(8_000, true))
+        assertEquals(Grade.AGAIN, AutoGrade.of(20_000, false))
+    }
+
+
+    @Test fun sessionKeepsOrderAndRecordsOncePerCard() {
+        var s = StudySession.start("s", cards.take(3), 0)
+        val order = s.queue.map { it.id }
+        s = s.goTo(1, 100); s = s.goTo(2, 200); s = s.goTo(1, 300)
+        val (a, first) = s.flip(2_300)!!.let { it.first to it.second }
+        assertEquals(Grade.KNOW, first!!.grade); assertEquals("c2", first.cardId)
+        val (b, none) = a.flip(3_000)
+        assertNull(none); val (c, again) = b.flip(4_000)
+        assertNull(again); assertTrue("c2" in c.flipped)
+        assertEquals(order, c.queue.map { it.id }); assertEquals(1, c.finished)
+    }
+
+    @Test fun hintAndBackAndForthKeepBehaviorGrade() {
+        val s = StudySession.start("s", cards.take(2), 0).useHint()
+        val (n, rec) = s.flip(2_000)
+        assertEquals(Grade.HARD, rec!!.grade)
+        assertEquals(1, n.hard); assertNull(StudySession.start("s", emptyList(), 0).flip(5).second)
+    }
+
+    @Test fun restoreKeepsPositionAndGrades() {
+        val saved = SavedSession("s", 0, 2, cards.take(3).map { it.id }, mapOf("c1" to Grade.KNOW, "zz" to Grade.HARD))
+        val s = StudySession.restore(saved, cards.take(3), 5)
+        assertEquals(2, s.index); assertEquals(mapOf("c1" to Grade.KNOW), s.grades)
+        assertEquals(3, s.goTo(99, 6).index)
     }
 }
