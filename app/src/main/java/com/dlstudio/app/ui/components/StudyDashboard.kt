@@ -35,7 +35,7 @@ fun StudyDashboard(lib: LibraryState, sessionSize: Int, study: StudyViewModel, o
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), Arrangement.spacedBy(14.dp)) {
         ScreenHeader(s.tabStudy)
         StudyHero(CardCounts.of(all, lib.states, lib.today), sessionSize, lib.stats.todayReviews, { startAll(false) }, { startAll(true) })
-        MotivationBanner(s.motivation(kind, n))
+        MotivationBanner(s.motivation(kind, n), motivationEmoji(kind))
         if (projects.isNotEmpty()) Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
             Text(s.projectsTitle, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = 4.dp))
             projects.forEach { (id, name, counts) -> StudyProjectCard(name, counts) { startProject(id) } }

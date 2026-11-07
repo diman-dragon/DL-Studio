@@ -13,6 +13,7 @@ import com.dlstudio.app.R
 import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.ui.theme.LocalStrings
+import com.dlstudio.app.ui.theme.LocalStudyOptions
 
 /** Лицевая сторона: слово по центру, подсказка слева, справа динамик и (для иностранного слова) микрофон проверки произношения. */
 @Composable
@@ -38,7 +39,7 @@ fun FlashFront(card: LibNode, mode: CardMode, hint: Boolean, hintReady: Boolean,
                 CardActionIcon(R.drawable.ic_lightbulb, onHint, colors = hintColors, highlight = hl, enabled = if (mode == CardMode.LISTEN) hintReady else true)
             } else Spacer(Modifier.size(80.dp))
             if (!isReverse) {
-                PronounceButton(pronounce)
+                if (LocalStudyOptions.current.pronounce) PronounceButton(pronounce)
                 CardActionIcon(R.drawable.ic_volume, { onSpeak(card.name) }, colors = soundColors)
             } else Spacer(Modifier.size(80.dp))
         }

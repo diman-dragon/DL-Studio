@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 /**
  * Текст, который сам уменьшается, пока не поместится: ни обрезков, ни разрыва слова посередине.
  * В одну строку слово не переносится вовсе; в несколько — переносы только по правилам языка.
+ * Межстрочный интервал уменьшается вместе с кеглем, чтобы пропорция строки не менялась.
  */
 @Composable
 fun FitText(
@@ -26,8 +27,9 @@ fun FitText(
     maxLines: Int = 1
 ) {
     var size by remember(text, style, maxLines) { mutableStateOf(style.fontSize) }
+    val line = if (style.lineHeight.isSp) (style.lineHeight.value * size.value / style.fontSize.value).sp else style.lineHeight
     Text(
-        text, modifier, color, size, style = style, maxLines = maxLines, softWrap = maxLines > 1,
+        text, modifier, color, size, lineHeight = line, style = style, maxLines = maxLines, softWrap = maxLines > 1,
         onTextLayout = { r ->
             val cut = (0 until r.lineCount - 1).any { i ->
                 val e = r.getLineEnd(i, true)

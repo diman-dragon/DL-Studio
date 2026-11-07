@@ -13,13 +13,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dlstudio.app.R
+import com.dlstudio.app.study.PronounceCheck
 import com.dlstudio.app.ui.theme.LocalStrings
 
-/** Блок ввода ответа с авто-раскладкой, кнопкой проверки и наглядной реакцией 👍 / 👎. */
+/** Блок ввода ответа с авто-раскладкой, кнопкой проверки и реакцией 👍 / 👎; регистр и знаки не важны; для слова на изучаемом языке (`onSpeak`) — динамик. */
 @Composable
-fun CardWriteInput(correct: String, submitted: Boolean, onAnswer: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+fun CardWriteInput(correct: String, submitted: Boolean, onAnswer: (Boolean) -> Unit, modifier: Modifier = Modifier, onSpeak: ((String) -> Unit)? = null) {
+    val s = LocalStrings.current
     var text by remember { mutableStateOf("") }
-    val isCorrect = text.trim().equals(correct.trim(), ignoreCase = true)
+    val isCorrect = PronounceCheck.normalize(text) == PronounceCheck.normalize(correct)
     val cs = MaterialTheme.colorScheme
     val ok = Color(0xFF2E7D32); val err = Color(0xFFC62828)
     val btnColor = if (submitted) (if (isCorrect) ok else err) else cs.primary
@@ -31,7 +33,7 @@ fun CardWriteInput(correct: String, submitted: Boolean, onAnswer: (Boolean) -> U
         Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
             CardWriteField(
                 value = text, onValueChange = { if (!submitted) text = it },
-                placeholder = LocalStrings.current.writePrompt, isRussian = isRu,
+                placeholder = s.writePrompt, isRussian = isRu,
                 enabled = !submitted, borderColor = borderColor, onDone = ::submit,
                 modifier = Modifier.weight(1f)
             )
@@ -42,7 +44,8 @@ fun CardWriteInput(correct: String, submitted: Boolean, onAnswer: (Boolean) -> U
             Arrangement.spacedBy(10.dp), Alignment.CenterVertically
         ) {
             Text(if (isCorrect) "👍" else "👎", fontSize = 24.sp)
-            Text(if (isCorrect) "Правильно!" else "Неправильно: $correct", style = MaterialTheme.typography.titleMedium, color = if (isCorrect) ok else err)
+            Text(if (isCorrect) s.writeRight else s.writeWrong(correct), Modifier.weight(1f), style = MaterialTheme.typography.titleMedium, color = if (isCorrect) ok else err)
+            if (onSpeak != null) SmallSpeaker(correct, onSpeak)
         }
     }
 }

@@ -13,7 +13,7 @@ fun AppPage(index: Int, state: AppState, vm: AppViewModel, onFolder: () -> Unit,
     when (index) {
         0 -> StudyScreen(state.sessionSize, vm::speak)
         1 -> StatsScreen()
-        2 -> LibraryScreen(onStudy = onStudy)
+        2 -> LibraryScreen(onStudy = onStudy, onSpeak = vm::speak)
         else -> SettingsScreen(state, vm, onFolder)
     }
 }

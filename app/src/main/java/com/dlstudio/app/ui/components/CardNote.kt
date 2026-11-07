@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.sp
 fun CardNote(text: String, modifier: Modifier = Modifier) {
     val cs = MaterialTheme.colorScheme
     val style = MaterialTheme.typography.bodyLarge.copy(
-        fontSize = 18.sp, lineHeight = 26.sp, textAlign = TextAlign.Center, hyphens = Hyphens.None, lineBreak = LineBreak.Paragraph
+        fontSize = 18.sp, lineHeight = 23.sp, textAlign = TextAlign.Center, hyphens = Hyphens.None, lineBreak = LineBreak.Paragraph
     )
-    Box(modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(cs.surfaceContainerHighest).padding(horizontal = 16.dp, vertical = 12.dp), Alignment.Center) {
+    Box(modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(cs.surfaceContainerHighest).padding(horizontal = 16.dp, vertical = 10.dp), Alignment.Center) {
         FitText(text.capFirst(), style, Modifier.fillMaxWidth(), cs.onSurface, minSize = 14.sp, maxLines = 4)
     }
 }

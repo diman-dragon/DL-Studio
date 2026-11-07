@@ -1,6 +1,8 @@
 package com.dlstudio.app.i18n
 
+import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.study.MotivationKind
+import com.dlstudio.app.study.PraiseKind
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
@@ -30,6 +32,14 @@ interface Strings {
     val doneWord: String
     val newRound: String
     val learn: String
+    val sectionModes: String; val sectionHelpers: String; val modeLast: String; val pronounceSetting: String; val celebrateSetting: String
+    val statsBestStreak: String; val statsWeek: String; val statsWeekTrend: String
+    val writeRight: String
+    fun writeWrong(correct: String): String
+    fun modeName(mode: CardMode): String
+    fun pronounceError(code: Int): String
+    fun praise(kind: PraiseKind, n: Int): String
+    fun sessionPraise(level: Int): String
     fun reviewsCount(n: Int): String
     fun motivation(kind: MotivationKind, n: Int): String
     val startStudy: String

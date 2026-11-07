@@ -9,13 +9,14 @@ import com.dlstudio.app.settings.ThemeMode
 import com.dlstudio.app.study.SpeechLang
 import com.dlstudio.app.ui.theme.DlTheme
 import com.dlstudio.app.ui.theme.LocalSpeechTag
+import com.dlstudio.app.ui.theme.LocalStudyOptions
 import com.dlstudio.app.ui.theme.LocalStrings
 
 /** Корень интерфейса: тема и язык из состояния, дальше — каркас с экранами. */
 @Composable
 fun AppRoot(vm: AppViewModel, onFolder: () -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
-    CompositionLocalProvider(LocalStrings provides stringsFor(state.lang), LocalSpeechTag provides SpeechLang.fromVoice(state.speechVoiceName)) {
+    CompositionLocalProvider(LocalStrings provides stringsFor(state.lang), LocalSpeechTag provides SpeechLang.fromVoice(state.speechVoiceName), LocalStudyOptions provides state.study) {
         DlTheme(dark = state.theme == ThemeMode.DARK, accent = state.accent) { AppScaffold(state, vm, onFolder) }
     }
 }

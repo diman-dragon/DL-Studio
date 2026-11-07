@@ -27,6 +27,7 @@ import com.dlstudio.app.ui.components.AboutDialog
 import com.dlstudio.app.ui.components.ScreenHeader
 import com.dlstudio.app.ui.components.SettingsData
 import com.dlstudio.app.ui.components.SettingsLook
+import com.dlstudio.app.ui.components.SettingsModes
 import com.dlstudio.app.ui.components.SettingsSpeech
 import com.dlstudio.app.ui.components.SettingsStudy
 import com.dlstudio.app.ui.components.VoicePicker
@@ -51,6 +52,7 @@ fun SettingsScreen(state: AppState, vm: AppViewModel, onFolder: () -> Unit) {
         SettingsLook(state, vm)
         SettingsSpeech(state, vm) { chooseVoice = true; vm.loadVoices() }
         SettingsStudy(state, vm, denied, onReminders)
+        SettingsModes(state, vm)
         SettingsData(state, onFolder) { about = true }
     }
     if (about) AboutDialog { about = false }

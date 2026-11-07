@@ -18,8 +18,8 @@ val DlTypography = Typography().let { b ->
         bodyLarge = b.bodyLarge.dlStyle(FontWeight.Normal),
         bodyMedium = b.bodyMedium.dlStyle(FontWeight.Normal),
         bodySmall = b.bodySmall.dlStyle(FontWeight.Normal),
-        labelLarge = b.labelLarge.dlStyle(FontWeight.Medium),
-        labelMedium = b.labelMedium.dlStyle(FontWeight.Medium),
-        labelSmall = b.labelSmall.dlStyle(FontWeight.Medium)
+        labelLarge = b.labelLarge.dlStyle(FontWeight.Medium, ratio = 1.2f),
+        labelMedium = b.labelMedium.dlStyle(FontWeight.Medium, ratio = 1.2f),
+        labelSmall = b.labelSmall.dlStyle(FontWeight.Medium, ratio = 1.2f)
     )
 }

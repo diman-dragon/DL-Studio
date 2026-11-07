@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.library.LibNode
+import com.dlstudio.app.ui.components.SmallSpeaker
 import com.dlstudio.app.ui.components.StudyPlayButton
 import androidx.compose.foundation.border
 
@@ -26,6 +27,7 @@ fun ItemRow(node: LibNode, level: Int, actions: ItemActions) {
         ItemBadge(level, 48.dp)
         ItemText(node, level, Modifier.weight(1f))
         if (cards(node, level) > 0) StudyPlayButton({ actions.onStudy(node) })
+        else if (level == 2) SmallSpeaker(node.name, actions.onSpeak)
         ItemMenu(node, actions)
     }
 }

@@ -27,7 +27,7 @@ fun SettingTile(title: String, value: String, onClick: () -> Unit, enabled: Bool
         border = BorderStroke(1.dp, colors.outlineVariant),
         colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant)
     ) {
-        Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp), Arrangement.spacedBy(4.dp)) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 13.dp), Arrangement.spacedBy(3.dp)) {
             FitText(title, MaterialTheme.typography.titleMedium, Modifier.fillMaxWidth(), minSize = 13.sp)
             FitText(value.replace("/", "/​"), MaterialTheme.typography.bodyMedium, Modifier.fillMaxWidth(), colors.primary, 11.sp, 2)
         }

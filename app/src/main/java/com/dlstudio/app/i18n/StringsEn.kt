@@ -1,6 +1,8 @@
 package com.dlstudio.app.i18n
 
+import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.study.MotivationKind
+import com.dlstudio.app.study.PraiseKind
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
@@ -20,6 +22,27 @@ object StringsEn : Strings {
     override val sectionLook = "Appearance"; override val sectionSpeech = "Speech"; override val sectionStudy = "Study"; override val sectionData = "Data"
     override val yesterdayTitle = "Yesterday"; override val yesterdayEmpty = "No study yesterday"; override val streakTitle = "Streak"; override val forecastTitle = "Next 7 days"
     override val projectsTitle = "Projects"; override val doneWord = "done"; override val newRound = "Round complete. Starting a new one in a different order…"; override val learn = "Study"
+    override val sectionModes = "Card modes"; override val sectionHelpers = "Helpers"; override val modeLast = "At least one mode is required"
+    override val pronounceSetting = "Pronunciation check (microphone)"; override val celebrateSetting = "Animations and cheers"
+    override val statsBestStreak = "Best streak"; override val statsWeek = "Last 7 days"; override val statsWeekTrend = "vs previous week"
+    override val writeRight = "Correct!"; override fun writeWrong(correct: String) = "Not quite: $correct"
+    override fun modeName(mode: CardMode) = when (mode) {
+        CardMode.CHOICE_FWD -> "Choose the translation"
+        CardMode.CHOICE_REV -> "Choose the word"
+        CardMode.LISTEN -> "Listening: word by ear"
+        CardMode.WRITE_FWD -> "Type the translation"
+        CardMode.WRITE_REV -> "Type the word"
+    }
+    override fun pronounceError(code: Int) = "Speech recognition failed to start (code $code). Please try again"
+    override fun praise(kind: PraiseKind, n: Int) = when (kind) {
+        PraiseKind.RECORD_DAY -> "Best day in two weeks: $n reviews. Keep it up!"
+        PraiseKind.UP_TODAY -> "$n more reviews than yesterday. Keep it up!"
+        PraiseKind.BEST_STREAK -> "New record! $n ${if (n == 1) "day" else "days"} in a row. Don't stop!"
+        PraiseKind.WEEK_UP -> "$n% more reviews than last week. Great pace!"
+        PraiseKind.ACCURACY -> "Accuracy $n%: you remember really well. Keep it up!"
+        PraiseKind.KEEP -> "Every review is a step forward. Keep it up!"
+    }
+    override fun sessionPraise(level: Int) = listOf("What matters is that you practised. Repetition will help!", "Good work, better each time!", "Excellent result! Keep it up!")[level]
     override fun reviewsCount(n: Int) = "$n ${if (n == 1) "review" else "reviews"}"
     override fun motivation(kind: MotivationKind, n: Int) = when (kind) {
         MotivationKind.EMPTY -> "Add your first cards in the library and we will begin."
@@ -47,7 +70,7 @@ object StringsEn : Strings {
     override val on = "On"
     override val off = "Off"
     override val pronounceListening = "Listening… say it out loud"; override val pronounceOk = "Great, that sounded right"; override val pronounceClose = "Almost there, try once more"; override val pronounceMiss = "Not quite, listen and repeat"
-    override val pronounceNoSpeech = "Could not hear you. Tap the microphone and speak louder"; override val pronounceUnavailable = "Speech recognition is not available on this device"; override val pronounceDenied = "Allow the microphone in Android settings"
+    override val pronounceNoSpeech = "Could not hear you. Tap the microphone and speak louder"; override val pronounceUnavailable = "No speech recognition service found. Turn on Google voice input in Android settings"; override val pronounceDenied = "Allow the microphone in Android settings"
     override fun pronounceHeard(text: String) = "Heard: “$text”"
     override val notificationsNeeded = "Allow notifications in Android settings, or reminders will not arrive."
     override val statsReviewsTitle = "Reviews, 14 days"

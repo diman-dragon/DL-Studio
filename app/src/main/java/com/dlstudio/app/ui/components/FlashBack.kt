@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.dlstudio.app.R
 import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.study.CardMode
+import com.dlstudio.app.ui.theme.LocalStudyOptions
 
 /** Обратная сторона: перевод по центру, пояснения; при иностранном слове — динамик и микрофон проверки произношения. */
 @Composable
@@ -26,11 +27,11 @@ fun FlashBack(card: LibNode, mode: CardMode, onSpeak: (String) -> Unit, pronounc
                 if (card.explanation.isNotBlank()) CardNote(card.explanation)
             }
         }
-        if (card.example.isNotBlank()) CardNote(card.example, Modifier.padding(bottom = 8.dp))
+        if (card.example.isNotBlank()) SpeakNote(card.example, onSpeak, Modifier.padding(bottom = 8.dp))
         if (isReverse) PronounceFeedback(pronounce)
         Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(16.dp, Alignment.End), Alignment.Bottom) {
             if (isReverse) {
-                PronounceButton(pronounce)
+                if (LocalStudyOptions.current.pronounce) PronounceButton(pronounce)
                 CardActionIcon(R.drawable.ic_volume, { onSpeak(card.name) }, colors = soundColors)
             } else Spacer(Modifier.size(80.dp))
         }

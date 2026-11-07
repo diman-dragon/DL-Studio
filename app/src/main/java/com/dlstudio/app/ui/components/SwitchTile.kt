@@ -18,17 +18,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 
-/** Плитка с переключателем: название, пояснение и Switch; нажимается вся плитка. */
+/** Плитка с переключателем: название, пояснение и Switch; нажимается вся плитка (`enabled = false` — переключатель заблокирован). */
 @Composable
-fun SwitchTile(title: String, value: String, checked: Boolean, onChange: (Boolean) -> Unit) {
+fun SwitchTile(title: String, value: String, checked: Boolean, onChange: (Boolean) -> Unit, enabled: Boolean = true) {
     val colors = MaterialTheme.colorScheme
     Surface(Modifier.fillMaxWidth(), RoundedCornerShape(20.dp), colors.surfaceVariant, border = BorderStroke(1.dp, colors.outlineVariant)) {
-        Row(Modifier.toggleable(checked, role = Role.Switch, onValueChange = onChange).padding(horizontal = 20.dp, vertical = 14.dp), Arrangement.SpaceBetween, Alignment.CenterVertically) {
-            Column(Modifier.weight(1f), Arrangement.spacedBy(4.dp)) {
+        Row(Modifier.toggleable(checked, enabled, Role.Switch, onChange).padding(horizontal = 20.dp, vertical = 12.dp), Arrangement.SpaceBetween, Alignment.CenterVertically) {
+            Column(Modifier.weight(1f), Arrangement.spacedBy(3.dp)) {
                 Text(title, style = MaterialTheme.typography.titleMedium)
                 Text(value, style = MaterialTheme.typography.bodyMedium, color = colors.primary)
             }
-            Switch(checked, null)
+            Switch(checked, null, enabled = enabled)
         }
     }
 }

@@ -4,7 +4,10 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,8 +34,8 @@ fun <T> OptionChips(title: String, options: List<Pair<String, T>>, selected: T, 
                         Modifier.weight(1f).clickable(role = Role.RadioButton) { onSelect(value) }, RoundedCornerShape(14.dp),
                         if (on) colors.primaryContainer else colors.background, border = BorderStroke(1.dp, if (on) colors.primary else colors.outline)
                     ) {
-                        Row(Modifier.padding(vertical = 11.dp), Arrangement.Center, Alignment.CenterVertically) {
-                            FitText(label, MaterialTheme.typography.labelLarge, color = if (on) colors.primary else colors.onSurfaceVariant, minSize = 10.sp)
+                        Box(Modifier.height(42.dp), Alignment.Center) {
+                            ButtonLabel(label, if (on) colors.primary else colors.onSurfaceVariant, Modifier.fillMaxHeight(0.9f), maxSize = 15.sp, minSize = 10.sp, maxLines = 1)
                         }
                     }
                 }

@@ -18,25 +18,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.R
+import com.dlstudio.app.study.SessionPraise
 import com.dlstudio.app.study.StudySession
 import com.dlstudio.app.ui.theme.LocalAccent
 import com.dlstudio.app.ui.theme.LocalStrings
+import com.dlstudio.app.ui.theme.LocalStudyOptions
 import com.dlstudio.app.ui.theme.gradientColors
 
-/** Итог сессии; в режиме «Учить» из библиотеки сообщает, что сейчас начнётся новый круг в другом порядке. */
+/** Итог сессии с похвалой по результату (при «отлично» — конфетти); в режиме «Учить» сообщает о новом круге в другом порядке. */
 @Composable
 fun SessionDone(session: StudySession, onBack: () -> Unit) {
     val s = LocalStrings.current
-    Column(Modifier.fillMaxSize().padding(24.dp), Arrangement.Center, Alignment.CenterHorizontally) {
-        Box(Modifier.size(96.dp).background(Brush.linearGradient(LocalAccent.current.gradientColors()), CircleShape), contentAlignment = Alignment.Center) {
-            AppIcon(R.drawable.ic_check, Color.White, 52.dp)
+    val level = SessionPraise.level(session.know, session.total)
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize().padding(24.dp), Arrangement.Center, Alignment.CenterHorizontally) {
+            Box(Modifier.size(96.dp).background(Brush.linearGradient(LocalAccent.current.gradientColors()), CircleShape), contentAlignment = Alignment.Center) {
+                AppIcon(R.drawable.ic_check, Color.White, 52.dp)
+            }
+            Text(s.sessionDone, Modifier.padding(top = 20.dp), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
+            Text(s.sessionPraise(level), Modifier.padding(top = 6.dp), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary, textAlign = TextAlign.Center)
+            Text(
+                s.sessionSummary(session.know, session.hard, session.again), Modifier.padding(top = 6.dp, bottom = 12.dp),
+                style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center
+            )
+            if (session.random) Text(s.newRound, Modifier.padding(bottom = 20.dp), color = MaterialTheme.colorScheme.primary, textAlign = TextAlign.Center)
+            GradientButton(s.backToList, onBack)
         }
-        Text(s.sessionDone, Modifier.padding(top = 24.dp), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
-        Text(
-            s.sessionSummary(session.know, session.hard, session.again), Modifier.padding(top = 8.dp, bottom = 12.dp),
-            style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center
-        )
-        if (session.random) Text(s.newRound, Modifier.padding(bottom = 20.dp), color = MaterialTheme.colorScheme.primary, textAlign = TextAlign.Center)
-        GradientButton(s.backToList, onBack)
+        if (level == 2 && LocalStudyOptions.current.celebrate) Confetti(Modifier.fillMaxSize())
     }
 }

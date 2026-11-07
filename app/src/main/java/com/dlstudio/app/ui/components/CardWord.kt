@@ -15,7 +15,7 @@ import com.dlstudio.app.ui.theme.DlFonts
 @Composable
 fun CardWord(text: String, color: Color, modifier: Modifier = Modifier) {
     val style = MaterialTheme.typography.displaySmall.copy(
-        fontFamily = DlFonts, fontWeight = FontWeight.SemiBold, fontSize = 38.sp, lineHeight = 46.sp,
+        fontFamily = DlFonts, fontWeight = FontWeight.SemiBold, fontSize = 38.sp, lineHeight = 44.sp,
         letterSpacing = 0.sp, textAlign = TextAlign.Center, hyphens = Hyphens.None
     )
     FitText(text.capFirst(), style, modifier.fillMaxWidth(), color, minSize = 20.sp, maxLines = 3)

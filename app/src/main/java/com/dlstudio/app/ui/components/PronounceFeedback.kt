@@ -25,15 +25,16 @@ fun PronounceFeedback(state: PronounceState, modifier: Modifier = Modifier) {
     if (phase == PronouncePhase.IDLE) return
     val ok = Color(0xFF2E7D32); val warn = Color(0xFFB45309); val err = Color(0xFFC62828)
     val (text, tint) = when (phase) {
-        PronouncePhase.LISTENING -> s.pronounceListening to MaterialTheme.colorScheme.primary
+        PronouncePhase.LISTENING -> (if (state.heard.isBlank()) s.pronounceListening else "${s.pronounceListening}\n${s.pronounceHeard(state.heard)}") to MaterialTheme.colorScheme.primary
         PronouncePhase.OK -> "👍 ${s.pronounceOk}\n${s.pronounceHeard(state.heard)}" to ok
         PronouncePhase.CLOSE -> "${s.pronounceClose}\n${s.pronounceHeard(state.heard)}" to warn
         PronouncePhase.MISS -> "👎 ${s.pronounceMiss}\n${s.pronounceHeard(state.heard)}" to err
         PronouncePhase.NO_SPEECH -> s.pronounceNoSpeech to warn
         PronouncePhase.UNAVAILABLE -> s.pronounceUnavailable to err
+        PronouncePhase.FAILED -> s.pronounceError(state.errorCode) to err
         else -> s.pronounceDenied to err
     }
-    val style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp, lineHeight = 22.sp, textAlign = TextAlign.Center, hyphens = Hyphens.None)
+    val style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp, lineHeight = 20.sp, textAlign = TextAlign.Center, hyphens = Hyphens.None)
     Box(modifier.fillMaxWidth().padding(bottom = 8.dp).clip(RoundedCornerShape(14.dp)).background(tint.copy(alpha = .16f)).padding(horizontal = 16.dp, vertical = 10.dp), Alignment.Center) {
         FitText(text, style, Modifier.fillMaxWidth(), tint, minSize = 12.sp, maxLines = 3)
     }

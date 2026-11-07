@@ -1,6 +1,8 @@
 package com.dlstudio.app.i18n
 
+import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.study.MotivationKind
+import com.dlstudio.app.study.PraiseKind
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
@@ -20,6 +22,27 @@ object StringsRu : Strings {
     override val sectionLook = "Внешний вид"; override val sectionSpeech = "Озвучка"; override val sectionStudy = "Учёба"; override val sectionData = "Данные"
     override val yesterdayTitle = "Вчера"; override val yesterdayEmpty = "Вчера занятий не было"; override val streakTitle = "Серия"; override val forecastTitle = "Ближайшие 7 дней"
     override val projectsTitle = "Проекты"; override val doneWord = "сделано"; override val newRound = "Круг пройден. Начинаем новый, порядок будет другим…"; override val learn = "Учить"
+    override val sectionModes = "Режимы карточек"; override val sectionHelpers = "Помощники"; override val modeLast = "Нужен хотя бы один режим"
+    override val pronounceSetting = "Проверка произношения (микрофон)"; override val celebrateSetting = "Анимации и поздравления"
+    override val statsBestStreak = "Рекорд серии"; override val statsWeek = "За 7 дней"; override val statsWeekTrend = "К прошлой неделе"
+    override val writeRight = "Правильно!"; override fun writeWrong(correct: String) = "Неправильно: $correct"
+    override fun modeName(mode: CardMode) = when (mode) {
+        CardMode.CHOICE_FWD -> "Выбор перевода"
+        CardMode.CHOICE_REV -> "Выбор слова по переводу"
+        CardMode.LISTEN -> "Аудирование: слово на слух"
+        CardMode.WRITE_FWD -> "Ввод перевода с клавиатуры"
+        CardMode.WRITE_REV -> "Ввод слова с клавиатуры"
+    }
+    override fun pronounceError(code: Int) = "Не удалось включить распознавание речи (код $code). Попробуйте ещё раз"
+    override fun praise(kind: PraiseKind, n: Int) = when (kind) {
+        PraiseKind.RECORD_DAY -> "Лучший день за две недели: $n повторов. Так держать!"
+        PraiseKind.UP_TODAY -> "Сегодня на $n больше повторов, чем вчера. Так держать!"
+        PraiseKind.BEST_STREAK -> "Рекорд! $n ${ruPlural(n, "день", "дня", "дней")} подряд. Не останавливайтесь!"
+        PraiseKind.WEEK_UP -> "За неделю на $n% больше повторов, чем на прошлой. Отличный темп!"
+        PraiseKind.ACCURACY -> "Точность $n%: вы отлично запоминаете. Так держать!"
+        PraiseKind.KEEP -> "Каждый повтор — шаг вперёд. Так держать!"
+    }
+    override fun sessionPraise(level: Int) = listOf("Главное, что вы занимались. Повтор закрепит!", "Хорошая работа, с каждым разом лучше!", "Отличный результат! Так держать!")[level]
     override fun reviewsCount(n: Int) = "$n ${ruPlural(n, "повтор", "повтора", "повторов")}"
     override fun motivation(kind: MotivationKind, n: Int) = when (kind) {
         MotivationKind.EMPTY -> "Добавьте первые карточки в библиотеке, и начнём."
@@ -47,7 +70,7 @@ object StringsRu : Strings {
     override val on = "Включены"
     override val off = "Выключены"
     override val pronounceListening = "Слушаю… Скажите вслух"; override val pronounceOk = "Отлично, произношение верное"; override val pronounceClose = "Почти получилось, попробуйте ещё раз"; override val pronounceMiss = "Не то, послушайте и повторите"
-    override val pronounceNoSpeech = "Не расслышал. Нажмите на микрофон и скажите громче"; override val pronounceUnavailable = "Распознавание речи на этом устройстве недоступно"; override val pronounceDenied = "Разрешите микрофон в настройках Android"
+    override val pronounceNoSpeech = "Не расслышал. Нажмите на микрофон и скажите громче"; override val pronounceUnavailable = "Служба распознавания речи не найдена. Включите голосовой ввод Google в настройках Android"; override val pronounceDenied = "Разрешите микрофон в настройках Android"
     override fun pronounceHeard(text: String) = "Услышано: «$text»"
     override val notificationsNeeded = "Разрешите уведомления в настройках Android, иначе напоминания не придут."
     override val statsReviewsTitle = "Повторы за 14 дней"

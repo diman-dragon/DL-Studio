@@ -4,18 +4,14 @@ import com.dlstudio.app.library.LibNode
 import kotlin.math.abs
 import kotlin.random.Random
 
-/** Выбор учебного режима по заданным весам и подбор 4 вариантов ответа. */
+/** Выбор учебного режима по весам среди включённых в настройках и подбор 4 вариантов ответа. */
 object ModeWeights {
-    fun modeFor(card: LibNode, index: Int): CardMode {
-        if (card.back.isBlank()) return CardMode.CHOICE_FWD
-        val slot = abs(card.id.hashCode() * 37 + index * 17) % 55
-        return when {
-            slot < 8 -> CardMode.CHOICE_FWD
-            slot < 32 -> CardMode.CHOICE_REV
-            slot < 43 -> CardMode.LISTEN
-            slot < 49 -> CardMode.WRITE_FWD
-            else -> CardMode.WRITE_REV
-        }
+    private val weights = listOf(CardMode.CHOICE_FWD to 8, CardMode.CHOICE_REV to 24, CardMode.LISTEN to 11, CardMode.WRITE_FWD to 6, CardMode.WRITE_REV to 6)
+
+    fun modeFor(card: LibNode, index: Int, enabled: Set<CardMode> = CardMode.values().toSet()): CardMode {
+        val pool = weights.filter { it.first in enabled }.ifEmpty { weights }
+        var slot = abs(card.id.hashCode() * 37 + index * 17) % pool.sumOf { it.second }
+        return pool.first { (_, w) -> if (slot < w) true else { slot -= w; false } }.first
     }
 
     fun optionsFor(card: LibNode, queue: List<LibNode>, reverse: Boolean, index: Int): List<String> {
