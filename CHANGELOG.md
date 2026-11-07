@@ -3,6 +3,16 @@
 Версия лежит в `version.txt` и поднимается при **каждом** изменении: меняется последняя цифра (0.0.1 → 0.0.2 → …).
 Верхняя запись этого файла обязана совпадать с `version.txt` (проверяет `scripts/check.mjs`).
 
+## 0.1.12
+**Автоматическое переключение системной клавиатуры**
+- Реализован компонент [`CardWriteField`](file:///d:/Projekts/GooglePlay/DL-Studio/app/src/main/java/com/dlstudio/app/ui/components/CardWriteField.kt) с прямым пробросом системного `imeHintLocales` (`android.os.LocaleList`) в IME Android (API 24+).
+- При фокусе на поле ввода системная клавиатура (Gboard, Samsung Keyboard и др.) автоматически переключает раскладку на требуемый язык (русский или английский).
+
+## 0.1.11
+**Исправление сборки поля ввода**
+- Устранён вызов неподдерживаемого в Compose BOM 2024.02.00 параметра `hintLocales` в [`CardWriteInput`](file:///d:/Projekts/GooglePlay/DL-Studio/app/src/main/java/com/dlstudio/app/ui/components/CardWriteInput.kt).
+- Подсказка требуемого языка ввода (RU / EN) выведена непосредственно в плейсхолдер поля.
+
 ## 0.1.10
 **Человеческие имена голосов, авто-раскладка и цветные элементы**
 - В настройках озвучки технические идентификаторы (вроде `ru-ru-x-dfc`) заменены на приятные человеческие имена через [`VoiceName`](file:///d:/Projekts/GooglePlay/DL-Studio/app/src/main/java/com/dlstudio/app/ui/components/VoiceName.kt) («Алёна (Россия)», «Игорь», «Оливия (Великобритания)»).
