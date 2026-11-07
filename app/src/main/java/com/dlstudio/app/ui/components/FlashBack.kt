@@ -14,28 +14,30 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dlstudio.app.R
 import com.dlstudio.app.library.LibNode
+import com.dlstudio.app.study.CardMode
 
-/** Обратная сторона карточки: центрированный перевод, пояснения и озвучка. */
+/** Обратная сторона карточки: центрированный перевод, пояснения и динамик если здесь иностранное слово. */
 @Composable
-fun FlashBack(card: LibNode, onSpeak: (String) -> Unit) {
+fun FlashBack(card: LibNode, mode: CardMode, onSpeak: (String) -> Unit) {
     val cs = MaterialTheme.colorScheme
-    val text = card.back.ifBlank { card.name }
+    val isReverse = mode == CardMode.CHOICE_REV || mode == CardMode.WRITE_REV
+    val text = if (isReverse) card.name else card.back.ifBlank { card.name }
+
     Column(Modifier.fillMaxSize()) {
-        Row(Modifier.fillMaxWidth(), Arrangement.End, Alignment.CenterVertically) {
-            CardActionIcon(R.drawable.ic_volume, { onSpeak(text) }, size = 42.dp)
-        }
         Box(Modifier.fillMaxWidth().weight(1f), Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 FitText(text, MaterialTheme.typography.displayMedium.copy(textAlign = TextAlign.Center), color = cs.onSurface, minSize = 22.sp, maxLines = 2)
-                if (card.explanation.isNotBlank()) {
-                    Text(card.explanation, style = MaterialTheme.typography.bodyMedium, color = cs.onSurfaceVariant, textAlign = TextAlign.Center)
-                }
+                if (card.explanation.isNotBlank()) Text(card.explanation, style = MaterialTheme.typography.bodyMedium, color = cs.onSurfaceVariant, textAlign = TextAlign.Center)
             }
         }
         if (card.example.isNotBlank()) {
-            Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(cs.surfaceContainerHighest).padding(horizontal = 14.dp, vertical = 8.dp), Alignment.Center) {
+            Box(Modifier.fillMaxWidth().padding(bottom = 8.dp).clip(RoundedCornerShape(12.dp)).background(cs.surfaceContainerHighest).padding(horizontal = 14.dp, vertical = 8.dp), Alignment.Center) {
                 Text(card.example, style = MaterialTheme.typography.bodySmall, color = cs.onSurfaceVariant, textAlign = TextAlign.Center)
             }
+        }
+        Row(Modifier.fillMaxWidth(), Arrangement.End, Alignment.Bottom) {
+            if (isReverse) CardActionIcon(R.drawable.ic_volume, { onSpeak(card.name) })
+            else Spacer(Modifier.size(64.dp))
         }
     }
 }

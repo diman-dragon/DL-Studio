@@ -21,14 +21,16 @@ import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.study.CardMode
 import kotlin.math.abs
 
-/** Уменьшенная аккуратная карточка с центрированным словом и анимацией флипа. */
+/** Уменьшенная аккуратная карточка с центрированным словом и блокировкой переворота до ответа. */
 @Composable
 fun StudyFlashCard(
     card: LibNode,
     mode: CardMode,
     flipped: Boolean,
     hint: Boolean,
+    hintReady: Boolean,
     listenRevealed: Boolean,
+    canFlip: Boolean,
     onFlip: () -> Unit,
     onHint: () -> Unit,
     onSpeak: (String) -> Unit,
@@ -39,14 +41,14 @@ fun StudyFlashCard(
     val cs = MaterialTheme.colorScheme
     Box(
         modifier = modifier.fillMaxWidth()
-            .clickable(remember { MutableInteractionSource() }, null, onClick = onFlip)
+            .clickable(remember { MutableInteractionSource() }, null, enabled = canFlip, onClick = onFlip)
             .graphicsLayer { scaleX = abs(1f - 2f * turn).coerceAtLeast(0.02f) }
             .clip(shape).background(cs.surfaceContainerHigh).border(1.dp, cs.outlineVariant, shape).padding(20.dp)
     ) {
         if (turn < 0.5f) {
-            FlashFront(card, mode, hint, listenRevealed, onHint, onSpeak)
+            FlashFront(card, mode, hint, hintReady, listenRevealed, onHint, onSpeak)
         } else {
-            FlashBack(card, onSpeak)
+            FlashBack(card, mode, onSpeak)
         }
     }
 }

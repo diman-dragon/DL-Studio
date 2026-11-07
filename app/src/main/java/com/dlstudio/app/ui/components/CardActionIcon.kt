@@ -18,7 +18,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-/** Красивая функциональная кнопка-иконка для карточки (звук, подсказка). */
+/** Крупная функциональная круглая кнопка для карточки (звук в правом углу, подсказка в левом). */
 @Composable
 fun CardActionIcon(
     @DrawableRes icon: Int,
@@ -27,30 +27,29 @@ fun CardActionIcon(
     active: Boolean = false,
     highlight: Boolean = false,
     enabled: Boolean = true,
-    size: Dp = 44.dp
+    size: Dp = 64.dp
 ) {
     val cs = MaterialTheme.colorScheme
     val targetBg = when {
-        !enabled -> cs.surfaceContainerHighest.copy(alpha = 0.4f)
-        active -> cs.primaryContainer
+        !enabled -> cs.surfaceContainerHighest.copy(alpha = 0.35f)
         highlight -> cs.tertiaryContainer
+        active -> cs.primaryContainer
         else -> cs.surfaceContainerHigh
     }
     val targetTint = when {
-        !enabled -> cs.onSurfaceVariant.copy(alpha = 0.35f)
-        active -> cs.primary
+        !enabled -> cs.onSurfaceVariant.copy(alpha = 0.3f)
         highlight -> cs.tertiary
+        active -> cs.primary
         else -> cs.onSurfaceVariant
     }
     val bg by animateColorAsState(targetBg, label = "bg")
     val tint by animateColorAsState(targetTint, label = "tint")
     Box(
-        modifier = modifier.size(size).clip(CircleShape)
-            .background(bg)
-            .then(if (highlight) Modifier.border(1.5.dp, cs.tertiary, CircleShape) else Modifier)
+        modifier = modifier.size(size).clip(CircleShape).background(bg)
+            .then(if (highlight) Modifier.border(2.dp, cs.tertiary, CircleShape) else Modifier)
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        AppIcon(icon, tint, size = (size.value * 0.52f).dp)
+        AppIcon(icon, tint, size = (size.value * 0.5f).dp)
     }
 }

@@ -11,11 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-/** Компонентная кнопка варианта ответа с цветовой индикацией результата. */
+/** Адаптивная кнопка варианта ответа: крупный текст на 90% площади без обрезки и разрывов. */
 @Composable
 fun ChoiceButton(
     text: String,
@@ -34,12 +35,14 @@ fun ChoiceButton(
         else -> cs.surfaceContainerHigh to cs.outlineVariant
     }
     Box(
-        modifier = modifier.height(56.dp).clip(shape)
+        modifier = modifier.height(62.dp).clip(shape)
             .background(bg).border(1.dp, border, shape)
             .clickable(enabled = enabled, onClick = onClick)
-            .padding(horizontal = 10.dp),
+            .padding(horizontal = 8.dp, vertical = 4.dp),
         contentAlignment = Alignment.Center
     ) {
-        FitText(text, MaterialTheme.typography.titleSmall.copy(textAlign = TextAlign.Center), color = cs.onSurface, minSize = 11.sp, maxLines = 2)
+        Box(Modifier.fillMaxWidth(0.92f).fillMaxHeight(0.92f), Alignment.Center) {
+            FitText(text, MaterialTheme.typography.titleMedium.copy(textAlign = TextAlign.Center, fontWeight = FontWeight.Medium), color = cs.onSurface, minSize = 11.sp, maxLines = 2)
+        }
     }
 }
