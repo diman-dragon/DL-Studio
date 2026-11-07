@@ -41,6 +41,9 @@ interface Strings {
     val backToList: String
     val checkAnswer: String
     val listenPrompt: String
+    val pronounceListening: String; val pronounceOk: String; val pronounceClose: String; val pronounceMiss: String
+    val pronounceNoSpeech: String; val pronounceUnavailable: String; val pronounceDenied: String
+    fun pronounceHeard(text: String): String
     val writePrompt: String
     val todayTitle: String
     val freshWord: String

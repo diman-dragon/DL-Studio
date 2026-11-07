@@ -3,6 +3,13 @@
 Версия лежит в `version.txt` и поднимается при **каждом** изменении: меняется последняя цифра (0.0.1 → 0.0.2 → …).
 Верхняя запись этого файла обязана совпадать с `version.txt` (проверяет `scripts/check.mjs`).
 
+## 0.1.14
+**Проверка произношения на карточке**
+- Микрофон ([`PronounceButton`](app/src/main/java/com/dlstudio/app/ui/components/PronounceButton.kt)) только на изучаемой стороне, рядом с динамиком; результат — полоска [`PronounceFeedback`](app/src/main/java/com/dlstudio/app/ui/components/PronounceFeedback.kt) («Слушаю…», что услышано, оценка).
+- Встроенное распознавание Android: [`Listener`](app/src/main/java/com/dlstudio/app/study/Listener.kt) (`SpeechRecognizer`, на устройстве, если доступно); сравнение — [`PronounceCheck`](app/src/main/java/com/dlstudio/app/study/PronounceCheck.kt), язык — [`SpeechLang`](app/src/main/java/com/dlstudio/app/study/SpeechLang.kt) (из голоса озвучки или по буквам слова).
+- Разрешение `RECORD_AUDIO` запрашивается при первом нажатии; `queries` для сервиса распознавания (Android 11+).
+- Тексты RU/EN, тест `PronounceCheckTest`.
+
 ## 0.1.13
 **Карточки: шрифты, размер текста, переносы**
 - Слово карточки ([`CardWord`](app/src/main/java/com/dlstudio/app/ui/components/CardWord.kt)): Inter SemiBold 38sp, по центру, с заглавной буквы.

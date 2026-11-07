@@ -11,9 +11,9 @@ import com.dlstudio.app.R
 import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.study.CardMode
 
-/** Обратная сторона карточки: центрированный перевод, пояснения и крупный цветной динамик при иностранном слове. */
+/** Обратная сторона: перевод по центру, пояснения; при иностранном слове — динамик и микрофон проверки произношения. */
 @Composable
-fun FlashBack(card: LibNode, mode: CardMode, onSpeak: (String) -> Unit) {
+fun FlashBack(card: LibNode, mode: CardMode, onSpeak: (String) -> Unit, pronounce: PronounceState) {
     val cs = MaterialTheme.colorScheme
     val isReverse = mode == CardMode.CHOICE_REV || mode == CardMode.WRITE_REV
     val text = if (isReverse) card.name else card.back.ifBlank { card.name }
@@ -27,9 +27,12 @@ fun FlashBack(card: LibNode, mode: CardMode, onSpeak: (String) -> Unit) {
             }
         }
         if (card.example.isNotBlank()) CardNote(card.example, Modifier.padding(bottom = 8.dp))
-        Row(Modifier.fillMaxWidth(), Arrangement.End, Alignment.Bottom) {
-            if (isReverse) CardActionIcon(R.drawable.ic_volume, { onSpeak(card.name) }, colors = soundColors)
-            else Spacer(Modifier.size(80.dp))
+        if (isReverse) PronounceFeedback(pronounce)
+        Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(16.dp, Alignment.End), Alignment.Bottom) {
+            if (isReverse) {
+                PronounceButton(pronounce)
+                CardActionIcon(R.drawable.ic_volume, { onSpeak(card.name) }, colors = soundColors)
+            } else Spacer(Modifier.size(80.dp))
         }
     }
 }

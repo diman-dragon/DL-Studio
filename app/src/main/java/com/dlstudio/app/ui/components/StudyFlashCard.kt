@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.study.CardMode
+import com.dlstudio.app.study.SpeechLang
+import com.dlstudio.app.ui.theme.LocalSpeechTag
 import kotlin.math.abs
 
 /** Уменьшенная аккуратная карточка с центрированным словом и блокировкой переворота до ответа. */
@@ -39,6 +41,7 @@ fun StudyFlashCard(
     val turn by animateFloatAsState(if (flipped) 1f else 0f, tween(260, easing = FastOutSlowInEasing), label = "flip")
     val shape = RoundedCornerShape(26.dp)
     val cs = MaterialTheme.colorScheme
+    val pronounce = rememberPronounce(card.name, SpeechLang.forText(card.name, LocalSpeechTag.current))
     Box(
         modifier = modifier.fillMaxWidth()
             .clickable(remember { MutableInteractionSource() }, null, enabled = canFlip, onClick = onFlip)
@@ -46,9 +49,9 @@ fun StudyFlashCard(
             .clip(shape).background(cs.surfaceContainerHigh).border(1.dp, cs.outlineVariant, shape).padding(20.dp)
     ) {
         if (turn < 0.5f) {
-            FlashFront(card, mode, hint, hintReady, listenRevealed, onHint, onSpeak)
+            FlashFront(card, mode, hint, hintReady, listenRevealed, onHint, onSpeak, pronounce)
         } else {
-            FlashBack(card, mode, onSpeak)
+            FlashBack(card, mode, onSpeak, pronounce)
         }
     }
 }

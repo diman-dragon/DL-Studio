@@ -14,9 +14,9 @@ import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.ui.theme.LocalStrings
 
-/** Лицевая сторона: центрированное слово, цветная подсказка слева и крупный цветной динамик справа. */
+/** Лицевая сторона: слово по центру, подсказка слева, справа динамик и (для иностранного слова) микрофон проверки произношения. */
 @Composable
-fun FlashFront(card: LibNode, mode: CardMode, hint: Boolean, hintReady: Boolean, listenRevealed: Boolean, onHint: () -> Unit, onSpeak: (String) -> Unit) {
+fun FlashFront(card: LibNode, mode: CardMode, hint: Boolean, hintReady: Boolean, listenRevealed: Boolean, onHint: () -> Unit, onSpeak: (String) -> Unit, pronounce: PronounceState) {
     val s = LocalStrings.current
     val isReverse = mode == CardMode.CHOICE_REV || mode == CardMode.WRITE_REV
     val word = if (isReverse) card.back.ifBlank { card.name } else card.name
@@ -31,13 +31,16 @@ fun FlashFront(card: LibNode, mode: CardMode, hint: Boolean, hintReady: Boolean,
             else CardWord(word, MaterialTheme.colorScheme.onSurface)
         }
         if (hint && card.hint.isNotBlank() && mode != CardMode.LISTEN) CardNote(card.hint, Modifier.padding(bottom = 8.dp))
+        if (!isReverse) PronounceFeedback(pronounce)
         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.Bottom) {
             if (canHint) {
                 val hl = mode == CardMode.LISTEN && hintReady && !listenRevealed
                 CardActionIcon(R.drawable.ic_lightbulb, onHint, colors = hintColors, highlight = hl, enabled = if (mode == CardMode.LISTEN) hintReady else true)
             } else Spacer(Modifier.size(80.dp))
-            if (!isReverse) CardActionIcon(R.drawable.ic_volume, { onSpeak(card.name) }, colors = soundColors)
-            else Spacer(Modifier.size(80.dp))
+            if (!isReverse) {
+                PronounceButton(pronounce)
+                CardActionIcon(R.drawable.ic_volume, { onSpeak(card.name) }, colors = soundColors)
+            } else Spacer(Modifier.size(80.dp))
         }
     }
 }

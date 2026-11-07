@@ -46,6 +46,9 @@ object StringsEn : Strings {
     override val reminderText = "Time to review your cards"
     override val on = "On"
     override val off = "Off"
+    override val pronounceListening = "Listening… say it out loud"; override val pronounceOk = "Great, that sounded right"; override val pronounceClose = "Almost there, try once more"; override val pronounceMiss = "Not quite, listen and repeat"
+    override val pronounceNoSpeech = "Could not hear you. Tap the microphone and speak louder"; override val pronounceUnavailable = "Speech recognition is not available on this device"; override val pronounceDenied = "Allow the microphone in Android settings"
+    override fun pronounceHeard(text: String) = "Heard: “$text”"
     override val notificationsNeeded = "Allow notifications in Android settings, or reminders will not arrive."
     override val statsReviewsTitle = "Reviews, 14 days"
     override val weekdays = listOf("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")

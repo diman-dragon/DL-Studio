@@ -46,6 +46,9 @@ object StringsRu : Strings {
     override val reminderText = "Время повторить карточки"
     override val on = "Включены"
     override val off = "Выключены"
+    override val pronounceListening = "Слушаю… Скажите вслух"; override val pronounceOk = "Отлично, произношение верное"; override val pronounceClose = "Почти получилось, попробуйте ещё раз"; override val pronounceMiss = "Не то, послушайте и повторите"
+    override val pronounceNoSpeech = "Не расслышал. Нажмите на микрофон и скажите громче"; override val pronounceUnavailable = "Распознавание речи на этом устройстве недоступно"; override val pronounceDenied = "Разрешите микрофон в настройках Android"
+    override fun pronounceHeard(text: String) = "Услышано: «$text»"
     override val notificationsNeeded = "Разрешите уведомления в настройках Android, иначе напоминания не придут."
     override val statsReviewsTitle = "Повторы за 14 дней"
     override val weekdays = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс")
