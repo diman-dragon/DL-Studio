@@ -17,54 +17,35 @@ import com.dlstudio.app.ui.theme.LocalAccent
 import com.dlstudio.app.ui.theme.LocalStrings
 import com.dlstudio.app.ui.theme.gradientColors
 
-/** Героическая плитка дня: счётчики, кнопка старта и кольцо прогресса. Список проектов убран — он в библиотеке. */
+/** Плитка «Сегодня»: счётчики, кнопка старта и кольцо прогресса. Список проектов убран — он в библиотеке. */
 @Composable
 fun StudyHero(counts: CardCounts, sessionSize: Int, doneToday: Int, onStart: () -> Unit, onExtra: () -> Unit) {
     val s = LocalStrings.current
-    val accent = LocalAccent.current
     val planned = minOf(sessionSize, counts.due + counts.fresh)
     val progress = if (doneToday + planned == 0) 0f else doneToday.toFloat() / (doneToday + planned)
+    val cs = MaterialTheme.colorScheme
     Column(
-        Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(28.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(28.dp))
-            .padding(20.dp),
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp))
+            .background(cs.surfaceContainerHigh).border(1.dp, cs.outlineVariant, RoundedCornerShape(28.dp)).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
             Column(Modifier.weight(1f).padding(end = 16.dp), Arrangement.spacedBy(4.dp)) {
-                Text(s.todayTitle, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(s.todayTitle, style = MaterialTheme.typography.labelLarge, color = cs.onSurfaceVariant)
                 Text(
                     if (planned > 0 || counts.total == 0) "$planned" else s.nothingDue,
-                    style = MaterialTheme.typography.displaySmall,
-                    color = MaterialTheme.colorScheme.onSurface
+                    style = MaterialTheme.typography.displaySmall, color = cs.onSurface
                 )
                 Text(
-                    when {
-                        counts.total == 0 -> s.noCards
-                        planned > 0 -> "${counts.due} ${s.due} · ${counts.fresh} ${s.freshWord}"
-                        else -> s.nothingDueHint
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    when { counts.total == 0 -> s.noCards; planned > 0 -> "${counts.due} ${s.due} · ${counts.fresh} ${s.freshWord}"; else -> s.nothingDueHint },
+                    style = MaterialTheme.typography.bodyMedium, color = cs.onSurfaceVariant
                 )
                 if (counts.total > 0) {
                     Spacer(Modifier.height(4.dp))
-                    GradientButton(
-                        label = if (planned > 0) s.startStudy else s.practiceMore,
-                        onClick = if (planned > 0) onStart else onExtra
-                    )
+                    GradientButton(if (planned > 0) s.startStudy else s.practiceMore, if (planned > 0) onStart else onExtra)
                 }
             }
-            // Кольцо прогресса на мягком акцентном фоне, а не на сплошном primary
-            Box(
-                Modifier
-                    .clip(RoundedCornerShape(22.dp))
-                    .background(Brush.linearGradient(accent.gradientColors()))
-                    .padding(6.dp)
-            ) {
+            Box(Modifier.clip(RoundedCornerShape(22.dp)).background(Brush.linearGradient(LocalAccent.current.gradientColors())).padding(6.dp)) {
                 StudyRing(progress, "$doneToday", s.doneWord)
             }
         }

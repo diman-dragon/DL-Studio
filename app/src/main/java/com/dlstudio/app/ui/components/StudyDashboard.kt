@@ -1,13 +1,6 @@
 package com.dlstudio.app.ui.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -33,29 +26,19 @@ fun StudyDashboard(lib: LibraryState, sessionSize: Int, study: StudyViewModel, o
     val s = LocalStrings.current
     val all = remember(lib.items) { StudyScope.cards(lib.items, null, null) }
     val projects = remember(lib.items, lib.states, lib.today) {
-        lib.items.map { project ->
-            Triple(project.id, project.name, CardCounts.of(StudyScope.cards(lib.items, project.id, null), lib.states, lib.today))
-        }
+        lib.items.map { p -> Triple(p.id, p.name, CardCounts.of(StudyScope.cards(lib.items, p.id, null), lib.states, lib.today)) }
     }
     val forecast = remember(lib.states, lib.today) { Forecast.next(lib.states.values, lib.today) }
     val (kind, n) = Motivation.pick(lib.stats)
-    fun startAll(extra: Boolean) { study.begin(SessionPicker.pick(all, lib.states, lib.today, sessionSize, extra))?.let(onSession) }
-    fun startProject(projectId: String) {
-        val cards = StudyScope.cards(lib.items, projectId, null)
-        study.begin(SessionPicker.pick(cards, lib.states, lib.today, sessionSize))?.let(onSession)
-    }
+    fun startAll(extra: Boolean) = study.begin(SessionPicker.pick(all, lib.states, lib.today, sessionSize, extra))?.let(onSession)
+    fun startProject(id: String) = study.begin(SessionPicker.pick(StudyScope.cards(lib.items, id, null), lib.states, lib.today, sessionSize))?.let(onSession)
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), Arrangement.spacedBy(14.dp)) {
         ScreenHeader(s.tabStudy)
         StudyHero(CardCounts.of(all, lib.states, lib.today), sessionSize, lib.stats.todayReviews, { startAll(false) }, { startAll(true) })
         MotivationBanner(s.motivation(kind, n))
-        // Секция проектов: по каждому — счётчики и кнопка старта
-        if (projects.isNotEmpty()) {
-            Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
-                Text(s.projectsTitle, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = 4.dp))
-                projects.forEach { (id, name, counts) ->
-                    StudyProjectCard(name = name, counts = counts, onStart = { startProject(id) })
-                }
-            }
+        if (projects.isNotEmpty()) Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
+            Text(s.projectsTitle, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = 4.dp))
+            projects.forEach { (id, name, counts) -> StudyProjectCard(name, counts) { startProject(id) } }
         }
         Row(Modifier.fillMaxWidth().height(IntrinsicSize.Max), Arrangement.spacedBy(12.dp)) {
             StreakCard(lib.stats, lib.today, Modifier.weight(1f))
