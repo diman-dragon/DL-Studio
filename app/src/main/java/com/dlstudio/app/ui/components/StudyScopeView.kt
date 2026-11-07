@@ -42,7 +42,7 @@ fun StudyScopeView(ui: StudyUi, lib: LibraryState, sessionSize: Int, study: Stud
         LibraryHeader(deck?.name ?: project?.name ?: s.tabStudy, true, study::back)
         if (cards.isEmpty()) Text(s.noCards, color = MaterialTheme.colorScheme.onSurfaceVariant)
         else {
-            StudyHero(counts(cards), emptyList(), sessionSize, lib.stats.todayReviews, { start(false) }, { start(true) })
+            StudyHero(counts(cards), sessionSize, lib.stats.todayReviews, { start(false) }, { start(true) })
             if (ui.deckId == null) {
                 ViewToggle(grid) { grid = it }
                 StudyCatalog(project?.children.orEmpty(), 1, grid, { counts(it.children) }, { study.openDeck(it.id) })
