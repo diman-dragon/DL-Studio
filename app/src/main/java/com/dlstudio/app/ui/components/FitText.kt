@@ -28,8 +28,12 @@ fun FitText(
     var size by remember(text, style, maxLines) { mutableStateOf(style.fontSize) }
     Text(
         text, modifier, color, size, style = style, maxLines = maxLines, softWrap = maxLines > 1,
-        onTextLayout = {
-            if ((it.didOverflowWidth || it.didOverflowHeight) && size > minSize) size = (size.value * 0.92f).coerceAtLeast(minSize.value).sp
+        onTextLayout = { r ->
+            val cut = (0 until r.lineCount - 1).any { i ->
+                val e = r.getLineEnd(i, true)
+                e in 1 until text.length && !text[e - 1].isWhitespace() && !text[e].isWhitespace() && text[e - 1] != '-'
+            }
+            if ((r.didOverflowWidth || r.didOverflowHeight || cut) && size > minSize) size = (size.value * 0.92f).coerceAtLeast(minSize.value).sp
         }
     )
 }

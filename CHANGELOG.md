@@ -3,6 +3,13 @@
 Версия лежит в `version.txt` и поднимается при **каждом** изменении: меняется последняя цифра (0.0.1 → 0.0.2 → …).
 Верхняя запись этого файла обязана совпадать с `version.txt` (проверяет `scripts/check.mjs`).
 
+## 0.1.13
+**Карточки: шрифты, размер текста, переносы**
+- Слово карточки ([`CardWord`](app/src/main/java/com/dlstudio/app/ui/components/CardWord.kt)): Inter SemiBold 38sp, по центру, с заглавной буквы.
+- Подсказка, пояснение и пример ([`CardNote`](app/src/main/java/com/dlstudio/app/ui/components/CardNote.kt)): 18sp, межстрочный 26sp, основной цвет текста, заглавная буква, без автопереносов внутри слова.
+- [`FitText`](app/src/main/java/com/dlstudio/app/ui/components/FitText.kt) уменьшает текст, если строка разрывает слово посередине.
+- [`FlashFront`](app/src/main/java/com/dlstudio/app/ui/components/FlashFront.kt) и [`FlashBack`](app/src/main/java/com/dlstudio/app/ui/components/FlashBack.kt) используют новые компоненты.
+
 ## 0.1.12
 **Автоматическое переключение системной клавиатуры**
 - Реализован компонент [`CardWriteField`](file:///d:/Projekts/GooglePlay/DL-Studio/app/src/main/java/com/dlstudio/app/ui/components/CardWriteField.kt) с прямым пробросом системного `imeHintLocales` (`android.os.LocaleList`) в IME Android (API 24+).
