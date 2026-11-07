@@ -3,6 +3,19 @@
 Версия лежит в `version.txt` и поднимается при **каждом** изменении: меняется последняя цифра (0.0.1 → 0.0.2 → …).
 Верхняя запись этого файла обязана совпадать с `version.txt` (проверяет `scripts/check.mjs`).
 
+## 0.1.7
+**Тотальная компонентность UI**
+- Выделен компонент [`BackButton`](file:///d:/Projekts/GooglePlay/DL-Studio/app/src/main/java/com/dlstudio/app/ui/components/BackButton.kt) — единая кнопка возврата для заголовков библиотеки и учебной сессии.
+- Выделен компонент [`SessionProgress`](file:///d:/Projekts/GooglePlay/DL-Studio/app/src/main/java/com/dlstudio/app/ui/components/SessionProgress.kt) — прогресс-бар прохождения сессии.
+- Унифицирован [`ActionIconButton`](file:///d:/Projekts/GooglePlay/DL-Studio/app/src/main/java/com/dlstudio/app/ui/components/ActionIconButton.kt) и применён для действий редактирования/удаления в [`ItemMenu`](file:///d:/Projekts/GooglePlay/DL-Studio/app/src/main/java/com/dlstudio/app/ui/library/ItemMenu.kt) и кнопки подтверждения в [`CardWriteInput`](file:///d:/Projekts/GooglePlay/DL-Studio/app/src/main/java/com/dlstudio/app/ui/components/CardWriteInput.kt).
+- Полностью устранён сырой инлайновый код разметки кнопок и элементов навигации.
+
+## 0.1.6
+**Компонентная архитектура кнопок и элементов ввода**
+- Выделен отдельный переиспользуемый компонент [`ChoiceButton`](file:///d:/Projekts/GooglePlay/DL-Studio/app/src/main/java/com/dlstudio/app/ui/components/ChoiceButton.kt) для кнопок вариантов ответов со всеми состояниями (обычное, верный выбор, ошибочный выбор, подсветка целевого ответа).
+- Выделен компонент [`ActionIconButton`](file:///d:/Projekts/GooglePlay/DL-Studio/app/src/main/java/com/dlstudio/app/ui/components/ActionIconButton.kt) для квадратных скруглённых кнопок действий с иконкой.
+- Контейнеры [`ChoiceOptions`](file:///d:/Projekts/GooglePlay/DL-Studio/app/src/main/java/com/dlstudio/app/ui/components/ChoiceOptions.kt) и [`CardWriteInput`](file:///d:/Projekts/GooglePlay/DL-Studio/app/src/main/java/com/dlstudio/app/ui/components/CardWriteInput.kt) переведены на использование выделенных компонентов без инлайнового дублирования стилей.
+
 ## 0.1.5
 **Новые режимы учёбы и улучшение карточек**
 - Карточки стали компактнее и аккуратнее: слово расположено строго по центру, сделано крупнее и само подстраивает свой размер (`FitText`), исключая обрезку и переносы.

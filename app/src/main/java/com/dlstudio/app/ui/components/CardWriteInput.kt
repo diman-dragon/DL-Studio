@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.dlstudio.app.R
 import com.dlstudio.app.ui.theme.LocalStrings
 
-/** Поле ввода ответа для режимов письма с кнопкой проверки. */
+/** Поле ввода ответа для режимов письма с компонентной кнопкой проверки ActionIconButton. */
 @Composable
 fun CardWriteInput(correct: String, submitted: Boolean, onAnswer: (Boolean) -> Unit, modifier: Modifier = Modifier) {
     var text by remember { mutableStateOf("") }
@@ -37,9 +37,15 @@ fun CardWriteInput(correct: String, submitted: Boolean, onAnswer: (Boolean) -> U
                     unfocusedBorderColor = if (submitted) btnColor else cs.outlineVariant
                 )
             )
-            Surface(Modifier.size(54.dp), RoundedCornerShape(16.dp), color = btnColor, onClick = { submit() }) {
-                Box(Modifier.fillMaxSize(), Alignment.Center) { AppIcon(R.drawable.ic_check, Color.White, 26.dp) }
-            }
+            ActionIconButton(
+                icon = R.drawable.ic_check,
+                onClick = { submit() },
+                enabled = !submitted && text.isNotBlank(),
+                size = 54.dp,
+                shape = RoundedCornerShape(16.dp),
+                containerColor = btnColor,
+                iconTint = Color.White
+            )
         }
         if (submitted && !isCorrect) {
             Text(correct, style = MaterialTheme.typography.bodyMedium, color = okColor, modifier = Modifier.padding(horizontal = 4.dp))
