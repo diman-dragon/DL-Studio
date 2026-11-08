@@ -33,19 +33,16 @@ class Prefs(context: Context) {
         get() = sp.getBoolean("libraryGrid", true)
         set(value) { sp.edit().putBoolean("libraryGrid", value).apply() }
 
-    var speechRate: Float
-        get() = sp.getFloat("speechRate", 1f)
-        set(value) { sp.edit().putFloat("speechRate", value).apply() }
-
-    var speechPitch: Float
-        get() = sp.getFloat("speechPitch", 1f)
-        set(value) { sp.edit().putFloat("speechPitch", value).apply() }
-
     var speechVoiceName: String?
         get() = sp.getString("speechVoice", null)
         set(value) = sp.putPref("speechVoice", value)
 
-    /** Размер одной учебной сессии (10, 20, 30 или 50 карточек). */
+    /** Человеческое имя выбранного голоса — ровно то, что пользователь выбрал в списке. */
+    var speechVoiceLabel: String?
+        get() = sp.getString("speechVoiceLabel", null)
+        set(value) = sp.putPref("speechVoiceLabel", value)
+
+    /** Размер одной учебной сессии: 10, 50 или своё число. */
     var sessionSize: Int get() = sp.getInt("dailyCards", 20); set(value) { sp.edit().putInt("dailyCards", value).apply() }
     /** Снимок расписания для напоминаний (см. `ReminderSnapshot`). */
     var reminderSnapshot: String?

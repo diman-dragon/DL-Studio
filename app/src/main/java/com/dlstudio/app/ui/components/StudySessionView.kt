@@ -13,6 +13,8 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.dlstudio.app.study.Grade
+import com.dlstudio.app.study.Speak
 import com.dlstudio.app.study.StudySession
 import kotlinx.coroutines.delay
 
@@ -21,12 +23,12 @@ import kotlinx.coroutines.delay
 @Composable
 fun StudySessionView(
     session: StudySession,
-    onFlip: (String) -> Unit,
+    onFlip: (String, Grade?) -> Unit,
     onHint: () -> Unit,
     onPage: (Int) -> Unit,
     onNextRound: () -> Unit,
     onClose: () -> Unit,
-    onSpeak: (String) -> Unit
+    onSpeak: Speak
 ) {
     key(session.id) {
         val pager = rememberPagerState(initialPage = session.index) { session.total + 1 }

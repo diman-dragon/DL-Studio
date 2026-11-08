@@ -14,11 +14,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dlstudio.app.R
 import com.dlstudio.app.study.PronounceCheck
+import com.dlstudio.app.study.Speak
 import com.dlstudio.app.ui.theme.LocalStrings
 
 /** Блок ввода ответа с авто-раскладкой, кнопкой проверки и реакцией 👍 / 👎; регистр и знаки не важны; для слова на изучаемом языке (`onSpeak`) — динамик. */
 @Composable
-fun CardWriteInput(correct: String, submitted: Boolean, onAnswer: (Boolean) -> Unit, modifier: Modifier = Modifier, onSpeak: ((String) -> Unit)? = null) {
+fun CardWriteInput(correct: String, submitted: Boolean, onAnswer: (Boolean) -> Unit, modifier: Modifier = Modifier, onSpeak: Speak? = null) {
     val s = LocalStrings.current
     var text by remember { mutableStateOf("") }
     val isCorrect = PronounceCheck.normalize(text) == PronounceCheck.normalize(correct)
@@ -39,12 +40,14 @@ fun CardWriteInput(correct: String, submitted: Boolean, onAnswer: (Boolean) -> U
             )
             ActionIconButton(R.drawable.ic_check, ::submit, enabled = !submitted && text.isNotBlank(), size = 54.dp, shape = RoundedCornerShape(16.dp), containerColor = btnColor, iconTint = Color.White)
         }
-        if (submitted) Row(
+        if (submitted) Column(
             Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(if (isCorrect) ok.copy(alpha = .16f) else err.copy(alpha = .16f)).padding(horizontal = 14.dp, vertical = 8.dp),
-            Arrangement.spacedBy(10.dp), Alignment.CenterVertically
+            Arrangement.spacedBy(6.dp)
         ) {
-            Text(if (isCorrect) "👍" else "👎", fontSize = 24.sp)
-            Text(if (isCorrect) s.writeRight else s.writeWrong(correct), Modifier.weight(1f), style = MaterialTheme.typography.titleMedium, color = if (isCorrect) ok else err)
+            Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
+                Text(if (isCorrect) "👍" else "👎", fontSize = 24.sp)
+                FitText(if (isCorrect) s.writeRight else s.writeWrong(correct), MaterialTheme.typography.titleMedium, Modifier.weight(1f), if (isCorrect) ok else err, 12.sp, 2)
+            }
             if (onSpeak != null) SmallSpeaker(correct, onSpeak)
         }
     }

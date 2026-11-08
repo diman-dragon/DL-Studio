@@ -52,9 +52,9 @@ class StudyViewModel : ViewModel() {
     fun goTo(page: Int) = mutable.update { u -> u.copy(session = u.session?.goTo(page, System.currentTimeMillis())) }
     fun hint() = mutable.update { u -> u.copy(session = u.session?.useHint()) }
 
-    /** Тап по карточке; возвращает запись для базы при первом показе перевода. */
-    fun flip(cardId: String): Answer? {
-        val result = mutable.value.session?.flip(cardId, System.currentTimeMillis()) ?: return null
+    /** Тап по карточке; возвращает запись для базы при первом показе перевода (`forced` — оценка голосового режима). */
+    fun flip(cardId: String, forced: Grade? = null): Answer? {
+        val result = mutable.value.session?.flip(cardId, System.currentTimeMillis(), forced) ?: return null
         mutable.update { it.copy(session = result.first) }
         return result.second
     }

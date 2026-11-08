@@ -3,6 +3,7 @@ package com.dlstudio.app.i18n
 import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.study.MotivationKind
 import com.dlstudio.app.study.PraiseKind
+import com.dlstudio.app.study.SpeechSpeed
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
@@ -15,24 +16,33 @@ object StringsEn : Strings {
     override val cardBack = "Back side"; override val cardHint = "Hint (optional)"; override val cardExplanation = "Explanation (optional)"; override val cardExample = "Example (optional)"
     override val showAnswer = "Show translation"; override val hintButton = "Hint"; override val speak = "Speak"; override val previous = "Previous"; override val next = "Next"; override val noCards = "Add cards to your library to start studying here."
     override val statsOverview = "Study overview"; override val statsProjects = "Projects"; override val statsDecks = "Decks"; override val statsCards = "Cards"; override val statsStudied = "Studied"; override val statsProgress = "Library progress"; override val statsEmpty = "Your progress will appear here after the first card."
-    override val speechVoice = "Android speech"; override val speechRate = "Speech rate"; override val speechPitch = "Voice pitch"; override val dailyCards = "Cards per session"; override val reminders = "Study reminders"; override val reminderTime = "Reminder time"
+    override val speechVoice = "Android speech"; override val dailyCards = "Cards per session"; override val reminders = "Study reminders"; override val reminderTime = "Reminder time"
     override val allDecks = "All decks"; override val allCards = "All cards"; override val chooseProject = "Choose a project"; override val chooseDeck = "Choose a deck"; override val flipHint = "Tap the card to flip it"; override val voicePreview = "Voice preview"; override val voicePackagesEmpty = "No system language packs found"; override val due = "due"; override val overdue = "overdue"; override val statsDue = "Due"; override val statsOverdue = "Overdue"; override val statsToday = "Reviews today"; override val statsAverage = "Average answer time"; override val statsStreak = "Day streak"; override val statsReviewsChart = "Reviews over 14 days"; override val statsIntervals = "Interval distribution"
     override val importFormat = "One card per line: a word and its translation separated by “;”, a tab or “ - ”, for example “cat;кот”. CSV, TSV, TXT (including Anki and Quizlet exports) and JSON work. A first row “word;translation;deck” splits the cards into decks."
     override val importPick = "Choose file"; override val importEmpty = "No cards found in the file. Lines like “word;translation” are expected."
     override val sectionLook = "Appearance"; override val sectionSpeech = "Speech"; override val sectionStudy = "Study"; override val sectionData = "Data"
     override val yesterdayTitle = "Yesterday"; override val yesterdayEmpty = "No study yesterday"; override val streakTitle = "Streak"; override val forecastTitle = "Next 7 days"
-    override val projectsTitle = "Projects"; override val doneWord = "done"; override val newRound = "Round complete. Starting a new one in a different order…"; override val learn = "Study"
+    override val projectsTitle = "Projects"; override val doneWord = "Done"; override val newRound = "Round complete. Starting a new one in a different order…"; override val learn = "Study"
     override val sectionModes = "Card modes"; override val sectionHelpers = "Helpers"; override val modeLast = "At least one mode is required"
     override val pronounceSetting = "Pronunciation check (microphone)"; override val celebrateSetting = "Animations and cheers"
     override val statsBestStreak = "Best streak"; override val statsWeek = "Last 7 days"; override val statsWeekTrend = "vs previous week"
     override val writeRight = "Correct!"; override fun writeWrong(correct: String) = "Not quite: $correct"
     override fun modeName(mode: CardMode) = when (mode) {
+        CardMode.FLIP_FWD -> "Word with flip"
+        CardMode.FLIP_REV -> "Translation with flip"
         CardMode.CHOICE_FWD -> "Choose the translation"
         CardMode.CHOICE_REV -> "Choose the word"
         CardMode.LISTEN -> "Listening: word by ear"
         CardMode.WRITE_FWD -> "Type the translation"
         CardMode.WRITE_REV -> "Type the word"
+        CardMode.PRONOUNCE -> "Pronunciation: say the word"
+        CardMode.REPEAT -> "Repeat after the speaker"
     }
+    override fun speakLabel(speed: SpeechSpeed) = when (speed) { SpeechSpeed.NORMAL -> "Speak"; SpeechSpeed.SLOW -> "Slowly"; SpeechSpeed.SLOWER -> "Even slower" }
+    override val sectionFrequency = "Frequency"; override val flipShare = "Flip cards"
+    override val flipShareHint = "Share of word and translation cards with a flip; the rest is spread across the modes below."
+    override val pronouncePrompt = "Say it in the language you study"; override val repeatPrompt = "Repeat after the speaker"; override val revealAnswer = "Show answer"
+    override val customSize = "Custom"; override val customSizeTitle = "Custom number of cards"; override val customSizeHint = "From 1 to 500"
     override fun pronounceError(code: Int) = "Speech recognition failed to start (code $code). Please try again"
     override fun praise(kind: PraiseKind, n: Int) = when (kind) {
         PraiseKind.RECORD_DAY -> "Best day in two weeks: $n reviews. Keep it up!"

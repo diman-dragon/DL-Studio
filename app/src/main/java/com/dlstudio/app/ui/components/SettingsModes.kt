@@ -1,17 +1,28 @@
 package com.dlstudio.app.ui.components
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.ui.AppState
 import com.dlstudio.app.ui.AppViewModel
 import com.dlstudio.app.ui.theme.LocalStrings
+import kotlin.math.abs
 
-/** Разделы «Режимы карточек» (какие упражнения показывать; хотя бы один включён) и «Помощники» (микрофон, поздравления). */
+/** Разделы «Частота показов» (доля карточек с переворотом), «Режимы карточек» (хотя бы один включён) и «Помощники» (микрофон, поздравления). */
 @Composable
 fun SettingsModes(state: AppState, vm: AppViewModel) {
     val s = LocalStrings.current
     val study = state.study
+    val shares = listOf(30, 50, 70, 90)
     fun label(on: Boolean) = if (on) s.on else s.off
+    SettingsSection(s.sectionFrequency) {
+        OptionChips(s.flipShare, shares.map { "$it%" to it }, shares.minByOrNull { abs(it - study.flipShare) } ?: 50, { vm.setStudy(study.copy(flipShare = it)) })
+        Text(s.flipShareHint, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
     SettingsSection(s.sectionModes) {
         CardMode.values().forEach { mode ->
             val on = mode in study.modes

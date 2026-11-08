@@ -13,7 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-/** Адаптивная кнопка варианта ответа: текст занимает до 90% ширины и высоты кнопки, отступы по краям сохраняются. */
+/** Кнопка варианта ответа: слово с заглавной буквы максимально крупно, до 90% ширины и высоты кнопки, по краям небольшой зазор. */
 @Composable
 fun ChoiceButton(
     text: String,
@@ -32,7 +32,7 @@ fun ChoiceButton(
         else -> cs.surfaceContainerHigh to cs.outlineVariant
     }
     Box(
-        modifier = modifier.height(64.dp).clip(shape)
+        modifier = modifier.height(72.dp).clip(shape)
             .background(bg).border(1.dp, border, shape)
             .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center

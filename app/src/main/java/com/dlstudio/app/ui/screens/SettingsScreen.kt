@@ -50,11 +50,11 @@ fun SettingsScreen(state: AppState, vm: AppViewModel, onFolder: () -> Unit) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), Arrangement.spacedBy(12.dp)) {
         ScreenHeader(s.tabSettings)
         SettingsLook(state, vm)
-        SettingsSpeech(state, vm) { chooseVoice = true; vm.loadVoices() }
+        SettingsSpeech(state) { chooseVoice = true; vm.loadVoices() }
         SettingsStudy(state, vm, denied, onReminders)
         SettingsModes(state, vm)
         SettingsData(state, onFolder) { about = true }
     }
     if (about) AboutDialog { about = false }
-    if (chooseVoice) VoicePicker(voices, state.speechVoiceName, vm::preview, { vm.setSpeechVoice(it.name); chooseVoice = false }) { chooseVoice = false }
+    if (chooseVoice) VoicePicker(voices, state.speechVoiceName, vm::preview, { vm.setSpeechVoice(it); chooseVoice = false }) { chooseVoice = false }
 }

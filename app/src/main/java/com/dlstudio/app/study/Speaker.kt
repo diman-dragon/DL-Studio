@@ -17,10 +17,10 @@ class Speaker(private val context: Context) {
         queued = null
     }.also { tts = it }
 
-    fun speak(text: String, rate: Float, pitch: Float, voiceName: String?) {
+    fun speak(text: String, speed: SpeechSpeed, voiceName: String?) {
         val e = engine()
         val run = {
-            e.setSpeechRate(rate); e.setPitch(pitch)
+            e.setSpeechRate(speed.rate); e.setPitch(1f)
             voiceName?.let { n -> e.voices?.firstOrNull { it.name == n }?.let(e::setVoice) }
             e.speak(text, TextToSpeech.QUEUE_FLUSH, null, "dl")
             Unit
@@ -35,9 +35,9 @@ class Speaker(private val context: Context) {
         return if (ready) e.voices?.filter { !it.isNetworkConnectionRequired }.orEmpty() else emptyList()
     }
 
-    fun preview(voice: Voice, text: String, rate: Float, pitch: Float) {
+    fun preview(voice: Voice, text: String) {
         val e = engine()
-        e.setSpeechRate(rate); e.setPitch(pitch); e.setVoice(voice)
+        e.setSpeechRate(1f); e.setPitch(1f); e.setVoice(voice)
         e.speak(text, TextToSpeech.QUEUE_FLUSH, null, "preview")
     }
 

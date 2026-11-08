@@ -6,6 +6,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 /** Кольцо прогресса дня: белая дуга по полупрозрачной дорожке, внутри число и подпись. Рисуется на градиентной плитке. */
 @Composable
@@ -34,7 +36,7 @@ fun StudyRing(progress: Float, value: String, caption: String, modifier: Modifie
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(value, style = MaterialTheme.typography.titleLarge, color = Color.White)
-            Text(caption, style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.8f))
+            FitText(caption.capFirst(), MaterialTheme.typography.labelMedium, Modifier.widthIn(max = 64.dp), Color.White.copy(alpha = 0.8f), 8.sp)
         }
     }
 }

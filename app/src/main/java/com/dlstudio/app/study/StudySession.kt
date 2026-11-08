@@ -31,9 +31,10 @@ data class StudySession(
 
     /**
      * Тап по карточке `cardId`: показать перевод или вернуться к слову. Переворачивается именно та карточка,
-     * по которой тапнули (индекс страницы мог ещё не обновиться). Запись для базы — только при первом показе перевода.
+     * по которой тапнули (индекс страницы мог ещё не обновиться). Запись для базы — только при первом показе перевода;
+     * `forced` — готовая оценка (голосовые режимы), иначе она выводится из поведения.
      */
-    fun flip(cardId: String, now: Long): Pair<StudySession, Answer?> {
+    fun flip(cardId: String, now: Long, forced: Grade? = null): Pair<StudySession, Answer?> {
         val at = queue.indexOfFirst { it.id == cardId }
         if (at < 0) return this to null
         val card = queue[at]
@@ -42,7 +43,7 @@ data class StudySession(
         val shown = base.copy(flipped = flipped + card.id)
         if (card.id in grades) return shown to null
         val faceMs = (now - base.shownAt).coerceAtLeast(0)
-        val grade = AutoGrade.of(faceMs, card.id in hinted)
+        val grade = forced ?: AutoGrade.of(faceMs, card.id in hinted)
         return shown.copy(grades = grades + (card.id to grade)) to Answer(card.id, grade, faceMs, 0)
     }
 

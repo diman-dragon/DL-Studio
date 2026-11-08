@@ -15,7 +15,7 @@ import com.dlstudio.app.ui.components.SmallSpeaker
 import com.dlstudio.app.ui.components.StudyPlayButton
 import androidx.compose.foundation.border
 
-/** Строка списка: плитка уровня, название с подписью, меню. */
+/** Строка списка: плитка уровня, название с подписью (у карточки под ними озвучка), меню. */
 @Composable
 fun ItemRow(node: LibNode, level: Int, actions: ItemActions) {
     Row(
@@ -25,9 +25,11 @@ fun ItemRow(node: LibNode, level: Int, actions: ItemActions) {
         horizontalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         ItemBadge(level, 48.dp)
-        ItemText(node, level, Modifier.weight(1f))
+        Column(Modifier.weight(1f), Arrangement.spacedBy(6.dp)) {
+            ItemText(node, level)
+            if (level == 2) SmallSpeaker(node.name, actions.onSpeak)
+        }
         if (cards(node, level) > 0) StudyPlayButton({ actions.onStudy(node) })
-        else if (level == 2) SmallSpeaker(node.name, actions.onSpeak)
         ItemMenu(node, actions)
     }
 }

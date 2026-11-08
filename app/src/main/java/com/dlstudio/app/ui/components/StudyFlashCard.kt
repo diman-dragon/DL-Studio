@@ -18,40 +18,26 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.library.LibNode
-import com.dlstudio.app.study.CardMode
-import com.dlstudio.app.study.SpeechLang
-import com.dlstudio.app.ui.theme.LocalSpeechTag
+import com.dlstudio.app.study.CardPlan
+import com.dlstudio.app.study.Speak
 import kotlin.math.abs
 
-/** Уменьшенная аккуратная карточка с центрированным словом и блокировкой переворота до ответа. */
+/** Карточка с переворотом: слово по центру максимально крупно; переворот заблокирован, пока нет ответа (`canFlip`). */
 @Composable
 fun StudyFlashCard(
-    card: LibNode,
-    mode: CardMode,
-    flipped: Boolean,
-    hint: Boolean,
-    hintReady: Boolean,
-    listenRevealed: Boolean,
-    canFlip: Boolean,
-    onFlip: () -> Unit,
-    onHint: () -> Unit,
-    onSpeak: (String) -> Unit,
-    modifier: Modifier = Modifier
+    card: LibNode, plan: CardPlan, flipped: Boolean, hint: Boolean, hintReady: Boolean, listenRevealed: Boolean, canFlip: Boolean,
+    onFlip: () -> Unit, onHint: () -> Unit, onSpeak: Speak, pronounce: PronounceState, modifier: Modifier = Modifier
 ) {
     val turn by animateFloatAsState(if (flipped) 1f else 0f, tween(260, easing = FastOutSlowInEasing), label = "flip")
     val shape = RoundedCornerShape(26.dp)
     val cs = MaterialTheme.colorScheme
-    val pronounce = rememberPronounce(card.name, SpeechLang.forText(card.name, LocalSpeechTag.current))
     Box(
         modifier = modifier.fillMaxWidth()
             .clickable(remember { MutableInteractionSource() }, null, enabled = canFlip, onClick = onFlip)
             .graphicsLayer { scaleX = abs(1f - 2f * turn).coerceAtLeast(0.02f) }
-            .clip(shape).background(cs.surfaceContainerHigh).border(1.dp, cs.outlineVariant, shape).padding(20.dp)
+            .clip(shape).background(cs.surfaceContainerHigh).border(1.dp, cs.outlineVariant, shape).padding(16.dp)
     ) {
-        if (turn < 0.5f) {
-            FlashFront(card, mode, hint, hintReady, listenRevealed, onHint, onSpeak, pronounce)
-        } else {
-            FlashBack(card, mode, onSpeak, pronounce)
-        }
+        if (turn < 0.5f) FlashFront(card, plan.mode, plan.target, hint, hintReady, listenRevealed, onHint, onSpeak, pronounce)
+        else FlashBack(card, plan.mode, onSpeak, pronounce)
     }
 }

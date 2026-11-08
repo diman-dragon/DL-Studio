@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,6 +21,7 @@ import com.dlstudio.app.ui.theme.LocalStrings
 @Composable
 fun VoicePicker(voices: List<Voice>, selected: String?, onPreview: (Voice, String) -> Unit, onSelect: (Voice) -> Unit, onClose: () -> Unit) {
     val s = LocalStrings.current; val colors = MaterialTheme.colorScheme
+    val names = remember(voices) { VoiceName.labels(voices) }
     DlModal.Shell(s.speechVoice, onClose) {
         Column(Modifier.heightIn(max = 390.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (voices.isEmpty()) Text(s.voicePackagesEmpty, color = colors.onSurfaceVariant)
@@ -33,7 +35,7 @@ fun VoicePicker(voices: List<Voice>, selected: String?, onPreview: (Voice, Strin
                 ) {
                     Row(Modifier.padding(14.dp), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
-                            Text(VoiceName.label(voice), style = MaterialTheme.typography.titleSmall)
+                            Text(names[voice.name] ?: VoiceName.fallback(voice.name), style = MaterialTheme.typography.titleSmall)
                             Text(language, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
                         }
                         DlModal.Action("▶", { onPreview(voice, s.voicePreview) })

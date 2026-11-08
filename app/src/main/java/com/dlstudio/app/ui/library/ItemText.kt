@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.ui.components.FitText
+import com.dlstudio.app.ui.components.capFirst
 import com.dlstudio.app.ui.theme.LocalStrings
 
 /** Название элемента и подпись: для проекта и колоды — сколько внутри, для карточки — обратная сторона. */
@@ -17,9 +18,9 @@ import com.dlstudio.app.ui.theme.LocalStrings
 fun ItemText(node: LibNode, level: Int, modifier: Modifier = Modifier) {
     val sub = if (level == 2) node.back else LocalStrings.current.contentCount(level, node.children.size)
     Column(modifier) {
-        FitText(node.name, MaterialTheme.typography.titleMedium, Modifier.fillMaxWidth(), minSize = 12.sp, maxLines = 2)
+        FitText(node.name.capFirst(), MaterialTheme.typography.titleMedium, Modifier.fillMaxWidth(), minSize = 12.sp, maxLines = 2)
         FitText(
-            sub, MaterialTheme.typography.bodyMedium, Modifier.fillMaxWidth().padding(top = 2.dp),
+            sub.capFirst(), MaterialTheme.typography.bodyMedium, Modifier.fillMaxWidth().padding(top = 2.dp),
             MaterialTheme.colorScheme.onSurfaceVariant, 11.sp, 2
         )
     }

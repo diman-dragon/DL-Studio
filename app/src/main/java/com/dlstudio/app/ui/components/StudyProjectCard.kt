@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.dlstudio.app.study.CardCounts
 import com.dlstudio.app.ui.theme.LocalStrings
 
@@ -38,7 +39,7 @@ fun StudyProjectCard(name: String, counts: CardCounts, onStart: () -> Unit) {
             Alignment.CenterVertically
         ) {
             Column(Modifier.weight(1f).padding(end = 12.dp), Arrangement.spacedBy(3.dp)) {
-                Text(name, style = MaterialTheme.typography.titleSmall, color = colors.onSurface)
+                FitText(name.capFirst(), MaterialTheme.typography.titleLarge, Modifier.fillMaxWidth(), colors.onSurface, 12.sp, 2)
                 if (counts.total == 0) {
                     Text(s.noCards, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
                 } else if (hasWork) {

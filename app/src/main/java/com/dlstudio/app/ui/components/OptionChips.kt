@@ -34,8 +34,8 @@ fun <T> OptionChips(title: String, options: List<Pair<String, T>>, selected: T, 
                         Modifier.weight(1f).clickable(role = Role.RadioButton) { onSelect(value) }, RoundedCornerShape(14.dp),
                         if (on) colors.primaryContainer else colors.background, border = BorderStroke(1.dp, if (on) colors.primary else colors.outline)
                     ) {
-                        Box(Modifier.height(42.dp), Alignment.Center) {
-                            ButtonLabel(label, if (on) colors.primary else colors.onSurfaceVariant, Modifier.fillMaxHeight(0.9f), maxSize = 15.sp, minSize = 10.sp, maxLines = 1)
+                        Box(Modifier.height(46.dp), Alignment.Center) {
+                            ButtonLabel(label, if (on) colors.primary else colors.onSurfaceVariant, Modifier.fillMaxHeight(0.9f), maxSize = 20.sp, minSize = 10.sp, maxLines = 1)
                         }
                     }
                 }

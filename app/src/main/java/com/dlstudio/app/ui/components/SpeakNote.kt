@@ -1,18 +1,19 @@
 package com.dlstudio.app.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.dlstudio.app.study.Speak
 
-/** Пример (или другая фраза) на изучаемом языке: текст и справа маленький динамик для прослушки. */
+/** Пример (или другая фраза) на изучаемом языке: текст и под ним озвучка — обычно, медленно, ещё медленнее. */
 @Composable
-fun SpeakNote(text: String, onSpeak: (String) -> Unit, modifier: Modifier = Modifier) {
-    Row(modifier.fillMaxWidth(), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
-        CardNote(text, Modifier.weight(1f))
+fun SpeakNote(text: String, onSpeak: Speak, modifier: Modifier = Modifier) {
+    Column(modifier.fillMaxWidth(), Arrangement.spacedBy(6.dp), Alignment.CenterHorizontally) {
+        CardNote(text)
         SmallSpeaker(text, onSpeak)
     }
 }

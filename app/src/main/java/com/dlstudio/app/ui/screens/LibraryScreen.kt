@@ -14,6 +14,7 @@ import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.library.LibraryViewModel
 import com.dlstudio.app.library.childrenAt
 import com.dlstudio.app.library.findAt
+import com.dlstudio.app.study.Speak
 import com.dlstudio.app.ui.library.*
 import com.dlstudio.app.ui.theme.LocalStrings
 import androidx.compose.material3.MaterialTheme
@@ -21,7 +22,7 @@ import androidx.compose.material3.Text
 
 /** Библиотека: проект → колода → карточка; создание, правка, удаление и импорт из файла на каждом уровне. */
 @Composable
-fun LibraryScreen(vm: LibraryViewModel = viewModel(), onStudy: (List<LibNode>) -> Unit = {}, onSpeak: (String) -> Unit = {}) {
+fun LibraryScreen(vm: LibraryViewModel = viewModel(), onStudy: (List<LibNode>) -> Unit = {}, onSpeak: Speak = { _, _ -> }) {
     val s = LocalStrings.current
     val state by vm.state.collectAsStateWithLifecycle()
     var dialog by remember { mutableStateOf<LibDialog?>(null) }

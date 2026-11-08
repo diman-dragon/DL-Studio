@@ -3,6 +3,7 @@ package com.dlstudio.app.i18n
 import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.study.MotivationKind
 import com.dlstudio.app.study.PraiseKind
+import com.dlstudio.app.study.SpeechSpeed
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
@@ -16,7 +17,7 @@ interface Strings {
     val cardExplanation: String; val cardExample: String; val showAnswer: String; val hintButton: String; val speak: String
     val previous: String; val next: String; val noCards: String; val statsOverview: String; val statsProjects: String; val statsDecks: String
     val statsCards: String; val statsStudied: String; val statsProgress: String; val statsEmpty: String; val speechVoice: String
-    val speechRate: String; val speechPitch: String; val dailyCards: String; val reminders: String; val reminderTime: String; val importFormat: String; val importPick: String; val importEmpty: String
+    val dailyCards: String; val reminders: String; val reminderTime: String; val importFormat: String; val importPick: String; val importEmpty: String
     val allDecks: String; val allCards: String; val chooseProject: String; val chooseDeck: String; val flipHint: String; val voicePreview: String; val voicePackagesEmpty: String; val due: String; val overdue: String; val statsDue: String; val statsOverdue: String; val statsToday: String; val statsAverage: String; val statsStreak: String; val statsReviewsChart: String; val statsIntervals: String
     val sectionLook: String
     val sectionSpeech: String
@@ -37,6 +38,10 @@ interface Strings {
     val writeRight: String
     fun writeWrong(correct: String): String
     fun modeName(mode: CardMode): String
+    fun speakLabel(speed: SpeechSpeed): String
+    val sectionFrequency: String; val flipShare: String; val flipShareHint: String
+    val pronouncePrompt: String; val repeatPrompt: String; val revealAnswer: String
+    val customSize: String; val customSizeTitle: String; val customSizeHint: String
     fun pronounceError(code: Int): String
     fun praise(kind: PraiseKind, n: Int): String
     fun sessionPraise(level: Int): String

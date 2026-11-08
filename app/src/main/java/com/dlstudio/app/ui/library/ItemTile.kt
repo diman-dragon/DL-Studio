@@ -15,11 +15,11 @@ import com.dlstudio.app.ui.components.SmallSpeaker
 import com.dlstudio.app.ui.components.StudyPlayButton
 import androidx.compose.foundation.border
 
-/** Плитка сетки: крупная иконка уровня, меню в углу, название и подпись внизу. */
+/** Плитка сетки: крупная иконка уровня, меню в углу, название и подпись внизу; у карточки ещё озвучка слова (обычно / медленно / ещё медленнее). */
 @Composable
 fun ItemTile(node: LibNode, level: Int, actions: ItemActions) {
     Column(
-        Modifier.fillMaxWidth().height(184.dp).clip(RoundedCornerShape(24.dp))
+        Modifier.fillMaxWidth().height(if (level == 2) 216.dp else 184.dp).clip(RoundedCornerShape(24.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant).border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(24.dp))
             .clickable { actions.onOpen(node) }.padding(start = 14.dp, top = 14.dp, end = 4.dp, bottom = 14.dp),
         verticalArrangement = Arrangement.SpaceBetween
@@ -28,10 +28,12 @@ fun ItemTile(node: LibNode, level: Int, actions: ItemActions) {
             ItemBadge(level, 52.dp)
             ItemMenu(node, actions)
         }
-        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.Bottom) {
-            ItemText(node, level, Modifier.weight(1f).padding(end = 10.dp))
-            if (cards(node, level) > 0) StudyPlayButton({ actions.onStudy(node) }, Modifier.padding(end = 10.dp))
-            else if (level == 2) SmallSpeaker(node.name, actions.onSpeak, Modifier.padding(end = 10.dp))
+        Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(6.dp)) {
+            Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.Bottom) {
+                ItemText(node, level, Modifier.weight(1f).padding(end = 10.dp))
+                if (cards(node, level) > 0) StudyPlayButton({ actions.onStudy(node) }, Modifier.padding(end = 10.dp))
+            }
+            if (level == 2) SmallSpeaker(node.name, actions.onSpeak)
         }
     }
 }

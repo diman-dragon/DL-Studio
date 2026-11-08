@@ -1,6 +1,7 @@
 package com.dlstudio.app.ui.library
 
 import com.dlstudio.app.library.LibNode
+import com.dlstudio.app.study.Speak
 
 /** Что можно сделать с элементом: открыть (тап), изменить, удалить, учить (проект или колоду целиком), озвучить слово карточки. */
 class ItemActions(
@@ -8,5 +9,5 @@ class ItemActions(
     val onEdit: (LibNode) -> Unit,
     val onDelete: (LibNode) -> Unit,
     val onStudy: (LibNode) -> Unit,
-    val onSpeak: (String) -> Unit
+    val onSpeak: Speak
 )

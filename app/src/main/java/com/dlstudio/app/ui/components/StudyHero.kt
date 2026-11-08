@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.dlstudio.app.study.CardCounts
 import com.dlstudio.app.ui.theme.LocalAccent
 import com.dlstudio.app.ui.theme.LocalStrings
@@ -34,7 +35,7 @@ fun StudyHero(counts: CardCounts, sessionSize: Int, doneToday: Int, onStart: () 
         Row(Modifier.fillMaxWidth().padding(20.dp), Arrangement.SpaceBetween, Alignment.CenterVertically) {
             Column(Modifier.weight(1f).padding(end = 16.dp), Arrangement.spacedBy(3.dp)) {
                 Text(s.todayTitle, style = MaterialTheme.typography.labelLarge, color = cs.onSurfaceVariant)
-                Text(if (planned > 0 || counts.total == 0) "$shown" else s.nothingDue, style = MaterialTheme.typography.displaySmall, color = cs.onSurface)
+                FitText(if (planned > 0 || counts.total == 0) "$shown" else s.nothingDue, MaterialTheme.typography.displaySmall, Modifier.fillMaxWidth(), cs.onSurface, 18.sp, 2)
                 Text(
                     when { counts.total == 0 -> s.noCards; planned > 0 -> "${counts.due} ${s.due} · ${counts.fresh} ${s.freshWord}"; else -> s.nothingDueHint },
                     style = MaterialTheme.typography.bodyMedium, color = cs.onSurfaceVariant
