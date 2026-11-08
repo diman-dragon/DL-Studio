@@ -28,8 +28,7 @@ object StringsEn : Strings {
     override val statsBestStreak = "Best streak"; override val statsWeek = "Last 7 days"; override val statsWeekTrend = "vs previous week"
     override val writeRight = "Correct!"; override fun writeWrong(correct: String) = "Not quite: $correct"
     override fun modeName(mode: CardMode) = when (mode) {
-        CardMode.FLIP_FWD -> "Word with flip"
-        CardMode.FLIP_REV -> "Translation with flip"
+        CardMode.FLIP_FWD -> "Card preview"
         CardMode.CHOICE_FWD -> "Choose the translation"
         CardMode.CHOICE_REV -> "Choose the word"
         CardMode.LISTEN -> "Listening: word by ear"
@@ -39,10 +38,10 @@ object StringsEn : Strings {
         CardMode.REPEAT -> "Repeat after the speaker"
     }
     override fun speakLabel(speed: SpeechSpeed) = when (speed) { SpeechSpeed.NORMAL -> "Speak"; SpeechSpeed.SLOW -> "Slowly"; SpeechSpeed.SLOWER -> "Even slower" }
-    override val sectionFrequency = "Frequency"; override val flipShare = "Flip cards"
-    override val flipShareHint = "Share of word and translation cards with a flip; the rest is spread across the modes below."
+    override val sectionFrequency = "Frequency"; override val flipShare = "Choose translation / choose word"
+    override val flipShareHint = "Share of \"word → translation\" and \"translation → word\"; the rest is spread across the modes below."
     override fun taskText(mode: CardMode) = when (mode) {
-        CardMode.FLIP_FWD, CardMode.FLIP_REV -> "Flip the card"
+        CardMode.FLIP_FWD -> "Flip the card"
         CardMode.CHOICE_FWD, CardMode.CHOICE_REV -> "Choose the correct option"
         CardMode.LISTEN -> "Listen and choose the correct option"
         CardMode.WRITE_FWD, CardMode.WRITE_REV -> "Type the answer"

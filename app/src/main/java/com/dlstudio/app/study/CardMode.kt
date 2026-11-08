@@ -5,10 +5,8 @@ package com.dlstudio.app.study
  * `speaks` — отвечают голосом в микрофон. Режим выбирается через [ModeWeights].
  */
 enum class CardMode(val reverse: Boolean = false, val speaks: Boolean = false) {
-    /** Изучаемое слово, тап — перевод. */
+    /** Только просмотр из библиотеки: изучаемое слово, тап — перевод. В интервальном повторении не бывает: там всегда нужно отвечать. */
     FLIP_FWD,
-    /** Родное слово, тап — изучаемое слово. */
-    FLIP_REV(reverse = true),
     /** Показывается иностранное слово → 4 варианта перевода на родном языке. */
     CHOICE_FWD,
     /** Показывается родное слово → 4 варианта иностранного. */
@@ -24,7 +22,12 @@ enum class CardMode(val reverse: Boolean = false, val speaks: Boolean = false) {
     /** Диктор произносит слово или предложение: нужно повторить за ним. */
     REPEAT(speaks = true);
 
-    val flip: Boolean get() = this == FLIP_FWD || this == FLIP_REV
+    val flip: Boolean get() = this == FLIP_FWD
     val typed: Boolean get() = this == WRITE_FWD || this == WRITE_REV
     val choice: Boolean get() = !flip && !typed && !speaks
+
+    companion object {
+        /** Режимы интервального повторения (все, кроме просмотра): их включают и выключают в настройках. */
+        val studied: Set<CardMode> = values().filter { !it.flip }.toSet()
+    }
 }

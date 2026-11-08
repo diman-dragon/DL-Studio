@@ -17,12 +17,12 @@ class StudyPrefs(context: Context) {
 
     fun load(): StudyOptions {
         val off = disabled()
-        val modes = CardMode.values().filter { it.name !in off }.toSet().ifEmpty { CardMode.values().toSet() }
+        val modes = CardMode.studied.filter { it.name !in off }.toSet().ifEmpty { CardMode.studied }
         return StudyOptions(modes, sp.getBoolean("pronounce", true), sp.getBoolean("celebrate", true), sp.getInt("flipShare", StudyOptions.DEFAULT_FLIP_SHARE))
     }
 
     fun save(options: StudyOptions) {
-        sp.edit().putString("modesOff", CardMode.values().filter { it !in options.modes }.joinToString(",") { it.name })
+        sp.edit().putString("modesOff", CardMode.studied.filter { it !in options.modes }.joinToString(",") { it.name })
             .putBoolean("pronounce", options.pronounce).putBoolean("celebrate", options.celebrate).putInt("flipShare", options.flipShare).apply()
     }
 

@@ -28,8 +28,7 @@ object StringsRu : Strings {
     override val statsBestStreak = "Рекорд серии"; override val statsWeek = "За 7 дней"; override val statsWeekTrend = "К прошлой неделе"
     override val writeRight = "Правильно!"; override fun writeWrong(correct: String) = "Неправильно: $correct"
     override fun modeName(mode: CardMode) = when (mode) {
-        CardMode.FLIP_FWD -> "Слово с переворотом"
-        CardMode.FLIP_REV -> "Перевод с переворотом"
+        CardMode.FLIP_FWD -> "Просмотр карточки"
         CardMode.CHOICE_FWD -> "Выбор перевода"
         CardMode.CHOICE_REV -> "Выбор слова по переводу"
         CardMode.LISTEN -> "Аудирование: слово на слух"
@@ -39,10 +38,10 @@ object StringsRu : Strings {
         CardMode.REPEAT -> "Повтор за диктором"
     }
     override fun speakLabel(speed: SpeechSpeed) = when (speed) { SpeechSpeed.NORMAL -> "Озвучить"; SpeechSpeed.SLOW -> "Медленно"; SpeechSpeed.SLOWER -> "Ещё медленнее" }
-    override val sectionFrequency = "Частота показов"; override val flipShare = "Карточки с переворотом"
-    override val flipShareHint = "Доля показов слова и перевода с переворотом; остальное распределяется по режимам ниже."
+    override val sectionFrequency = "Частота показов"; override val flipShare = "Выбор перевода и выбор слова"
+    override val flipShareHint = "Доля показов «слово → перевод» и «перевод → слово»; остальное распределяется по режимам ниже."
     override fun taskText(mode: CardMode) = when (mode) {
-        CardMode.FLIP_FWD, CardMode.FLIP_REV -> "Переверните карточку"
+        CardMode.FLIP_FWD -> "Переверните карточку"
         CardMode.CHOICE_FWD, CardMode.CHOICE_REV -> "Выберите правильный вариант"
         CardMode.LISTEN -> "Прослушайте и выберите правильный вариант"
         CardMode.WRITE_FWD, CardMode.WRITE_REV -> "Введите ответ"

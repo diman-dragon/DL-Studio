@@ -24,7 +24,7 @@ fun SettingsModes(state: AppState, vm: AppViewModel) {
         Text(s.flipShareHint, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
     SettingsSection(s.sectionModes) {
-        CardMode.values().forEach { mode ->
+        CardMode.studied.forEach { mode ->
             val on = mode in study.modes
             val last = study.isLastMode(mode)
             SwitchTile(s.modeName(mode), if (last) s.modeLast else label(on), on, { vm.setStudy(study.withMode(mode, it)) }, enabled = !last)

@@ -24,30 +24,27 @@ class ModeWeightsTest {
         assertTrue(used(StudyOptions(modes = setOf(CardMode.LISTEN))).all { it == CardMode.LISTEN })
     }
 
-    @Test fun flipCardsTakeAboutHalfByDefault() {
+    private val CardMode.frequent get() = this == CardMode.CHOICE_FWD || this == CardMode.CHOICE_REV
+
+    @Test fun choiceCardsTakeAboutHalfByDefault() {
         val modes = used(StudyOptions())
-        val flips = modes.count { it.flip } / modes.size.toDouble()
-        assertEquals(0.5, flips, 0.05)
-        assertTrue(CardMode.FLIP_FWD in modes && CardMode.FLIP_REV in modes)
-        assertEquals(0.5, modes.count { it == CardMode.FLIP_FWD } / modes.count { it.flip }.toDouble(), 0.07)
+        assertEquals(0.5, modes.count { it.frequent } / modes.size.toDouble(), 0.05)
+        assertEquals(0.5, modes.count { it == CardMode.CHOICE_FWD } / modes.count { it.frequent }.toDouble(), 0.07)
     }
 
-    @Test fun flipShareIsAdjustable() {
-        assertEquals(0.9, used(StudyOptions(flipShare = 90)).count { it.flip } / cards.size.toDouble(), 0.04)
-        assertEquals(0.3, used(StudyOptions(flipShare = 30)).count { it.flip } / cards.size.toDouble(), 0.04)
+    @Test fun shareIsAdjustable() {
+        assertEquals(0.9, used(StudyOptions(flipShare = 90)).count { it.frequent } / cards.size.toDouble(), 0.04)
+        assertEquals(0.3, used(StudyOptions(flipShare = 30)).count { it.frequent } / cards.size.toDouble(), 0.04)
     }
 
-    @Test fun restFollowsWeightsAndAllModesAppear() {
+    @Test fun reviewNeverUsesPlainFlip() {
         val u = used(StudyOptions()).toSet()
-        assertEquals(CardMode.values().toSet(), u)
+        assertEquals(CardMode.studied, u)
+        assertFalse(CardMode.FLIP_FWD in u)
     }
 
-    @Test fun withoutFlipModesNoFlips() {
-        assertTrue(used(StudyOptions(modes = CardMode.values().toSet() - CardMode.FLIP_FWD - CardMode.FLIP_REV)).none { it.flip })
-    }
-
-    @Test fun onlyFlipModesGiveOnlyFlips() {
-        assertTrue(used(StudyOptions(modes = setOf(CardMode.FLIP_REV), flipShare = 10)).all { it == CardMode.FLIP_REV })
+    @Test fun withoutChoiceModesNoChoice() {
+        assertTrue(used(StudyOptions(modes = CardMode.studied - CardMode.CHOICE_FWD - CardMode.CHOICE_REV)).none { it.frequent })
     }
 
     @Test fun pronounceOnlyForOneOrTwoWords() {
@@ -58,7 +55,7 @@ class ModeWeightsTest {
         assertTrue(ModeWeights.eligible(verb, CardMode.PRONOUNCE))
         assertFalse(ModeWeights.eligible(noBack, CardMode.PRONOUNCE))
         val only = StudyOptions(modes = setOf(CardMode.PRONOUNCE))
-        assertTrue(used(only, listOf(long, long)).all { it == CardMode.FLIP_FWD })
+        assertTrue(used(only, listOf(long, long)).all { it == CardMode.CHOICE_FWD })
         assertTrue(used(only, listOf(verb, verb)).all { it == CardMode.PRONOUNCE })
     }
 
