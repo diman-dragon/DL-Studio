@@ -22,7 +22,7 @@ import com.dlstudio.app.ui.theme.LocalStrings
 @Composable
 fun VoicePicker(voices: List<Voice>, selected: String?, ui: Locale, onPreview: (Voice, String) -> Unit, onSelect: (Voice) -> Unit, onClose: () -> Unit) {
     val s = LocalStrings.current; val colors = MaterialTheme.colorScheme
-    val names = remember(voices) { VoiceName.labels(voices, ui) }
+    val names = remember(voices, ui) { VoiceName.labels(voices, ui) }
     DlModal.Shell(s.speechVoice, onClose) {
         Column(Modifier.heightIn(max = 390.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (voices.isEmpty()) Text(s.voicePackagesEmpty, color = colors.onSurfaceVariant)

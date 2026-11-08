@@ -23,8 +23,8 @@ import com.dlstudio.app.ui.theme.gradientColors
 @Composable
 fun GradientButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Box(
-        modifier.fillMaxWidth().height(56.dp).clip(RoundedCornerShape(18.dp)).background(Brush.linearGradient(LocalAccent.current.gradientColors()))
+        modifier.fillMaxWidth().height(64.dp).clip(RoundedCornerShape(18.dp)).background(Brush.linearGradient(LocalAccent.current.gradientColors()))
             .clickable(role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center
-    ) { ButtonLabel(label, Color.White, Modifier.fillMaxHeight(0.9f), maxSize = 26.sp, maxLines = 1) }
+    ) { ButtonLabel(label, Color.White, Modifier.fillMaxHeight(0.9f), maxSize = 36.sp, maxLines = 1) }
 }

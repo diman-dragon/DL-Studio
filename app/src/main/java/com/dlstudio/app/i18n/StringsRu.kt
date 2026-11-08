@@ -42,11 +42,12 @@ object StringsRu : Strings {
     override val sectionFrequency = "Частота показов"; override val flipShare = "Карточки с переворотом"
     override val flipShareHint = "Доля показов слова и перевода с переворотом; остальное распределяется по режимам ниже."
     override fun taskText(mode: CardMode) = when (mode) {
-        CardMode.FLIP_FWD -> "Вспомните перевод и переверните карточку"; CardMode.FLIP_REV -> "Вспомните слово и переверните карточку"
-        CardMode.CHOICE_FWD -> "Выберите перевод"; CardMode.CHOICE_REV -> "Выберите слово на изучаемом языке"
-        CardMode.LISTEN -> "Послушайте и выберите перевод"; CardMode.WRITE_FWD -> "Напишите перевод"
-        CardMode.WRITE_REV -> "Напишите слово на изучаемом языке"; CardMode.PRONOUNCE -> "Скажите слово на изучаемом языке"
-        CardMode.REPEAT -> "Повторите за диктором"
+        CardMode.FLIP_FWD, CardMode.FLIP_REV -> "Переверните карточку"
+        CardMode.CHOICE_FWD, CardMode.CHOICE_REV -> "Выберите правильный вариант"
+        CardMode.LISTEN -> "Прослушайте и выберите правильный вариант"
+        CardMode.WRITE_FWD, CardMode.WRITE_REV -> "Введите ответ"
+        CardMode.PRONOUNCE -> "Произнесите слово"
+        CardMode.REPEAT -> "Повторите слово или фразу"
     }
     override val revealAnswer = "Показать ответ"
     override val customSize = "Своё"; override val customSizeTitle = "Своё число карточек"; override val customSizeHint = "От 1 до 500"

@@ -1,5 +1,6 @@
 package com.dlstudio.app.ui.components
 
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.Hyphens
@@ -15,7 +16,7 @@ object TextFit {
     }
 
     /** Наибольший кегль от `min` до `max` (sp) для области `width` × `height` px; если не помещается и минимальный — вернёт `min`. */
-    fun size(measurer: TextMeasurer, text: String, style: TextStyle, width: Int, height: Int, max: Float, min: Float, maxLines: Int): Float {
+    fun size(measurer: TextMeasurer, text: AnnotatedString, style: TextStyle, width: Int, height: Int, max: Float, min: Float, maxLines: Int): Float {
         if (fits(measurer, text, styled(style, max), width, height, maxLines)) return max
         var low = min
         var high = max
@@ -26,11 +27,12 @@ object TextFit {
         return low
     }
 
-    private fun fits(measurer: TextMeasurer, text: String, style: TextStyle, width: Int, height: Int, maxLines: Int): Boolean {
+    private fun fits(measurer: TextMeasurer, text: AnnotatedString, style: TextStyle, width: Int, height: Int, maxLines: Int): Boolean {
         val r = measurer.measure(text = text, style = style, maxLines = maxLines, constraints = Constraints(maxWidth = width))
         val cut = (0 until r.lineCount - 1).any { i ->
             val e = r.getLineEnd(i, true)
-            e in 1 until text.length && !text[e - 1].isWhitespace() && !text[e].isWhitespace() && text[e - 1] != '-'
+            val t = text.text
+            e in 1 until t.length && !t[e - 1].isWhitespace() && !t[e].isWhitespace() && t[e - 1] != '-'
         }
         return !cut && !r.didOverflowHeight && !r.didOverflowWidth && r.size.height <= height
     }

@@ -8,20 +8,32 @@ import java.util.Locale
  * Пол берётся только из названия голоса («female» / «male»); если там его нет, имя нейтральное (Саша, Алекс), чтобы женскому голосу не досталось «Томас».
  */
 object VoiceName {
-    private val ruFemale = listOf("Алёна", "Анна", "Екатерина", "Мария", "Дарья", "Ольга", "Ирина", "Наталья", "Софья", "Полина", "Татьяна", "Елена")
-    private val ruMale = listOf("Игорь", "Александр", "Дмитрий", "Максим", "Сергей", "Артём", "Андрей", "Михаил", "Николай", "Павел", "Иван", "Владимир")
-    private val enFemale = listOf("Оливия", "Эмма", "Джессика", "София", "Алиса", "Виктория", "Мия", "Эмили", "Грейс", "Лилия", "Клэр", "Ханна")
-    private val enMale = listOf("Джеймс", "Оливер", "Уильям", "Майкл", "Джон", "Дэвид", "Дэниел", "Томас", "Генри", "Люк", "Адам", "Эндрю")
-    private val neutral = listOf("Алекс", "Сэм", "Робин", "Джордан", "Тейлор", "Кэмерон", "Райли", "Квинн", "Саша", "Женя", "Валя", "Слава")
+    private fun list(text: String) = text.split(' ')
+    private val cyrillic = mapOf(
+        "ru-f" to list("Алёна Анна Екатерина Мария Дарья Ольга Ирина Наталья Софья Полина Татьяна Елена"),
+        "ru-m" to list("Игорь Александр Дмитрий Максим Сергей Артём Андрей Михаил Николай Павел Иван Владимир"),
+        "en-f" to list("Оливия Эмма Джессика София Алиса Виктория Мия Эмили Грейс Лилия Клэр Ханна"),
+        "en-m" to list("Джеймс Оливер Уильям Майкл Джон Дэвид Дэниел Томас Генри Люк Адам Эндрю"),
+        "any" to list("Алекс Сэм Робин Джордан Тейлор Кэмерон Райли Квинн Саша Женя Валя Слава")
+    )
+    private val latin = mapOf(
+        "ru-f" to list("Alyona Anna Ekaterina Maria Daria Olga Irina Natalia Sofia Polina Tatiana Elena"),
+        "ru-m" to list("Igor Alexander Dmitry Maxim Sergey Artyom Andrey Mikhail Nikolay Pavel Ivan Vladimir"),
+        "en-f" to list("Olivia Emma Jessica Sophia Alice Victoria Mia Emily Grace Lily Claire Hannah"),
+        "en-m" to list("James Oliver William Michael John David Daniel Thomas Henry Luke Adam Andrew"),
+        "any" to list("Alex Sam Robin Jordan Taylor Cameron Riley Quinn Sasha Jamie Charlie Morgan")
+    )
 
-    private fun pool(language: String, name: String): List<String> {
+    /** Имена по языку интерфейса (кириллица для русского, латиница для остальных), языку голоса и полу из названия голоса. */
+    private fun pool(language: String, name: String, ui: Locale): List<String> {
         val lower = name.lowercase()
-        val ru = language.lowercase() == "ru"
-        return when {
-            lower.contains("female") -> if (ru) ruFemale else enFemale
-            lower.contains("male") -> if (ru) ruMale else enMale
-            else -> neutral
+        val lang = if (language.lowercase() == "ru") "ru" else "en"
+        val key = when {
+            lower.contains("female") -> "$lang-f"
+            lower.contains("male") -> "$lang-m"
+            else -> "any"
         }
+        return (if (ui.language == "ru") cyrillic else latin).getValue(key)
     }
 
     private fun country(loc: Locale, ui: Locale): String = loc.getDisplayCountry(ui).ifBlank { loc.getDisplayLanguage(ui) }.let { if (it.isBlank()) "" else " ($it)" }
@@ -31,7 +43,7 @@ object VoiceName {
         val taken = HashSet<String>()
         return voices.sortedBy { it.name }.associate { v ->
             val loc = v.locale ?: Locale.getDefault()
-            val names = pool(loc.language, v.name)
+            val names = pool(loc.language, v.name, ui)
             val start = Math.floorMod(v.name.hashCode(), names.size)
             v.name to generateSequence(0) { it + 1 }.map { k ->
                 val n = names[(start + k) % names.size]
@@ -47,7 +59,7 @@ object VoiceName {
     fun fallback(name: String, ui: Locale): String {
         val parts = name.split('-', '_')
         val loc = Locale(parts[0], parts.getOrNull(1)?.takeIf { it.length == 2 }.orEmpty())
-        val names = pool(loc.language, name)
+        val names = pool(loc.language, name, ui)
         return names[Math.floorMod(name.hashCode(), names.size)] + country(loc, ui)
     }
 }

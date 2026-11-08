@@ -9,11 +9,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.dlstudio.app.ui.theme.DlFonts
 
-/** Главное слово карточки: с заглавной буквы, по центру, максимально крупно в выделенной области (до 72sp), слова не рвутся. */
+/**
+ * Главное слово карточки: с заглавной буквы, по центру, максимально крупно в выделенной области (до `maxSize`), слова не рвутся.
+ * Если передано `heard` (то, что услышано в микрофон), правильно произнесённые слова подсвечиваются зелёным.
+ */
 @Composable
-fun CardWord(text: String, color: Color, modifier: Modifier = Modifier) {
+fun CardWord(text: String, color: Color, modifier: Modifier = Modifier, heard: String = "", maxSize: Float = 72f) {
     val style = MaterialTheme.typography.displaySmall.copy(
-        fontFamily = DlFonts, fontWeight = FontWeight.SemiBold, fontSize = 72.sp, lineHeight = 83.sp, letterSpacing = 0.sp
+        fontFamily = DlFonts, fontWeight = FontWeight.SemiBold, fontSize = maxSize.sp, lineHeight = (maxSize * 1.15f).sp, letterSpacing = 0.sp
     )
-    BigText(text.capFirst(), style, modifier.fillMaxSize(), color, maxSize = 72.sp, minSize = 18.sp, maxLines = 6)
+    BigText(SpokenHighlight.build(text.capFirst(), heard, Color(0xFF2E9D4F)), style, modifier.fillMaxSize(), color, maxSize = maxSize.sp, minSize = 18.sp, maxLines = 6)
 }

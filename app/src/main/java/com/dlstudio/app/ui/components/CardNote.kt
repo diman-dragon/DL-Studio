@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -19,6 +20,6 @@ fun CardNote(text: String, modifier: Modifier = Modifier) {
     val cs = MaterialTheme.colorScheme
     val style = MaterialTheme.typography.bodyLarge.copy(fontSize = 24.sp, lineHeight = 30.sp)
     Box(modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(cs.surfaceContainerHighest).padding(horizontal = 14.dp, vertical = 8.dp), Alignment.Center) {
-        BigText(text.capFirst(), style, Modifier.fillMaxWidth(), cs.onSurface, maxSize = 24.sp, minSize = 13.sp, maxLines = 3)
+        BigText(AnnotatedString(text.capFirst()), style, Modifier.fillMaxWidth(), cs.onSurface, maxSize = 24.sp, minSize = 13.sp, maxLines = 3)
     }
 }

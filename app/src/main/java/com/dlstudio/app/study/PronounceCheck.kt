@@ -22,6 +22,12 @@ object PronounceCheck {
         return variants.maxOf { v -> if (v.isEmpty() && b.isEmpty()) 1.0 else 1.0 - distance(v, b).toDouble() / max(v.length, b.length) }
     }
 
+    /** Для каждого слова эталона: сказано ли оно (есть среди услышанных слов или почти совпало). */
+    fun matchedWords(target: String, heard: String): List<Boolean> {
+        val said = normalize(heard).split(' ').filter { it.isNotEmpty() }
+        return target.split(spaces).filter { it.isNotEmpty() }.map { w -> normalize(w).let { n -> n.isNotEmpty() && said.any { similarity(n, it) >= 0.8 } } }
+    }
+
     fun verdict(target: String, heard: List<String>): PronounceVerdict {
         val best = heard.maxOfOrNull { similarity(target, it) } ?: 0.0
         return when {

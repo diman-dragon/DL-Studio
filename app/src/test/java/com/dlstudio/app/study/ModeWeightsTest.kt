@@ -88,4 +88,10 @@ class ModeWeightsTest {
         assertEquals(Grade.AGAIN, AutoGrade.ofSpeech(PronounceVerdict.MISS, false))
         assertEquals(Grade.AGAIN, AutoGrade.ofSpeech(null, false))
     }
+
+    @Test fun matchedWordsAreMarkedPerWord() {
+        assertEquals(listOf(true, false), PronounceCheck.matchedWords("Good morning", "good"))
+        assertEquals(listOf(true, true), PronounceCheck.matchedWords("Good morning!", "Good Morning"))
+        assertEquals(listOf(false), PronounceCheck.matchedWords("cat", ""))
+    }
 }

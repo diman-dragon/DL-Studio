@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
@@ -18,7 +19,7 @@ import androidx.compose.ui.unit.TextUnit
  * Нужна ограниченная по ширине область; по высоте — желательно тоже. Внутри `IntrinsicSize` не использовать.
  */
 @Composable
-fun BigText(text: String, style: TextStyle, modifier: Modifier = Modifier, color: Color = Color.Unspecified, maxSize: TextUnit, minSize: TextUnit, maxLines: Int = 2) {
+fun BigText(text: AnnotatedString, style: TextStyle, modifier: Modifier = Modifier, color: Color = Color.Unspecified, maxSize: TextUnit, minSize: TextUnit, maxLines: Int = 2) {
     val measurer = rememberTextMeasurer()
     BoxWithConstraints(modifier, contentAlignment = Alignment.Center) {
         val width = constraints.maxWidth

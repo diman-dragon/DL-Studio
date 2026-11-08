@@ -17,7 +17,7 @@ fun FlashBack(card: LibNode, mode: CardMode, onSpeak: Speak, pronounce: Pronounc
     val text = if (mode.reverse) card.name else card.back.ifBlank { card.name }
     val mic = mode.reverse && !mode.speaks && LocalStudyOptions.current.pronounce
     Column(Modifier.fillMaxSize()) {
-        Box(Modifier.fillMaxWidth().weight(1f), Alignment.Center) { CardWord(text, MaterialTheme.colorScheme.onSurface) }
+        Box(Modifier.fillMaxWidth().weight(1f), Alignment.Center) { CardWord(text, MaterialTheme.colorScheme.onSurface, heard = if (mode.reverse) pronounce.heard else "") }
         if (card.explanation.isNotBlank()) CardNote(card.explanation, Modifier.padding(bottom = 8.dp))
         if (card.example.isNotBlank()) SpeakNote(card.example, onSpeak, Modifier.padding(bottom = 8.dp))
         if (mic) PronounceFeedback(pronounce)

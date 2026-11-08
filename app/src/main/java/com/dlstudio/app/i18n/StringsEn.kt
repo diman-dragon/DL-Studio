@@ -42,11 +42,12 @@ object StringsEn : Strings {
     override val sectionFrequency = "Frequency"; override val flipShare = "Flip cards"
     override val flipShareHint = "Share of word and translation cards with a flip; the rest is spread across the modes below."
     override fun taskText(mode: CardMode) = when (mode) {
-        CardMode.FLIP_FWD -> "Recall the translation and flip the card"; CardMode.FLIP_REV -> "Recall the word and flip the card"
-        CardMode.CHOICE_FWD -> "Choose the translation"; CardMode.CHOICE_REV -> "Choose the word in the language you study"
-        CardMode.LISTEN -> "Listen and choose the translation"; CardMode.WRITE_FWD -> "Write the translation"
-        CardMode.WRITE_REV -> "Write the word in the language you study"; CardMode.PRONOUNCE -> "Say the word in the language you study"
-        CardMode.REPEAT -> "Repeat after the speaker"
+        CardMode.FLIP_FWD, CardMode.FLIP_REV -> "Flip the card"
+        CardMode.CHOICE_FWD, CardMode.CHOICE_REV -> "Choose the correct option"
+        CardMode.LISTEN -> "Listen and choose the correct option"
+        CardMode.WRITE_FWD, CardMode.WRITE_REV -> "Type the answer"
+        CardMode.PRONOUNCE -> "Say the word"
+        CardMode.REPEAT -> "Repeat the word or phrase"
     }
     override val revealAnswer = "Show answer"
     override val customSize = "Custom"; override val customSizeTitle = "Custom number of cards"; override val customSizeHint = "From 1 to 500"

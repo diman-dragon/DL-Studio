@@ -26,7 +26,11 @@ fun FlashFront(card: LibNode, mode: CardMode, target: String, hint: Boolean, hin
     Column(Modifier.fillMaxSize()) {
         TaskBanner(s.taskText(mode), Modifier.padding(bottom = 6.dp))
         Box(Modifier.fillMaxWidth().weight(1f), Alignment.Center) {
-            if (listening && !listenRevealed) CardWord(s.listenPrompt, MaterialTheme.colorScheme.onSurfaceVariant) else CardWord(word, MaterialTheme.colorScheme.onSurface)
+            if (listening && !listenRevealed) CardWord(s.listenPrompt, MaterialTheme.colorScheme.onSurfaceVariant)
+            else CardWord(word, MaterialTheme.colorScheme.onSurface, heard = if (mode == CardMode.REPEAT || mic) pronounce.heard else "")
+        }
+        if (mode == CardMode.PRONOUNCE && pronounce.heard.isNotBlank()) Box(Modifier.fillMaxWidth().height(64.dp), Alignment.Center) {
+            CardWord(card.name, MaterialTheme.colorScheme.onSurface, heard = pronounce.heard, maxSize = 36f)
         }
         if (hint && card.hint.isNotBlank() && !listening) CardNote(card.hint, Modifier.padding(bottom = 8.dp))
         if (mic) PronounceFeedback(pronounce)

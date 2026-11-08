@@ -17,7 +17,7 @@ fun SpeakAnswer(pronounce: PronounceState, onReveal: () -> Unit, modifier: Modif
     Column(modifier.fillMaxWidth(), Arrangement.spacedBy(0.dp)) {
         PronounceFeedback(pronounce)
         Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
-            PronounceButton(pronounce, Modifier.size(72.dp), 72.dp)
+            PronounceButton(pronounce, Modifier.size(84.dp), 84.dp)
             ChoiceButton(LocalStrings.current.revealAnswer, onReveal, Modifier.weight(1f))
         }
     }

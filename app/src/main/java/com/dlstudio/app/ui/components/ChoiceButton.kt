@@ -32,7 +32,7 @@ fun ChoiceButton(
         else -> cs.surfaceContainerHigh to cs.outlineVariant
     }
     Box(
-        modifier = modifier.height(72.dp).clip(shape)
+        modifier = modifier.height(84.dp).clip(shape)
             .background(bg).border(1.dp, border, shape)
             .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center
