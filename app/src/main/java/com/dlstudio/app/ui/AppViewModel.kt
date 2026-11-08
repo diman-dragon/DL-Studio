@@ -19,6 +19,7 @@ import com.dlstudio.app.study.SpeechSpeed
 import com.dlstudio.app.study.StudyOptions
 import com.dlstudio.app.study.StudyReminderScheduler
 import com.dlstudio.app.ui.components.VoiceName
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,12 +44,20 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     init { StudyReminderScheduler.sync(app, prefs); viewModelScope.launch(Dispatchers.IO) { runCatching { ensureLayout(openParent(app, prefs)) } } }
 
     fun setTheme(theme: ThemeMode) { prefs.theme = theme; mutable.update { it.copy(theme = theme) } }
-    fun setLang(lang: AppLang) { prefs.lang = lang; mutable.update { it.copy(lang = lang) } }
+    fun setLang(lang: AppLang) {
+        prefs.lang = lang
+        val name = mutable.value.speechVoiceName
+        val label = name?.let { VoiceName.fallback(it, Locale(lang.name.lowercase())) }
+        prefs.speechVoiceLabel = label
+        mutable.update { it.copy(lang = lang, speechVoiceLabel = label) }
+    }
     fun setAccent(accent: AccentColor) { prefs.accent = accent; mutable.update { it.copy(accent = accent) } }
     fun setStudy(options: StudyOptions) { studyPrefs.save(options); mutable.update { it.copy(study = options) } }
     fun setSessionSize(size: Int) { prefs.sessionSize = size; mutable.update { it.copy(sessionSize = size) } }
+    /** Язык интерфейса как Locale — на нём пишутся страны и языки голосов. */
+    fun uiLocale(): Locale = Locale(mutable.value.lang.name.lowercase())
     fun setSpeechVoice(voice: Voice) {
-        val label = VoiceName.labels(voiceList.value)[voice.name] ?: VoiceName.fallback(voice.name)
+        val label = VoiceName.labels(voiceList.value, uiLocale())[voice.name] ?: VoiceName.fallback(voice.name, uiLocale())
         prefs.speechVoiceName = voice.name; prefs.speechVoiceLabel = label
         mutable.update { it.copy(speechVoiceName = voice.name, speechVoiceLabel = label) }
     }

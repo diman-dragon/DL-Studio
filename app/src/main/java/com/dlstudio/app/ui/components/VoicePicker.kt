@@ -1,6 +1,7 @@
 package com.dlstudio.app.ui.components
 
 import android.speech.tts.Voice
+import java.util.Locale
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,14 +20,14 @@ import com.dlstudio.app.ui.theme.LocalStrings
 
 /** Выбор голоса с понятными человеческими именами («Алёна», «Игорь» и т.д.). */
 @Composable
-fun VoicePicker(voices: List<Voice>, selected: String?, onPreview: (Voice, String) -> Unit, onSelect: (Voice) -> Unit, onClose: () -> Unit) {
+fun VoicePicker(voices: List<Voice>, selected: String?, ui: Locale, onPreview: (Voice, String) -> Unit, onSelect: (Voice) -> Unit, onClose: () -> Unit) {
     val s = LocalStrings.current; val colors = MaterialTheme.colorScheme
-    val names = remember(voices) { VoiceName.labels(voices) }
+    val names = remember(voices) { VoiceName.labels(voices, ui) }
     DlModal.Shell(s.speechVoice, onClose) {
         Column(Modifier.heightIn(max = 390.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (voices.isEmpty()) Text(s.voicePackagesEmpty, color = colors.onSurfaceVariant)
             voices.sortedWith(compareBy({ it.locale.displayName }, { it.name })).forEach { voice ->
-                val language = voice.locale.getDisplayName(voice.locale).replaceFirstChar { it.titlecase(voice.locale) }
+                val language = VoiceName.language(voice, ui)
                 val on = voice.name == selected
                 Surface(
                     Modifier.fillMaxWidth().clickable { onSelect(voice) }, RoundedCornerShape(16.dp),
@@ -35,10 +36,10 @@ fun VoicePicker(voices: List<Voice>, selected: String?, onPreview: (Voice, Strin
                 ) {
                     Row(Modifier.padding(14.dp), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
-                            Text(names[voice.name] ?: VoiceName.fallback(voice.name), style = MaterialTheme.typography.titleSmall)
+                            Text(names[voice.name] ?: VoiceName.fallback(voice.name, ui), style = MaterialTheme.typography.titleSmall)
                             Text(language, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
                         }
-                        DlModal.Action("▶", { onPreview(voice, s.voicePreview) })
+                        DlModal.Action("▶", { onPreview(voice, if (voice.locale.language == "ru") s.voicePreview else "Hello! This is how I sound.") })
                     }
                 }
             }

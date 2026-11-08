@@ -39,8 +39,8 @@ class Prefs(context: Context) {
 
     /** Человеческое имя выбранного голоса — ровно то, что пользователь выбрал в списке. */
     var speechVoiceLabel: String?
-        get() = sp.getString("speechVoiceLabel", null)
-        set(value) = sp.putPref("speechVoiceLabel", value)
+        get() = sp.getString("speechVoiceLabelV2", null)
+        set(value) = sp.putPref("speechVoiceLabelV2", value)
 
     /** Размер одной учебной сессии: 10, 50 или своё число. */
     var sessionSize: Int get() = sp.getInt("dailyCards", 20); set(value) { sp.edit().putInt("dailyCards", value).apply() }

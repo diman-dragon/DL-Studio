@@ -41,7 +41,14 @@ object StringsRu : Strings {
     override fun speakLabel(speed: SpeechSpeed) = when (speed) { SpeechSpeed.NORMAL -> "Озвучить"; SpeechSpeed.SLOW -> "Медленно"; SpeechSpeed.SLOWER -> "Ещё медленнее" }
     override val sectionFrequency = "Частота показов"; override val flipShare = "Карточки с переворотом"
     override val flipShareHint = "Доля показов слова и перевода с переворотом; остальное распределяется по режимам ниже."
-    override val pronouncePrompt = "Скажите это на изучаемом языке"; override val repeatPrompt = "Повторите за диктором"; override val revealAnswer = "Показать ответ"
+    override fun taskText(mode: CardMode) = when (mode) {
+        CardMode.FLIP_FWD -> "Вспомните перевод и переверните карточку"; CardMode.FLIP_REV -> "Вспомните слово и переверните карточку"
+        CardMode.CHOICE_FWD -> "Выберите перевод"; CardMode.CHOICE_REV -> "Выберите слово на изучаемом языке"
+        CardMode.LISTEN -> "Послушайте и выберите перевод"; CardMode.WRITE_FWD -> "Напишите перевод"
+        CardMode.WRITE_REV -> "Напишите слово на изучаемом языке"; CardMode.PRONOUNCE -> "Скажите слово на изучаемом языке"
+        CardMode.REPEAT -> "Повторите за диктором"
+    }
+    override val revealAnswer = "Показать ответ"
     override val customSize = "Своё"; override val customSizeTitle = "Своё число карточек"; override val customSizeHint = "От 1 до 500"
     override fun pronounceError(code: Int) = "Не удалось включить распознавание речи (код $code). Попробуйте ещё раз"
     override fun praise(kind: PraiseKind, n: Int) = when (kind) {

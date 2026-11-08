@@ -40,7 +40,8 @@ interface Strings {
     fun modeName(mode: CardMode): String
     fun speakLabel(speed: SpeechSpeed): String
     val sectionFrequency: String; val flipShare: String; val flipShareHint: String
-    val pronouncePrompt: String; val repeatPrompt: String; val revealAnswer: String
+    fun taskText(mode: CardMode): String
+    val revealAnswer: String
     val customSize: String; val customSizeTitle: String; val customSizeHint: String
     fun pronounceError(code: Int): String
     fun praise(kind: PraiseKind, n: Int): String

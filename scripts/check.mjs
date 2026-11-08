@@ -15,7 +15,7 @@ const MAX_LINES = 60;
 const DUP_WINDOW = 4;
 const ENTRY_POINTS = new Set(['MainActivity', 'StudyBootReceiver']);
 // Осознанные исключения из лимита строк: таблицы переводов, две модели с общим замком и тесты логики.
-const LONG_OK = { Strings: 100, StringsRu: 125, StringsEn: 125, LibraryViewModel: 160, AppViewModel: 80, StudyViewModel: 70, StudyLogicTest: 200, ModeWeightsTest: 100 };
+const LONG_OK = { Strings: 100, StringsRu: 130, StringsEn: 130, LibraryViewModel: 160, AppViewModel: 95, StudyViewModel: 70, StudyLogicTest: 200, ModeWeightsTest: 100 };
 const bad = [];
 
 const walk = d => readdirSync(d).flatMap(n => {

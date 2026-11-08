@@ -41,7 +41,14 @@ object StringsEn : Strings {
     override fun speakLabel(speed: SpeechSpeed) = when (speed) { SpeechSpeed.NORMAL -> "Speak"; SpeechSpeed.SLOW -> "Slowly"; SpeechSpeed.SLOWER -> "Even slower" }
     override val sectionFrequency = "Frequency"; override val flipShare = "Flip cards"
     override val flipShareHint = "Share of word and translation cards with a flip; the rest is spread across the modes below."
-    override val pronouncePrompt = "Say it in the language you study"; override val repeatPrompt = "Repeat after the speaker"; override val revealAnswer = "Show answer"
+    override fun taskText(mode: CardMode) = when (mode) {
+        CardMode.FLIP_FWD -> "Recall the translation and flip the card"; CardMode.FLIP_REV -> "Recall the word and flip the card"
+        CardMode.CHOICE_FWD -> "Choose the translation"; CardMode.CHOICE_REV -> "Choose the word in the language you study"
+        CardMode.LISTEN -> "Listen and choose the translation"; CardMode.WRITE_FWD -> "Write the translation"
+        CardMode.WRITE_REV -> "Write the word in the language you study"; CardMode.PRONOUNCE -> "Say the word in the language you study"
+        CardMode.REPEAT -> "Repeat after the speaker"
+    }
+    override val revealAnswer = "Show answer"
     override val customSize = "Custom"; override val customSizeTitle = "Custom number of cards"; override val customSizeHint = "From 1 to 500"
     override fun pronounceError(code: Int) = "Speech recognition failed to start (code $code). Please try again"
     override fun praise(kind: PraiseKind, n: Int) = when (kind) {
