@@ -10,6 +10,8 @@ import com.dlstudio.app.settings.ThemeMode
 
 object StringsEn : Strings {
     override val tabStudy = "Study"; override val tabStats = "Stats"; override val tabLibrary = "Library"; override val tabSettings = "Settings"; override val stubHint = "Coming soon"
+    override val cardIpa = "Transcription (optional)"; override val modeFlipHint = "Word → translation, tap to flip"; override val modesLater = "Other modes"
+    override val studyPausedHint = "Cards open from the Library for now: tap ▶ on a deck"; override fun modesSoon(count: Int) = "Soon · $count"
     override val settingTheme = "Theme"; override val settingLanguage = "App language"; override val settingAccent = "Accent color"; override val settingFolder = "Storage folder"; override val settingAbout = "About"
     override val folderDefault = "App folder"; override val aboutTitle = "DL Studio"; override val aboutText = "Flashcards for learning languages. Works offline."; override val close = "Close"
     override val viewCards = "Cards"; override val viewList = "List"; override val edit = "Edit"; override val delete = "Delete"; override val save = "Save"; override val cancel = "Cancel"

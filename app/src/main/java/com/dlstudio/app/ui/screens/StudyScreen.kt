@@ -6,12 +6,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dlstudio.app.Features
 import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.library.LibraryViewModel
 import com.dlstudio.app.study.Speak
 import com.dlstudio.app.study.StudySession
 import com.dlstudio.app.study.StudyViewModel
 import com.dlstudio.app.ui.components.StudyHome
+import com.dlstudio.app.ui.components.StudyPaused
 import com.dlstudio.app.ui.components.StudySessionView
 import kotlinx.coroutines.flow.first
 
@@ -31,5 +33,5 @@ fun StudyScreen(sessionSize: Int, onSpeak: Speak, study: StudyViewModel = viewMo
             session, { id, forced -> study.flip(id, forced)?.let(library::grade) }, study::hint,
             { page -> study.goTo(page); library.savePosition(session.id, page) }, { study.nextRound()?.let(saveSession) }, study::close, onSpeak
         )
-    } else StudyHome(ui, sessionSize, study, library, saveSession)
+    } else if (Features.STUDY_HOME) StudyHome(ui, sessionSize, study, library, saveSession) else StudyPaused()
 }

@@ -5,6 +5,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.dlstudio.app.Features
 import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.study.AutoGrade
 import com.dlstudio.app.study.CardMode
@@ -25,7 +26,7 @@ fun StudyCardPage(
     onFlip: (String, Grade?) -> Unit, onHint: () -> Unit, onSpeak: Speak
 ) {
     val study = LocalStudyOptions.current
-    val interactive = !session.random && card.back.isNotBlank()
+    val interactive = !Features.FLIP_ONLY && !session.random && card.back.isNotBlank()
     val plan = remember(card.id, page, interactive, study) { CardPlan.of(card, page, session.queue, interactive, study) }
     val mode = plan.mode
     val pronounce = rememberPronounce(plan.target, SpeechLang.forText(plan.target, LocalSpeechTag.current))

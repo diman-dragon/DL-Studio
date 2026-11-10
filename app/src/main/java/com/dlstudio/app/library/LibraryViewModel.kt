@@ -93,18 +93,19 @@ class LibraryViewModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun add(name: String, back: String, hint: String = "", explanation: String = "", example: String = "") {
+    fun add(draft: LibNode) {
         if (!canEdit) return
-        val path = mutable.value.path; val node = LibNode(newId(), name, back, hint, explanation, example)
+        val path = mutable.value.path; val node = draft.copy(id = newId())
         mutable.update { it.copy(items = it.items.addAt(path, node)) }
         change { db -> db.nodes.insert(path.lastOrNull(), path.size, listOf(node)) }
     }
 
-    fun edit(id: String, name: String, back: String, hint: String = "", explanation: String = "", example: String = "") {
+    /** Замена узла целиком (его `id` не меняется): поля, которых нет в диалоге, например значения слова, приходят из самого узла. */
+    fun edit(node: LibNode) {
         if (!canEdit) return
-        val path = mutable.value.path + id
-        mutable.update { s -> s.copy(items = s.items.editAt(path) { it.copy(name = name, back = back, hint = hint, explanation = explanation, example = example) }) }
-        change { db -> db.nodes.update(LibNode(id, name, back, hint, explanation, example)) }
+        val path = mutable.value.path + node.id
+        mutable.update { s -> s.copy(items = s.items.editAt(path) { node }) }
+        change { db -> db.nodes.update(node) }
     }
 
     fun remove(id: String) {

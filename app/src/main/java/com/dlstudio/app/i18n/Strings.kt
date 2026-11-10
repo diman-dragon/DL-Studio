@@ -11,6 +11,8 @@ import com.dlstudio.app.settings.ThemeMode
 /** Все тексты интерфейса. Новый язык = новая реализация; забытая строка не соберётся. */
 interface Strings {
     val tabStudy: String; val tabStats: String; val tabLibrary: String; val tabSettings: String; val stubHint: String
+    val cardIpa: String; val modeFlipHint: String; val modesLater: String; val studyPausedHint: String
+    fun modesSoon(count: Int): String
     val settingTheme: String; val settingLanguage: String; val settingAccent: String; val settingFolder: String; val settingAbout: String
     val folderDefault: String; val aboutTitle: String; val aboutText: String; val close: String; val viewCards: String; val viewList: String
     val edit: String; val delete: String; val save: String; val cancel: String; val cardBack: String; val cardHint: String

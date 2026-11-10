@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -20,7 +21,7 @@ import com.dlstudio.app.ui.theme.LocalStrings
 fun TabItem(tab: TabSpec, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme
     Column(
-        modifier.selectable(selected, remember { MutableInteractionSource() }, null, role = Role.Tab, onClick = onClick)
+        modifier.alpha(if (tab.active) 1f else 0.45f).selectable(selected, remember { MutableInteractionSource() }, null, role = Role.Tab, onClick = onClick)
             .padding(horizontal = 2.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

@@ -22,7 +22,7 @@ import com.dlstudio.app.study.CardPlan
 import com.dlstudio.app.study.Speak
 import kotlin.math.abs
 
-/** Карточка с переворотом: слово по центру максимально крупно; переворот заблокирован, пока нет ответа (`canFlip`). */
+/** Карточка с переворотом; для просмотра (`FLIP_FWD`) — новое лицо и оборот со значениями, для остальных режимов прежние. Переворот заблокирован, пока нет ответа (`canFlip`). */
 @Composable
 fun StudyFlashCard(
     card: LibNode, plan: CardPlan, flipped: Boolean, hint: Boolean, hintReady: Boolean, listenRevealed: Boolean, canFlip: Boolean,
@@ -37,7 +37,11 @@ fun StudyFlashCard(
             .graphicsLayer { scaleX = abs(1f - 2f * turn).coerceAtLeast(0.02f) }
             .clip(shape).background(cs.surfaceContainerHigh).border(1.dp, cs.outlineVariant, shape).padding(16.dp)
     ) {
-        if (turn < 0.5f) FlashFront(card, plan.mode, plan.target, hint, hintReady, listenRevealed, onHint, onSpeak, pronounce)
-        else FlashBack(card, plan.mode, onSpeak, pronounce)
+        when {
+            turn < 0.5f && plan.mode.flip -> FlipFront(card, hint, onHint, onSpeak, pronounce)
+            turn < 0.5f -> FlashFront(card, plan.mode, plan.target, hint, hintReady, listenRevealed, onHint, onSpeak, pronounce)
+            plan.mode.flip && card.meanings.isNotEmpty() -> FlipBack(card, onSpeak)
+            else -> FlashBack(card, plan.mode, onSpeak, pronounce)
+        }
     }
 }

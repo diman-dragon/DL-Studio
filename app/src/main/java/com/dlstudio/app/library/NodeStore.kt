@@ -8,8 +8,8 @@ class NodeStore(private val db: SQLiteDatabase) {
     private class Row(val id: String, val parent: String?, val node: LibNode)
 
     fun load(): List<LibNode> {
-        val rows = db.rawQuery("SELECT id,parent_id,name,back,hint,explanation,example FROM nodes ORDER BY rowid", null).use { c ->
-            buildList { while (c.moveToNext()) add(Row(c.getString(0), c.getString(1), LibNode(c.getString(0), c.str(2), c.str(3), c.str(4), c.str(5), c.str(6)))) }
+        val rows = db.rawQuery("SELECT id,parent_id,name,back,hint,explanation,example,ipa,meanings FROM nodes ORDER BY rowid", null).use { c ->
+            buildList { while (c.moveToNext()) add(Row(c.getString(0), c.getString(1), LibNode(c.getString(0), c.str(2), c.str(3), c.str(4), c.str(5), c.str(6), ipa = c.str(7), meanings = MeaningsJson.decode(c.str(8))))) }
         }
         val byParent = rows.groupBy { it.parent }
         fun build(parent: String?): List<LibNode> = byParent[parent].orEmpty().map { it.node.copy(children = build(it.id)) }
@@ -23,13 +23,14 @@ class NodeStore(private val db: SQLiteDatabase) {
             db.insertOrThrow("nodes", null, ContentValues().apply {
                 put("id", n.id); put("parent_id", parentId); put("type", level); put("name", n.name)
                 put("back", n.back); put("hint", n.hint); put("explanation", n.explanation); put("example", n.example)
+                put("ipa", n.ipa); put("meanings", MeaningsJson.encode(n.meanings))
             })
             insert(n.id, level + 1, n.children)
         }
     }
 
     fun update(n: LibNode) {
-        db.update("nodes", ContentValues().apply { put("name", n.name); put("back", n.back); put("hint", n.hint); put("explanation", n.explanation); put("example", n.example) }, "id=?", arrayOf(n.id))
+        db.update("nodes", ContentValues().apply { put("name", n.name); put("back", n.back); put("hint", n.hint); put("explanation", n.explanation); put("example", n.example); put("ipa", n.ipa); put("meanings", MeaningsJson.encode(n.meanings)) }, "id=?", arrayOf(n.id))
     }
 
     /** Удаляет узел со всем содержимым; возвращает id удалённых карточек, чтобы стереть их расписание. */

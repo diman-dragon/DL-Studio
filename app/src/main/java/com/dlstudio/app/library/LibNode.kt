@@ -2,7 +2,8 @@ package com.dlstudio.app.library
 
 /**
  * Узел библиотеки. Глубина задаёт тип: 0 — проект (например «Английский B1»), 1 — колода,
- * 2 — карточка (`name` — лицевая сторона, `back` — обратная).
+ * 2 — карточка (`name` — лицевая сторона, `back` — главный перевод для списков). У карточки ещё `ipa` (транскрипция)
+ * и `meanings` (значения для рамок на обороте); оба поля необязательны, без них карточка открывается по-старому.
  */
 data class LibNode(
     val id: String,
@@ -11,5 +12,7 @@ data class LibNode(
     val hint: String = "",
     val explanation: String = "",
     val example: String = "",
-    val children: List<LibNode> = emptyList()
+    val children: List<LibNode> = emptyList(),
+    val ipa: String = "",
+    val meanings: List<Meaning> = emptyList()
 )

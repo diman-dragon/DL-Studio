@@ -10,6 +10,8 @@ import com.dlstudio.app.settings.ThemeMode
 
 object StringsRu : Strings {
     override val tabStudy = "Учёба"; override val tabStats = "Статистика"; override val tabLibrary = "Библиотека"; override val tabSettings = "Настройки"; override val stubHint = "Раздел в разработке"
+    override val cardIpa = "Транскрипция (необязательно)"; override val modeFlipHint = "Слово → перевод, тап переворачивает"; override val modesLater = "Другие режимы"
+    override val studyPausedHint = "Карточки пока открываются из Библиотеки: нажмите ▶ у колоды"; override fun modesSoon(count: Int) = "Скоро · $count"
     override val settingTheme = "Тема"; override val settingLanguage = "Язык приложения"; override val settingAccent = "Акцентный цвет"; override val settingFolder = "Папка хранения"; override val settingAbout = "О нас"
     override val folderDefault = "Папка приложения"; override val aboutTitle = "DL Studio"; override val aboutText = "Карточки для изучения языков. Работает без интернета."; override val close = "Закрыть"
     override val viewCards = "Карточки"; override val viewList = "Список"; override val edit = "Изменить"; override val delete = "Удалить"; override val save = "Сохранить"; override val cancel = "Отмена"

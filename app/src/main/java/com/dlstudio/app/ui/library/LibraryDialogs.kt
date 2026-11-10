@@ -15,9 +15,8 @@ fun LibraryDialogs(dialog: LibDialog?, level: Int, vm: LibraryViewModel, onClose
             { vm.remove(node.id); onClose() },
             onClose
         )
-        else -> EditDialog(level, node, { name, back, hint, explanation, example ->
-            if (node == null) vm.add(name, back, hint, explanation, example)
-            else vm.edit(node.id, name, back, hint, explanation, example)
+        else -> EditDialog(level, node, { draft ->
+            if (node == null) vm.add(draft) else vm.edit(draft)
             onClose()
         }, onClose)
     }
