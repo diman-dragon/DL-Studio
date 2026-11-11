@@ -37,6 +37,12 @@ class ModeWeightsTest {
         assertEquals(0.3, used(StudyOptions(flipShare = 30)).count { it.frequent } / cards.size.toDouble(), 0.04)
     }
 
+    @Test fun typedCardsTakeAboutThreePercentEach() {
+        val modes = used(StudyOptions())
+        assertEquals(0.03, modes.count { it == CardMode.WRITE_FWD } / modes.size.toDouble(), 0.015)
+        assertEquals(0.03, modes.count { it == CardMode.WRITE_REV } / modes.size.toDouble(), 0.015)
+    }
+
     @Test fun reviewNeverUsesPlainFlip() {
         val u = used(StudyOptions()).toSet()
         assertEquals(CardMode.studied, u)

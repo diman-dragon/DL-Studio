@@ -3,6 +3,11 @@
 Версия лежит в `version.txt` и поднимается при **каждом** изменении: меняется последняя цифра (0.0.1 → 0.0.2 → …).
 Верхняя запись этого файла обязана совпадать с `version.txt` (проверяет `scripts/check.mjs`).
 
+## 0.1.26
+**Учёба возвращена полностью, ввод слова — по 3%**
+- [`Features`](app/src/main/java/com/dlstudio/app/Features.kt): `FLIP_ONLY = false`, `STUDY_HOME = true` — снова доступны все режимы карточек, настройки частоты и дашборд вкладки «Учёба».
+- [`ModeWeights`](app/src/main/java/com/dlstudio/app/study/ModeWeights.kt): веса пересчитаны (в процентах от «остального»): ввод перевода и ввод слова по 6 — при доле выбора 50% это по 3% всех показов; слушание 33, произношение 31, повтор 24. Тест `typedCardsTakeAboutThreePercentEach`.
+
 ## 0.1.25
 **Длинное пояснение на обороте**
 - [`FlashBack`](app/src/main/java/com/dlstudio/app/ui/components/FlashBack.kt): пояснение и пример под словом больше не режутся тремя строками — блок прокручивается (до 260dp), шрифт пояснения не сжимается. У [`CardNote`](app/src/main/java/com/dlstudio/app/ui/components/CardNote.kt) появился `maxLines` (по умолчанию 3, как раньше для подсказки). Рамки значений (`MeaningBox`) строк не ограничивали.

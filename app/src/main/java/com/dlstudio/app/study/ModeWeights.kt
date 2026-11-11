@@ -10,8 +10,9 @@ import kotlin.random.Random
 object ModeWeights {
     /** Самые частые показы: слово → выбор перевода и перевод → выбор слова (карточка переворачивается после ответа). */
     private val frequent = listOf(CardMode.CHOICE_FWD, CardMode.CHOICE_REV)
+    /** Веса в процентах от «остального» (при доле выбора 50% это половина показов): ввод слова — по 6, то есть по 3% всех показов. */
     private val weights = listOf(
-        CardMode.LISTEN to 11, CardMode.WRITE_FWD to 6, CardMode.WRITE_REV to 6, CardMode.PRONOUNCE to 10, CardMode.REPEAT to 8
+        CardMode.LISTEN to 33, CardMode.WRITE_FWD to 6, CardMode.WRITE_REV to 6, CardMode.PRONOUNCE to 31, CardMode.REPEAT to 24
     )
 
     fun eligible(card: LibNode, mode: CardMode): Boolean =
