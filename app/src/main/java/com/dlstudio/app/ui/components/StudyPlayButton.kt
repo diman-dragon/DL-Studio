@@ -25,7 +25,7 @@ import com.dlstudio.app.ui.theme.gradientColors
 fun StudyPlayButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     val label = LocalStrings.current.learn
     Box(
-        modifier.size(42.dp).clip(RoundedCornerShape(13.dp)).background(Brush.linearGradient(LocalAccent.current.gradientColors()))
+        modifier.size(48.dp).clip(RoundedCornerShape(13.dp)).background(Brush.linearGradient(LocalAccent.current.gradientColors()))
             .clickable(role = Role.Button, onClick = onClick).semantics { contentDescription = label },
         contentAlignment = Alignment.Center
     ) { AppIcon(R.drawable.ic_play, Color.White, 22.dp) }

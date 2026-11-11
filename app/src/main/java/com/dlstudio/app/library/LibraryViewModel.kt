@@ -9,6 +9,7 @@ import com.dlstudio.app.data.openParent
 import com.dlstudio.app.study.Answer
 import com.dlstudio.app.study.DayMath
 import com.dlstudio.app.study.ReminderSnapshot
+import com.dlstudio.app.study.LauncherIcon
 import com.dlstudio.app.study.Sm2
 import com.dlstudio.app.study.StatsCalc
 import kotlinx.coroutines.Dispatchers
@@ -52,6 +53,7 @@ class LibraryViewModel(private val app: Application) : AndroidViewModel(app) {
         val total = db.nodes.cardCount()
         val stats = StatsCalc.compute(total, states.values, db.reviews.perDay(today - StatsCalc.DAYS + 1), db.reviews.activeDays(today - 365), today)
         prefs.reminderSnapshot = ReminderSnapshot.of(stats.newCards, db.reviews.lastDay(), states.values).encode()
+        LauncherIcon.sync(app, states.values.any { it.dueDay < today })
         mutable.update { it.copy(states = states, stats = stats, today = today) }
     }
 

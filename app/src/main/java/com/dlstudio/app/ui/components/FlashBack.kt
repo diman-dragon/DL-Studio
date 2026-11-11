@@ -22,9 +22,9 @@ fun FlashBack(card: LibNode, mode: CardMode, onSpeak: Speak, pronounce: Pronounc
         Box(Modifier.fillMaxWidth().weight(1f), Alignment.Center) { CardWord(text, MaterialTheme.colorScheme.onSurface, heard = if (mode.reverse) pronounce.heard else "") }
         Column(Modifier.heightIn(max = 260.dp).verticalScroll(rememberScrollState())) {
             if (card.explanation.isNotBlank()) ExpandableNote(card.explanation, Modifier.padding(bottom = 8.dp))
-            if (card.example.isNotBlank()) SpeakNote(card.example, onSpeak, Modifier.padding(bottom = 8.dp))
+            if (card.example.isNotBlank()) SpeakNote(card.example, onSpeak, Modifier.padding(bottom = 8.dp), pronounce = if (!mode.reverse && LocalStudyOptions.current.pronounce) pronounce else null)
         }
         if (mic) PronounceFeedback(pronounce)
-        if (mode.reverse || mode == CardMode.REPEAT) CardActions(card.name, onSpeak, if (mic) pronounce else null, null, false, true)
+        if (mode.reverse) CardActions(card.name, onSpeak, pronounce, {}, false, true, mic)
     }
 }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,9 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.study.CardPlan
 import com.dlstudio.app.study.Speak
+import com.dlstudio.app.ui.theme.LocalStrings
 import kotlin.math.abs
 
 /** Карточка с переворотом; для просмотра (`FLIP_FWD`) — новое лицо и оборот со значениями, для остальных режимов прежние. Переворот заблокирован, пока нет ответа (`canFlip`). */
@@ -28,14 +31,16 @@ fun StudyFlashCard(
     card: LibNode, plan: CardPlan, flipped: Boolean, hint: Boolean, hintReady: Boolean, listenRevealed: Boolean, canFlip: Boolean,
     onFlip: () -> Unit, onHint: () -> Unit, onSpeak: Speak, pronounce: PronounceState, modifier: Modifier = Modifier
 ) {
+    val flipLabel = LocalStrings.current.tapToFlip
     val turn by animateFloatAsState(if (flipped) 1f else 0f, tween(260, easing = FastOutSlowInEasing), label = "flip")
-    val shape = RoundedCornerShape(26.dp)
+    val shape = CardStyle.shape
     val cs = MaterialTheme.colorScheme
     Box(
         modifier = modifier.fillMaxWidth()
-            .clickable(remember { MutableInteractionSource() }, null, enabled = canFlip, onClick = onFlip)
+            .clickable(remember { MutableInteractionSource() }, null, enabled = canFlip, role = Role.Button, onClick = onFlip)
+            .semantics { contentDescription = flipLabel }
             .graphicsLayer { scaleX = abs(1f - 2f * turn).coerceAtLeast(0.02f) }
-            .clip(shape).background(cs.surfaceContainerHigh).border(1.dp, cs.outlineVariant, shape).padding(16.dp)
+            .clip(shape).background(cs.surfaceVariant).border(1.dp, cs.outlineVariant, shape).padding(16.dp)
     ) {
         when {
             turn < 0.5f && plan.mode.flip -> FlipFront(card, hint, onHint, onSpeak, pronounce)

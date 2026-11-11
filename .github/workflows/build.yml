@@ -15,8 +15,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v3
       - name: Структура (атомарность, версия)
         run: node scripts/check.mjs
-      - name: Тесты и сборка
-        run: chmod +x gradlew && ./gradlew testDebugUnitTest assembleRelease
+      - name: Тесты, lint и сборка
+        run: chmod +x gradlew && ./gradlew testDebugUnitTest connectedDebugAndroidTest lint assembleRelease
       - name: Версия
         id: ver
         run: echo "v=$(cat version.txt)" >> "$GITHUB_OUTPUT"

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -19,7 +18,7 @@ import androidx.compose.foundation.BorderStroke
 /** Плитка настроек: название сверху, значение под ним (после «/» разрешён перенос); тап — действие. */
 @Composable
 fun SettingTile(title: String, value: String, onClick: () -> Unit, enabled: Boolean = true) {
-    val shape = RoundedCornerShape(20.dp)
+    val shape = CardStyle.shape
     val colors = MaterialTheme.colorScheme
     Card(
         modifier = Modifier.fillMaxWidth().clip(shape).clickable(enabled = enabled, onClick = onClick),

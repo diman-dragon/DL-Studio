@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.sp
  * Межстрочный интервал — `fontSize × ratio` (заголовки и кнопки плотнее, абзацы чуть свободнее); лишнее место сверху и снизу строки срезано,
  * поэтому текст в кнопках стоит ровно по центру.
  */
-fun TextStyle.dlStyle(weight: FontWeight, family: FontFamily = DlFonts, heading: Boolean = false, ratio: Float = if (heading) 1.2f else 1.32f) = copy(
+fun TextStyle.dlStyle(weight: FontWeight, family: FontFamily = FontFamily.Default, heading: Boolean = false, ratio: Float = if (heading) 1.2f else 1.32f) = copy(
     fontFamily = family,
     fontWeight = weight,
     hyphens = if (heading) Hyphens.None else Hyphens.Auto,

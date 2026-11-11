@@ -27,7 +27,8 @@ data class StudySession(
     /** Переход к карточке `page` (последняя страница — итог); с этого момента идёт отсчёт времени до перевода. */
     fun goTo(page: Int, now: Long): StudySession = if (page == index) this else copy(index = page.coerceIn(0, queue.size), shownAt = now)
 
-    fun useHint(): StudySession = current?.let { copy(hinted = hinted + it.id) } ?: this
+    fun useHint(cardId: String): StudySession = if (queue.any { it.id == cardId }) copy(hinted = hinted + cardId) else this
+    fun useHint(): StudySession = current?.let { useHint(it.id) } ?: this
 
     /**
      * Тап по карточке `cardId`: показать перевод или вернуться к слову. Переворачивается именно та карточка,

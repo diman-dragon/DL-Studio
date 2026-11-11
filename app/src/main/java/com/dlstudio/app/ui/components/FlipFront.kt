@@ -37,6 +37,6 @@ fun FlipFront(card: LibNode, hint: Boolean, onHint: () -> Unit, onSpeak: Speak, 
             }
         }
         if (mic) PronounceFeedback(pronounce)
-        CardActions(card.name, onSpeak, if (mic) pronounce else null, onHint, false, note.isNotBlank())
+        CardActions(card.name, onSpeak, pronounce, onHint, false, note.isNotBlank(), mic)
     }
 }

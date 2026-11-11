@@ -10,6 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import com.dlstudio.app.ui.theme.LocalStrings
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.R
 
@@ -17,8 +20,9 @@ import com.dlstudio.app.R
 @Composable
 fun BackButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme
+    val label = LocalStrings.current.previous
     Surface(
-        modifier = modifier.size(44.dp).clickable(role = Role.Button, onClick = onClick),
+        modifier = modifier.size(48.dp).clickable(role = Role.Button, onClick = onClick).semantics { contentDescription = label },
         shape = RoundedCornerShape(14.dp),
         color = colors.surfaceVariant
     ) {

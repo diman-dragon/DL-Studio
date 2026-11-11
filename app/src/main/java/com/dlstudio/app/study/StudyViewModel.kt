@@ -50,7 +50,7 @@ class StudyViewModel : ViewModel() {
     }
 
     fun goTo(page: Int) = mutable.update { u -> u.copy(session = u.session?.goTo(page, System.currentTimeMillis())) }
-    fun hint() = mutable.update { u -> u.copy(session = u.session?.useHint()) }
+    fun hint(cardId: String) = mutable.update { u -> u.copy(session = u.session?.useHint(cardId)) }
 
     /** Тап по карточке; возвращает запись для базы при первом показе перевода (`forced` — оценка голосового режима). */
     fun flip(cardId: String, forced: Grade? = null): Answer? {

@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.dlstudio.app.ui.theme.DlFonts
 
 /**
  * Главное слово карточки: с заглавной буквы, по центру, максимально крупно в выделенной области (до `maxSize`), слова не рвутся.
@@ -18,7 +17,7 @@ import com.dlstudio.app.ui.theme.DlFonts
 @Composable
 fun CardWord(text: String, color: Color, modifier: Modifier = Modifier, heard: String = "", maxSize: Float = 72f, fill: Boolean = true) {
     val style = MaterialTheme.typography.displaySmall.copy(
-        fontFamily = DlFonts, fontWeight = FontWeight.SemiBold, fontSize = maxSize.sp, lineHeight = (maxSize * 1.15f).sp, letterSpacing = 0.sp
+        fontWeight = FontWeight.SemiBold, fontSize = maxSize.sp, lineHeight = (maxSize * 1.15f).sp, letterSpacing = 0.sp
     )
-    BigText(SpokenHighlight.build(text.capFirst(), heard, Color(0xFF2E9D4F)), style, modifier.then(if (fill) Modifier.fillMaxSize() else Modifier.fillMaxWidth()), color, maxSize = maxSize.sp, minSize = 18.sp, maxLines = 6)
+    BigText(SpokenHighlight.build(text.capFirst(), heard, MaterialTheme.colorScheme.primary), style, modifier.then(if (fill) Modifier.fillMaxSize() else Modifier.fillMaxWidth()), color, maxSize = maxSize.sp, minSize = 18.sp, maxLines = 6)
 }

@@ -4,6 +4,7 @@ import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.study.MotivationKind
 import com.dlstudio.app.study.PraiseKind
 import com.dlstudio.app.settings.AccentColor
+import com.dlstudio.app.settings.AccentPalette
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
 
@@ -13,7 +14,7 @@ interface Strings {
     val cardIpa: String; val modeFlipHint: String; val modesLater: String; val studyPausedHint: String
     fun modesSoon(count: Int): String
     val settingTheme: String; val settingLanguage: String; val settingAccent: String; val settingFolder: String; val settingAbout: String
-    val folderDefault: String; val aboutTitle: String; val aboutText: String; val close: String; val viewCards: String; val viewList: String
+    val folderDefault: String; val aboutTitle: String; val aboutText: String; val aboutCopyright: String; val close: String; val viewCards: String; val viewList: String
     val edit: String; val delete: String; val save: String; val cancel: String; val cardBack: String; val cardHint: String
     val cardExplanation: String; val cardExample: String; val showAnswer: String; val hintButton: String; val speak: String
     val previous: String; val next: String; val noCards: String; val statsOverview: String; val statsProjects: String; val statsDecks: String
@@ -92,6 +93,7 @@ interface Strings {
     fun importOutcome(level: Int): String
     fun importDone(n: Int): String
     fun accentName(accent: AccentColor): String
+    fun accentPaletteName(palette: AccentPalette): String
     fun themeName(mode: ThemeMode): String
     fun status(status: StorageStatus): String
 }

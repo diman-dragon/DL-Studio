@@ -23,7 +23,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dlstudio.app.ui.AppState
 import com.dlstudio.app.ui.AppViewModel
-import com.dlstudio.app.ui.components.AboutDialog
 import com.dlstudio.app.ui.components.ScreenHeader
 import com.dlstudio.app.ui.components.SettingsData
 import com.dlstudio.app.ui.components.SettingsLook
@@ -39,7 +38,6 @@ fun SettingsScreen(state: AppState, vm: AppViewModel, onFolder: () -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val voices by vm.voices.collectAsStateWithLifecycle()
-    var about by remember { mutableStateOf(false) }
     var chooseVoice by remember { mutableStateOf(false) }
     var denied by remember { mutableStateOf(false) }
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> denied = !granted; vm.setReminders(granted) }
@@ -53,8 +51,7 @@ fun SettingsScreen(state: AppState, vm: AppViewModel, onFolder: () -> Unit) {
         SettingsSpeech(state, vm.uiLocale()) { chooseVoice = true; vm.loadVoices() }
         SettingsStudy(state, vm, denied, onReminders)
         SettingsModes(state, vm)
-        SettingsData(state, onFolder) { about = true }
+        SettingsData(state, onFolder)
     }
-    if (about) AboutDialog { about = false }
     if (chooseVoice) VoicePicker(voices, state.speechVoiceName, vm.uiLocale(), vm::preview, { vm.setSpeechVoice(it); chooseVoice = false }) { chooseVoice = false }
 }

@@ -4,6 +4,7 @@ import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.study.MotivationKind
 import com.dlstudio.app.study.PraiseKind
 import com.dlstudio.app.settings.AccentColor
+import com.dlstudio.app.settings.AccentPalette
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
 
@@ -12,7 +13,7 @@ object StringsEn : Strings {
     override val cardIpa = "Transcription (optional)"; override val modeFlipHint = "Word → translation, tap to flip"; override val modesLater = "Other modes"
     override val studyPausedHint = "Cards open from the Library for now: tap ▶ on a deck"; override fun modesSoon(count: Int) = "Soon · $count"
     override val settingTheme = "Theme"; override val settingLanguage = "App language"; override val settingAccent = "Accent color"; override val settingFolder = "Storage folder"; override val settingAbout = "About"
-    override val folderDefault = "App folder"; override val aboutTitle = "DL Studio"; override val aboutText = "Flashcards for learning languages. Works offline."; override val close = "Close"
+    override val folderDefault = "App folder"; override val aboutTitle = "DL Studio"; override val aboutText = "Flashcards for learning languages. Works offline."; override val aboutCopyright = "© 2026 DataLaw DesignLab. All rights reserved."; override val close = "Close"
     override val viewCards = "Cards"; override val viewList = "List"; override val edit = "Edit"; override val delete = "Delete"; override val save = "Save"; override val cancel = "Cancel"
     override val cardBack = "Back side"; override val cardHint = "Hint (optional)"; override val cardExplanation = "Explanation (optional)"; override val cardExample = "Example (optional)"
     override val showAnswer = "Show translation"; override val hintButton = "Hint"; override val speak = "Speak"; override val previous = "Previous"; override val next = "Next"; override val noCards = "Add cards to your library to start studying here."
@@ -115,7 +116,8 @@ object StringsEn : Strings {
         "The cards from the file are added to this deck."
     )[level]
     override fun importDone(n: Int) = "Added $n ${if (n == 1) "card" else "cards"}"
-    override fun accentName(accent: AccentColor) = listOf("Violet", "Blue", "Teal", "Green", "Amber", "Pink", "Red")[accent.ordinal]
+    override fun accentName(accent: AccentColor) = listOf("Violet", "Blue", "Green", "Amber", "Red", "Lavender", "Sky", "Mint", "Peach", "Crimson", "Plum", "Turquoise", "Lime", "Orange", "Magenta")[accent.ordinal]
+    override fun accentPaletteName(palette: AccentPalette) = listOf("Classic", "Soft", "Bright")[palette.ordinal]
     override fun themeName(mode: ThemeMode) = if (mode == ThemeMode.DARK) "Dark (AMOLED)" else "Light"
     override fun status(status: StorageStatus) = when (status) {
         StorageStatus.NONE -> ""

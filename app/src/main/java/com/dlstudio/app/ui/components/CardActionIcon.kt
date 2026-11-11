@@ -16,6 +16,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -30,13 +32,15 @@ fun CardActionIcon(
     enabled: Boolean = true,
     size: Dp = 80.dp,
     iconSize: Dp = 48.dp
+    , contentDescription: String? = null
 ) {
     val alpha by animateFloatAsState(if (enabled) 1f else 0.35f, label = "alpha")
     Box(
         modifier = modifier.size(size).clip(CircleShape)
             .background(Brush.linearGradient(colors.map { it.copy(alpha = alpha) }))
             .then(if (highlight) Modifier.border(3.dp, Color.White, CircleShape) else Modifier)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+            .then(if (contentDescription != null) Modifier.semantics { this.contentDescription = contentDescription } else Modifier),
         contentAlignment = Alignment.Center
     ) {
         AppIcon(icon, Color.White.copy(alpha = alpha), size = iconSize)

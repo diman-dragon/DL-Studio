@@ -12,8 +12,8 @@ import androidx.compose.ui.unit.dp
 
 /** Ряд равных плиток показателей: (подпись, значение, цвет значения). */
 @Composable
-fun StatsMetricRow(cells: List<Triple<String, String, Color>>) {
+fun StatsMetricRow(cells: List<Triple<String, String, Color>>, onClick: (Int) -> Unit = {}) {
     Row(Modifier.fillMaxWidth().height(IntrinsicSize.Max), Arrangement.spacedBy(10.dp)) {
-        cells.forEach { (label, value, tint) -> StatsMetric(label, value, Modifier.weight(1f), tint) }
+        cells.forEachIndexed { index, (label, value, tint) -> StatsMetric(label, value, Modifier.weight(1f), tint) { onClick(index) } }
     }
 }

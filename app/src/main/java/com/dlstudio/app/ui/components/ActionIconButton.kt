@@ -26,7 +26,7 @@ fun ActionIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    size: Dp = 42.dp,
+    size: Dp = 48.dp,
     iconSize: Dp? = null,
     shape: Shape = RoundedCornerShape(13.dp),
     containerColor: Color = Color.Unspecified,

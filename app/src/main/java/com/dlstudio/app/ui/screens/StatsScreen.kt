@@ -29,7 +29,7 @@ import com.dlstudio.app.study.Grade
 
 /** Статистика: похвала по результатам, сводка по расписанию («к повтору» и «просрочено» — от начала дня), рекорды недели, активность и интервалы. */
 @Composable
-fun StatsScreen(vm: LibraryViewModel = viewModel()) {
+fun StatsScreen(vm: LibraryViewModel = viewModel(), onOverdue: () -> Unit = {}) {
     val s = LocalStrings.current
     val state by vm.state.collectAsStateWithLifecycle()
     val st = state.stats
@@ -41,7 +41,7 @@ fun StatsScreen(vm: LibraryViewModel = viewModel()) {
         if (st.totalCards == 0) Text(s.noCards, color = MaterialTheme.colorScheme.onSurfaceVariant)
         else {
             if (st.studiedCards > 0) Praise.pick(st).let { (kind, n) -> MotivationBanner(s.praise(kind, n), praiseEmoji(kind)) }
-            StatsMetricRow(listOf(Triple(s.statsDue, "${st.dueCards}", p), Triple(s.statsOverdue, "${st.overdueCards}", bad), Triple(s.statsNew, "${st.newCards}", p)))
+            StatsMetricRow(listOf(Triple(s.statsDue, "${st.dueCards}", p), Triple(s.statsOverdue, "${st.overdueCards}", bad), Triple(s.statsNew, "${st.newCards}", p)), onClick = { if (it == 1) onOverdue() })
             StatsMetricRow(listOf(Triple(s.statsToday, "${st.todayReviews}", p), Triple(s.statsStreak, "${st.streakDays} ${s.daysShort}", p), Triple(s.statsAccuracy, "${st.accuracy}%", p)))
             StatsMetricRow(listOf(Triple(s.statsAverage, "%.1f %s".format(st.averageFaceMs / 1000.0, s.secondsShort), p), Triple(s.statsStudied, "${st.studiedCards}", p), Triple(s.statsMature, "${st.matureCards}", p)))
             StatsMetricRow(listOf(

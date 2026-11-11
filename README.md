@@ -1,6 +1,6 @@
 # DL Studio
 
-Kotlin + Jetpack Compose. Версия — в `version.txt` (сейчас 0.1.15).
+Kotlin + Jetpack Compose. Версия — в `version.txt` (сейчас 0.2.1).
 
 ## Правило версий
 Каждое изменение = +1 к последней цифре (`version.txt` и верхняя запись `CHANGELOG.md` должны совпадать).
@@ -12,7 +12,7 @@ Kotlin + Jetpack Compose. Версия — в `version.txt` (сейчас 0.1.15
 Расширения предложатся автоматически. Задачи: `check`, `test`, `assembleDebug`.
 
 ## Оформление
-Шрифты Inter / Inter Display (SIL OFL, подмножество латиница+кириллица) лежат в `res/font`, лицензия — `licenses/Inter-OFL.txt`. Иконки — Material Design Icons (Pictogrammers, Apache 2.0), векторы в `res/drawable/ic_*` (вкладки: `ic_tab_*_fill` / `_outline`); рисуются через `AppIcon`. Любой текст показываем через стили `MaterialTheme.typography` (переносы по правилам включены), а подписи в одну строку — через `FitText`. Ориентация — только портретная.
+Используются системные шрифты Android; иконки — Material Design Icons (Pictogrammers, Apache 2.0), векторы в `res/drawable/ic_*` (вкладки: `ic_tab_*_fill` / `_outline`); рисуются через `AppIcon`. Любой текст показываем через стили `MaterialTheme.typography` (переносы по правилам включены), а подписи в одну строку — через `FitText`. Ориентация — только портретная.
 
 ## Сборка
 Push в GitHub → Actions → артефакт `DL-Studio-<версия>-debug` (APK).

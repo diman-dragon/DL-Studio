@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -23,7 +22,8 @@ fun PronounceFeedback(state: PronounceState, modifier: Modifier = Modifier) {
     val s = LocalStrings.current
     val phase = state.phase
     if (phase == PronouncePhase.IDLE) return
-    val ok = Color(0xFF2E7D32); val warn = Color(0xFFB45309); val err = Color(0xFFC62828)
+    val cs = MaterialTheme.colorScheme
+    val ok = cs.primary; val warn = cs.tertiary; val err = cs.error
     val (text, tint) = when (phase) {
         PronouncePhase.LISTENING -> (if (state.heard.isBlank()) s.pronounceListening else "${s.pronounceListening}\n${s.pronounceHeard(state.heard)}") to MaterialTheme.colorScheme.primary
         PronouncePhase.OK -> "👍 ${s.pronounceOk}\n${s.pronounceHeard(state.heard)}" to ok

@@ -70,6 +70,8 @@ const version = read('version.txt').trim();
 if (!/^\d+\.\d+\.\d+$/.test(version)) bad.push(`version.txt: "${version}" — не X.Y.Z`);
 const top = read('CHANGELOG.md').match(/^## (\S+)/m)?.[1];
 if (top !== version) bad.push(`CHANGELOG.md: верхняя запись ${top}, version.txt ${version}`);
+const readmeVersion = read('README.md').match(/Версия — в `version\.txt` \(сейчас (\S+)\)/)?.[1];
+if (readmeVersion !== version) bad.push(`README.md: версия ${readmeVersion}, version.txt ${version}`);
 
 if (bad.length) { console.error(`ПРОВЕРКА НЕ ПРОЙДЕНА (${bad.length}):\n` + bad.join('\n')); process.exit(1); }
 console.log(`OK: ${kt.length} Kotlin-файлов, версия ${version}`);

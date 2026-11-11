@@ -2,10 +2,8 @@ package com.dlstudio.app.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -22,15 +20,13 @@ fun AccentTile(title: String, selected: AccentColor, name: (AccentColor) -> Stri
     val colors = MaterialTheme.colorScheme
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        shape = CardStyle.shape,
         border = BorderStroke(1.dp, colors.outlineVariant),
         colors = CardDefaults.cardColors(containerColor = colors.surfaceVariant)
     ) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp), Arrangement.spacedBy(12.dp)) {
             FitText(title, MaterialTheme.typography.titleMedium, Modifier.fillMaxWidth(), minSize = 13.sp)
-            Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
-                AccentColor.values().forEach { AccentSwatch(it, it == selected, name(it)) { onSelect(it) } }
-            }
+            AccentWheel(selected, onSelect)
             FitText(name(selected), MaterialTheme.typography.bodyMedium, Modifier.fillMaxWidth(), colors.primary, 11.sp)
         }
     }

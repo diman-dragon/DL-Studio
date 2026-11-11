@@ -4,6 +4,7 @@ import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.study.MotivationKind
 import com.dlstudio.app.study.PraiseKind
 import com.dlstudio.app.settings.AccentColor
+import com.dlstudio.app.settings.AccentPalette
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
 
@@ -12,7 +13,7 @@ object StringsRu : Strings {
     override val cardIpa = "Транскрипция (необязательно)"; override val modeFlipHint = "Слово → перевод, тап переворачивает"; override val modesLater = "Другие режимы"
     override val studyPausedHint = "Карточки пока открываются из Библиотеки: нажмите ▶ у колоды"; override fun modesSoon(count: Int) = "Скоро · $count"
     override val settingTheme = "Тема"; override val settingLanguage = "Язык приложения"; override val settingAccent = "Акцентный цвет"; override val settingFolder = "Папка хранения"; override val settingAbout = "О нас"
-    override val folderDefault = "Папка приложения"; override val aboutTitle = "DL Studio"; override val aboutText = "Карточки для изучения языков. Работает без интернета."; override val close = "Закрыть"
+    override val folderDefault = "Папка приложения"; override val aboutTitle = "DL Studio"; override val aboutText = "Карточки для изучения языков. Работает без интернета."; override val aboutCopyright = "© 2026 DataLaw DesignLab. Все права защищены."; override val close = "Закрыть"
     override val viewCards = "Карточки"; override val viewList = "Список"; override val edit = "Изменить"; override val delete = "Удалить"; override val save = "Сохранить"; override val cancel = "Отмена"
     override val cardBack = "Обратная сторона"; override val cardHint = "Подсказка (необязательно)"; override val cardExplanation = "Пояснение (необязательно)"; override val cardExample = "Пример (необязательно)"
     override val showAnswer = "Показать перевод"; override val hintButton = "Подсказка"; override val speak = "Озвучить"; override val previous = "Назад"; override val next = "Дальше"; override val noCards = "Добавьте карточки в библиотеку — и здесь начнётся учёба."
@@ -115,7 +116,8 @@ object StringsRu : Strings {
         "Карточки из файла добавятся в эту колоду."
     )[level]
     override fun importDone(n: Int) = "Добавлено: $n ${ruPlural(n, "карточка", "карточки", "карточек")}"
-    override fun accentName(accent: AccentColor) = listOf("Фиолетовый", "Синий", "Бирюзовый", "Зелёный", "Янтарный", "Розовый", "Красный")[accent.ordinal]
+    override fun accentName(accent: AccentColor) = listOf("Фиолетовый", "Синий", "Зелёный", "Янтарный", "Красный", "Лавандовый", "Небесный", "Мятный", "Персиковый", "Малиновый", "Сливовый", "Бирюзовый", "Лаймовый", "Оранжевый", "Маджента")[accent.ordinal]
+    override fun accentPaletteName(palette: AccentPalette) = listOf("Классика", "Мягкие", "Яркие")[palette.ordinal]
     override fun themeName(mode: ThemeMode) = if (mode == ThemeMode.DARK) "Тёмная (AMOLED)" else "Светлая"
     override fun status(status: StorageStatus) = when (status) {
         StorageStatus.NONE -> ""

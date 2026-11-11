@@ -2,6 +2,7 @@ package com.dlstudio.app.ui.components
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.unit.Constraints
@@ -9,6 +10,10 @@ import androidx.compose.ui.unit.sp
 
 /** Подбор самого крупного кегля, при котором текст целиком помещается в область, а слова не рвутся посередине. */
 object TextFit {
+    fun wordBreak(text: String, result: TextLayoutResult): Boolean = (0 until result.lineCount - 1).any { i ->
+        val e = result.getLineEnd(i, true)
+        e in 1 until text.length && !text[e - 1].isWhitespace() && !text[e].isWhitespace() && text[e - 1] != '-'
+    }
     /** Стиль с кеглем `size`; межстрочный интервал сохраняет пропорцию исходного стиля, переносов внутри слова нет. */
     fun styled(style: TextStyle, size: Float): TextStyle {
         val ratio = if (style.lineHeight.isSp && style.fontSize.value > 0f) style.lineHeight.value / style.fontSize.value else 1.2f
@@ -29,11 +34,6 @@ object TextFit {
 
     private fun fits(measurer: TextMeasurer, text: AnnotatedString, style: TextStyle, width: Int, height: Int, maxLines: Int): Boolean {
         val r = measurer.measure(text = text, style = style, maxLines = maxLines, constraints = Constraints(maxWidth = width))
-        val cut = (0 until r.lineCount - 1).any { i ->
-            val e = r.getLineEnd(i, true)
-            val t = text.text
-            e in 1 until t.length && !t[e - 1].isWhitespace() && !t[e].isWhitespace() && t[e - 1] != '-'
-        }
-        return !cut && !r.didOverflowHeight && !r.didOverflowWidth && r.size.height <= height
+        return !wordBreak(text.text, r) && !r.didOverflowHeight && !r.didOverflowWidth && r.size.height <= height
     }
 }

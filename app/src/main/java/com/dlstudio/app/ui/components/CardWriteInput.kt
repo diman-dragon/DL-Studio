@@ -24,7 +24,7 @@ fun CardWriteInput(correct: String, submitted: Boolean, onAnswer: (Boolean) -> U
     var text by remember { mutableStateOf("") }
     val isCorrect = PronounceCheck.normalize(text) == PronounceCheck.normalize(correct)
     val cs = MaterialTheme.colorScheme
-    val ok = Color(0xFF2E7D32); val err = Color(0xFFC62828)
+    val ok = cs.primary; val err = cs.error
     val btnColor = if (submitted) (if (isCorrect) ok else err) else cs.primary
     val isRu = correct.any { it in 'а'..'я' || it in 'А'..'Я' || it == 'ё' || it == 'Ё' }
     val borderColor = if (submitted) btnColor else cs.outlineVariant

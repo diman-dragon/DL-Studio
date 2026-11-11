@@ -31,10 +31,7 @@ fun FitText(
     Text(
         text, modifier, color, size, lineHeight = line, style = style, maxLines = maxLines, softWrap = maxLines > 1,
         onTextLayout = { r ->
-            val cut = (0 until r.lineCount - 1).any { i ->
-                val e = r.getLineEnd(i, true)
-                e in 1 until text.length && !text[e - 1].isWhitespace() && !text[e].isWhitespace() && text[e - 1] != '-'
-            }
+            val cut = TextFit.wordBreak(text, r)
             if ((r.didOverflowWidth || r.didOverflowHeight || cut) && size > minSize) size = (size.value * 0.92f).coerceAtLeast(minSize.value).sp
         }
     )

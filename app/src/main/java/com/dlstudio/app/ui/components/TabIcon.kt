@@ -17,18 +17,21 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.dlstudio.app.ui.theme.LocalAccent
+import com.dlstudio.app.ui.theme.gradientColors
 
 /** Цветная иконка нижней навигации. Анимация читается только на этапах слоя и рисования — без перекомпоновок на каждый кадр. */
 @Composable
 fun TabIcon(tab: TabSpec, selected: Boolean) {
+    val accent = LocalAccent.current.gradientColors()
     val k by animateFloatAsState(if (selected) 1f else 0f, spring(stiffness = Spring.StiffnessMediumLow), label = "tab")
     val shape = RoundedCornerShape(21.dp)
-    val glow = if (selected) Modifier.shadow(14.dp, shape, ambientColor = tab.colors.last(), spotColor = tab.colors.last()) else Modifier
+    val glow = if (selected) Modifier.shadow(14.dp, shape, ambientColor = accent.last(), spotColor = accent.last()) else Modifier
     Box(
         Modifier.size(56.dp)
             .graphicsLayer { val scale = 1f + 0.08f * k; scaleX = scale; scaleY = scale; alpha = 0.82f + 0.18f * k }
             .then(glow)
-            .drawBehind { drawRoundRect(Brush.linearGradient(tab.colors), cornerRadius = CornerRadius(21.dp.toPx()), alpha = 0.28f + 0.72f * k) },
+            .drawBehind { drawRoundRect(Brush.linearGradient(accent), cornerRadius = CornerRadius(21.dp.toPx()), alpha = 0.28f + 0.72f * k) },
         contentAlignment = Alignment.Center
     ) { AppIcon(if (selected) tab.fill else tab.outline, Color.White, 32.dp) }
 }

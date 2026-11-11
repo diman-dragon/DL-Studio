@@ -5,7 +5,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.dlstudio.app.Features
 import com.dlstudio.app.library.LibNode
 import com.dlstudio.app.study.AutoGrade
 import com.dlstudio.app.study.CardMode
@@ -16,18 +15,14 @@ import com.dlstudio.app.study.SpeechLang
 import com.dlstudio.app.study.StudySession
 import com.dlstudio.app.ui.theme.LocalSpeechTag
 import com.dlstudio.app.ui.theme.LocalStudyOptions
-import com.dlstudio.app.ui.theme.LocalStrings
 import kotlinx.coroutines.delay
-
-/** Страница сессии: в библиотеке — простой просмотр; в плановой учёбе — режим по весам (`CardPlan`), ответ под карточкой. */
 @Composable
 fun StudyCardPage(
     card: LibNode, page: Int, session: StudySession, isCurrent: Boolean,
-    onFlip: (String, Grade?) -> Unit, onHint: () -> Unit, onSpeak: Speak
+    onFlip: (String, Grade?) -> Unit, onHint: (String) -> Unit, onSpeak: Speak
 ) {
     val study = LocalStudyOptions.current
-    val strings = LocalStrings.current
-    val interactive = !Features.FLIP_ONLY && !session.random && card.back.isNotBlank()
+    val interactive = !session.random && card.back.isNotBlank()
     val plan = remember(card.id, page, interactive, study) { CardPlan.of(card, page, session.queue, interactive, study) }
     val mode = plan.mode
     val pronounce = rememberPronounce(plan.target, SpeechLang.forText(plan.target, LocalSpeechTag.current))
@@ -46,15 +41,16 @@ fun StudyCardPage(
     }
     fun flipOnce() { if (!flipped) onFlip(card.id, grade) }
     fun handleHint() {
-        if (mode != CardMode.LISTEN || !interactive) onHint()
-        else if (hintReady) { listenRevealed = true; onHint() }
+        if (mode != CardMode.LISTEN || !interactive) onHint(card.id)
+        else if (hintReady) { listenRevealed = true; onHint(card.id) }
     }
-    Column(Modifier.fillMaxSize(), Arrangement.spacedBy(14.dp), Alignment.CenterHorizontally) {
-        if (interactive && !mode.flip) TaskBanner(strings.taskText(mode))
-        StudyFlashCard(
-            card, plan, flipped, card.id in session.hinted, hintReady, listenRevealed, canFlip,
-            { onFlip(card.id, grade) }, ::handleHint, onSpeak, pronounce, Modifier.weight(1f)
-        )
-        if (interactive) CardAnswers(plan, selected, submitted, pronounce, { selected = it; flipOnce() }, { submitted = true; flipOnce() }, ::flipOnce, onSpeak)
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize(), Arrangement.spacedBy(14.dp), Alignment.CenterHorizontally) {
+            StudyFlashCard(
+                card, plan, flipped, card.id in session.hinted, hintReady, listenRevealed, canFlip,
+                { onFlip(card.id, grade) }, ::handleHint, onSpeak, pronounce, Modifier.weight(1f)
+            )
+            if (interactive) CardAnswers(plan, selected, submitted, { selected = it; flipOnce() }, { submitted = true; flipOnce() }, onSpeak)
+        }
     }
 }

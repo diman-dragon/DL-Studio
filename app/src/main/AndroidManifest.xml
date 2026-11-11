@@ -10,6 +10,7 @@
     </queries>
     <application
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
@@ -18,11 +19,33 @@
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait">
+        </activity>
+        <activity-alias
+            android:name=".LauncherDefault"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@drawable/dl_studio_icon_photo"
+            android:roundIcon="@drawable/dl_studio_icon_photo"
+            android:label="@string/app_name"
+            android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherAlert"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@drawable/dl_studio_icon_alert"
+            android:roundIcon="@drawable/dl_studio_icon_alert"
+            android:label="@string/app_name"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
         <receiver android:name=".study.StudyReminderReceiver" android:exported="false" />
         <receiver android:name=".study.StudyBootReceiver" android:exported="true">
             <intent-filter>
