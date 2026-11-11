@@ -3,7 +3,6 @@ package com.dlstudio.app.i18n
 import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.study.MotivationKind
 import com.dlstudio.app.study.PraiseKind
-import com.dlstudio.app.study.SpeechSpeed
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
@@ -40,7 +39,6 @@ interface Strings {
     val writeRight: String
     fun writeWrong(correct: String): String
     fun modeName(mode: CardMode): String
-    fun speakLabel(speed: SpeechSpeed): String
     val sectionFrequency: String; val flipShare: String; val flipShareHint: String
     fun taskText(mode: CardMode): String
     val revealAnswer: String

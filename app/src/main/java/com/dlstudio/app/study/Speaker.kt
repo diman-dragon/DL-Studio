@@ -17,10 +17,10 @@ class Speaker(private val context: Context) {
         queued = null
     }.also { tts = it }
 
-    fun speak(text: String, speed: SpeechSpeed, voiceName: String?) {
+    fun speak(text: String, voiceName: String?) {
         val e = engine()
         val run = {
-            e.setSpeechRate(speed.rate); e.setPitch(1f)
+            e.setSpeechRate(1f); e.setPitch(1f)
             voiceName?.let { n -> e.voices?.firstOrNull { it.name == n }?.let(e::setVoice) }
             e.speak(text, TextToSpeech.QUEUE_FLUSH, null, "dl")
             Unit

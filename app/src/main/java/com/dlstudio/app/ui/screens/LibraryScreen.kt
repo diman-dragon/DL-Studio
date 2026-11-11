@@ -22,7 +22,7 @@ import androidx.compose.material3.Text
 
 /** Библиотека: проект → колода → карточка; создание, правка, удаление и импорт из файла на каждом уровне. */
 @Composable
-fun LibraryScreen(vm: LibraryViewModel = viewModel(), onStudy: (List<LibNode>) -> Unit = {}, onSpeak: Speak = { _, _ -> }) {
+fun LibraryScreen(vm: LibraryViewModel = viewModel(), onStudy: (List<LibNode>) -> Unit = {}, onSpeak: Speak = {}) {
     val s = LocalStrings.current
     val state by vm.state.collectAsStateWithLifecycle()
     var dialog by remember { mutableStateOf<LibDialog?>(null) }

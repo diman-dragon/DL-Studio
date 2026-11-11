@@ -3,7 +3,6 @@ package com.dlstudio.app.i18n
 import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.study.MotivationKind
 import com.dlstudio.app.study.PraiseKind
-import com.dlstudio.app.study.SpeechSpeed
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
@@ -39,7 +38,6 @@ object StringsEn : Strings {
         CardMode.PRONOUNCE -> "Pronunciation: say the word"
         CardMode.REPEAT -> "Repeat after the speaker"
     }
-    override fun speakLabel(speed: SpeechSpeed) = when (speed) { SpeechSpeed.NORMAL -> "Speak"; SpeechSpeed.SLOW -> "Slowly"; SpeechSpeed.SLOWER -> "Even slower" }
     override val sectionFrequency = "Frequency"; override val flipShare = "Choose translation / choose word"
     override val flipShareHint = "Share of \"word → translation\" and \"translation → word\"; the rest is spread across the modes below."
     override fun taskText(mode: CardMode) = when (mode) {

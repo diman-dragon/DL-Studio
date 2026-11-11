@@ -42,4 +42,11 @@ class ImportMeaningsTest {
         val card = ImportParser.parse("word;ipa;translation\ncat;kæt;кот", "f").single().children.single().children.single()
         assertEquals(Triple("cat", "kæt", "кот"), Triple(card.name, card.ipa, card.back))
     }
+
+    @Test fun hintIsOwnTextOrFirstExample() {
+        val bank = cards().first()
+        assertEquals("noun — a place where money is kept", bank.hintText)
+        assertEquals("I went to the bank.", bank.copy(hint = "").hintText)
+        assertEquals("", cards().last().hintText)
+    }
 }

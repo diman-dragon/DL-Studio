@@ -15,7 +15,6 @@ import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
 import com.dlstudio.app.study.Speaker
-import com.dlstudio.app.study.SpeechSpeed
 import com.dlstudio.app.study.StudyOptions
 import com.dlstudio.app.study.StudyReminderScheduler
 import com.dlstudio.app.ui.components.VoiceName
@@ -64,7 +63,7 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     fun setReminders(enabled: Boolean) { prefs.remindersEnabled = enabled; StudyReminderScheduler.sync(app, prefs); mutable.update { it.copy(remindersEnabled = enabled) } }
     fun setReminderHour(hour: Int) { prefs.reminderHour = hour; prefs.reminderMinute = 0; StudyReminderScheduler.sync(app, prefs); mutable.update { it.copy(reminderHour = hour) } }
 
-    fun speak(text: String, speed: SpeechSpeed) { if (text.isNotBlank()) speaker.speak(text, speed, mutable.value.speechVoiceName) }
+    fun speak(text: String) { if (text.isNotBlank()) speaker.speak(text, mutable.value.speechVoiceName) }
     fun loadVoices() { viewModelScope.launch(Dispatchers.Default) { voiceList.value = speaker.voices() } }
     fun preview(voice: Voice, text: String) = speaker.preview(voice, text)
 

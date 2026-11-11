@@ -15,7 +15,7 @@ import com.dlstudio.app.ui.components.SmallSpeaker
 import com.dlstudio.app.ui.components.StudyPlayButton
 import androidx.compose.foundation.border
 
-/** Плитка сетки: крупная иконка уровня, меню в углу, название и подпись внизу; у карточки ещё озвучка слова (обычно / медленно / ещё медленнее). */
+/** Плитка сетки: крупная иконка уровня, меню в углу, название и подпись внизу; у карточки ещё озвучка слова. */
 @Composable
 fun ItemTile(node: LibNode, level: Int, actions: ItemActions) {
     Column(

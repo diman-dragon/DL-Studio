@@ -13,7 +13,6 @@ import com.dlstudio.app.study.CardPlan
 import com.dlstudio.app.study.Grade
 import com.dlstudio.app.study.Speak
 import com.dlstudio.app.study.SpeechLang
-import com.dlstudio.app.study.SpeechSpeed
 import com.dlstudio.app.study.StudySession
 import com.dlstudio.app.ui.theme.LocalSpeechTag
 import com.dlstudio.app.ui.theme.LocalStudyOptions
@@ -40,8 +39,8 @@ fun StudyCardPage(
 
     LaunchedEffect(isCurrent, card.id, plan) {
         if (!isCurrent || !interactive) return@LaunchedEffect
-        if (mode == CardMode.REPEAT) onSpeak(plan.target, SpeechSpeed.NORMAL)
-        if (mode == CardMode.LISTEN) { onSpeak(card.name, SpeechSpeed.NORMAL); delay(4000L); hintReady = true }
+        if (mode == CardMode.REPEAT) onSpeak(plan.target)
+        if (mode == CardMode.LISTEN) { onSpeak(card.name); delay(4000L); hintReady = true }
     }
     fun flipOnce() { if (!flipped) onFlip(card.id, grade) }
     fun handleHint() {

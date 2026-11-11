@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.study.Speak
 
-/** Пример (или другая фраза) на изучаемом языке: текст и под ним озвучка — обычно, медленно, ещё медленнее. */
+/** Пример (или другая фраза) на изучаемом языке: текст и под ним кнопка озвучки. */
 @Composable
 fun SpeakNote(text: String, onSpeak: Speak, modifier: Modifier = Modifier) {
     Column(modifier.fillMaxWidth(), Arrangement.spacedBy(6.dp), Alignment.CenterHorizontally) {

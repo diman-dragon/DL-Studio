@@ -15,4 +15,7 @@ data class LibNode(
     val children: List<LibNode> = emptyList(),
     val ipa: String = "",
     val meanings: List<Meaning> = emptyList()
-)
+) {
+    /** Подсказка на изучаемом языке: своя (`hint`), а если её нет — пример из первого значения (то же предложение видно на обороте). */
+    val hintText: String get() = hint.ifBlank { meanings.firstOrNull()?.example.orEmpty() }
+}

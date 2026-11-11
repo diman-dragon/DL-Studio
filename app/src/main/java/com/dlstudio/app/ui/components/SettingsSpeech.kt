@@ -5,7 +5,7 @@ import com.dlstudio.app.ui.AppState
 import java.util.Locale
 import com.dlstudio.app.ui.theme.LocalStrings
 
-/** Раздел «Озвучка»: выбранный голос под его человеческим именем (так же, как в списке). Скорость — кнопками «медленно» на карточках. */
+/** Раздел «Озвучка»: выбранный голос под его человеческим именем (так же, как в списке). */
 @Composable
 fun SettingsSpeech(state: AppState, ui: Locale, onVoice: () -> Unit) {
     val s = LocalStrings.current
