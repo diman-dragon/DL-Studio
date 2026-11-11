@@ -25,6 +25,7 @@ object StringsEn : Strings {
     override val yesterdayTitle = "Yesterday"; override val yesterdayEmpty = "No study yesterday"; override val streakTitle = "Streak"; override val forecastTitle = "Next 7 days"
     override val projectsTitle = "Projects"; override val doneWord = "Done"; override val newRound = "Round complete. Starting a new one in a different order…"; override val learn = "Study"
     override val sectionModes = "Card modes"; override val sectionHelpers = "Helpers"; override val modeLast = "At least one mode is required"
+    override fun modesEnabled(count: Int, total: Int) = "$count of $total enabled"
     override val pronounceSetting = "Pronunciation check (microphone)"; override val celebrateSetting = "Animations and cheers"
     override val statsBestStreak = "Best streak"; override val statsWeek = "Last 7 days"; override val statsWeekTrend = "vs previous week"
     override val writeRight = "Correct!"; override fun writeWrong(correct: String) = "Not quite: $correct"
@@ -72,7 +73,7 @@ object StringsEn : Strings {
     }
     override val tapToContinue = "Swipe to move between cards"; override val tapToFlip = "Tap to see the translation"
     override val startStudy = "Start"; override val studyAll = "Whole library"; override val nothingDue = "All done for today!"; override val nothingDueHint = "New cards and reviews will appear here when they are due."
-    override val practiceMore = "Practice anyway"; override val sessionDone = "Session complete"; override val backToList = "Back to list"
+    override val practiceMore = "Practice anyway"; override val previewCards = "Preview cards"; override val sessionDone = "Session complete"; override val backToList = "Back to list"
     override val checkAnswer = "Check"; override val listenPrompt = "Listen to the word"; override val writePrompt = "Type the answer"
     override val todayTitle = "Today"
     override val freshWord = "new"

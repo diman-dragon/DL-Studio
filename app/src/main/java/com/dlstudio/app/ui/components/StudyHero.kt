@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -24,7 +25,7 @@ import com.dlstudio.app.ui.theme.gradientColors
 
 /** Плитка «Сегодня»: счётчики (число «набегает»), кнопка старта и кольцо прогресса; когда план дня выполнен — конфетти. */
 @Composable
-fun StudyHero(counts: CardCounts, sessionSize: Int, doneToday: Int, onStart: () -> Unit, onExtra: () -> Unit) {
+fun StudyHero(counts: CardCounts, sessionSize: Int, doneToday: Int, onStart: () -> Unit, onExtra: () -> Unit, onPreview: () -> Unit) {
     val s = LocalStrings.current
     val planned = minOf(sessionSize, counts.due + counts.fresh)
     val progress = if (doneToday + planned == 0) 0f else doneToday.toFloat() / (doneToday + planned)
@@ -43,6 +44,7 @@ fun StudyHero(counts: CardCounts, sessionSize: Int, doneToday: Int, onStart: () 
                 if (counts.total > 0) {
                     Spacer(Modifier.height(10.dp))
                     GradientButton(if (planned > 0) s.startStudy else s.practiceMore, if (planned > 0) onStart else onExtra)
+                    TextButton(onPreview, Modifier.fillMaxWidth().height(48.dp)) { Text(s.previewCards) }
                 }
             }
             Box(Modifier.clip(RoundedCornerShape(22.dp)).background(Brush.linearGradient(LocalAccent.current.gradientColors())).padding(6.dp)) {

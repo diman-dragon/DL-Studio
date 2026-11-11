@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.dlstudio.app.study.CardMode
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.ui.AppState
 import com.dlstudio.app.ui.AppViewModel
 import com.dlstudio.app.ui.theme.LocalStrings
@@ -25,7 +25,7 @@ fun SettingsModes(state: AppState, vm: AppViewModel) {
             OptionChips(s.flipShare, shares.map { "$it%" to it }, shares.minByOrNull { abs(it - study.flipShare) } ?: 50, { vm.setStudy(study.copy(flipShare = it)) })
             Text(s.flipShareHint, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        SettingsSection(s.sectionModes) {
+        SettingsSection(s.sectionModes, collapsible = true, summary = s.modesEnabled(study.modes.size, CardMode.studied.size)) {
             CardMode.studied.forEach { mode ->
                 val on = mode in study.modes
                 val last = study.isLastMode(mode)

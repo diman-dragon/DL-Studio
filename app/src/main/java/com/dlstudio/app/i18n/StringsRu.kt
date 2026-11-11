@@ -25,6 +25,7 @@ object StringsRu : Strings {
     override val yesterdayTitle = "Вчера"; override val yesterdayEmpty = "Вчера занятий не было"; override val streakTitle = "Серия"; override val forecastTitle = "Ближайшие 7 дней"
     override val projectsTitle = "Проекты"; override val doneWord = "Сделано"; override val newRound = "Круг пройден. Начинаем новый, порядок будет другим…"; override val learn = "Учить"
     override val sectionModes = "Режимы карточек"; override val sectionHelpers = "Помощники"; override val modeLast = "Нужен хотя бы один режим"
+    override fun modesEnabled(count: Int, total: Int) = "Включено $count из $total"
     override val pronounceSetting = "Проверка произношения (микрофон)"; override val celebrateSetting = "Анимации и поздравления"
     override val statsBestStreak = "Рекорд серии"; override val statsWeek = "За 7 дней"; override val statsWeekTrend = "К прошлой неделе"
     override val writeRight = "Правильно!"; override fun writeWrong(correct: String) = "Неправильно: $correct"
@@ -72,7 +73,7 @@ object StringsRu : Strings {
     }
     override val tapToContinue = "Листайте карточки свайпом"; override val tapToFlip = "Нажмите, чтобы увидеть перевод"
     override val startStudy = "Начать"; override val studyAll = "Вся библиотека"; override val nothingDue = "На сегодня всё!"; override val nothingDueHint = "Новые карточки и повторы появятся здесь, когда придёт срок."
-    override val practiceMore = "Позаниматься сверх плана"; override val sessionDone = "Сессия завершена"; override val backToList = "К списку"
+    override val practiceMore = "Позаниматься сверх плана"; override val previewCards = "Просто просмотреть"; override val sessionDone = "Сессия завершена"; override val backToList = "К списку"
     override val checkAnswer = "Проверить"; override val listenPrompt = "Послушайте слово"; override val writePrompt = "Введите ответ"
     override val todayTitle = "Сегодня"
     override val freshWord = "новых"

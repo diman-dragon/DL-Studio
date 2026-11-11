@@ -21,10 +21,11 @@ fun FlashFront(card: LibNode, mode: CardMode, target: String, hint: Boolean, hin
     val s = LocalStrings.current
     val word = when { mode == CardMode.REPEAT -> target; mode.reverse -> card.back.ifBlank { card.name }; else -> card.name }
     val listening = mode == CardMode.LISTEN
-    val canHint = listening || (mode != CardMode.REPEAT && card.hint.isNotBlank())
+    val note = card.hintText
+    val showHint = !mode.reverse && mode != CardMode.REPEAT
+    val canHint = showHint && note.isNotBlank()
     val mic = !mode.reverse && !mode.speaks && LocalStudyOptions.current.pronounce
     Column(Modifier.fillMaxSize()) {
-        TaskBanner(s.taskText(mode), Modifier.padding(bottom = 6.dp))
         Box(Modifier.fillMaxWidth().weight(1f), Alignment.Center) {
             if (listening && !listenRevealed) CardWord(s.listenPrompt, MaterialTheme.colorScheme.onSurfaceVariant)
             else CardWord(word, MaterialTheme.colorScheme.onSurface, heard = if (mode == CardMode.REPEAT || mic) pronounce.heard else "")
@@ -32,12 +33,12 @@ fun FlashFront(card: LibNode, mode: CardMode, target: String, hint: Boolean, hin
         if (mode == CardMode.PRONOUNCE && pronounce.heard.isNotBlank()) Box(Modifier.fillMaxWidth().height(64.dp), Alignment.Center) {
             CardWord(card.name, MaterialTheme.colorScheme.onSurface, heard = pronounce.heard, maxSize = 36f)
         }
-        if (hint && card.hint.isNotBlank() && !listening) CardNote(card.hint, Modifier.padding(bottom = 8.dp))
+        if (hint && note.isNotBlank() && !listening) CardNote(note, Modifier.padding(bottom = 8.dp))
         if (mic) PronounceFeedback(pronounce)
         CardActions(
             speakText = if (mode.reverse) null else if (mode == CardMode.REPEAT) target else card.name, onSpeak = onSpeak,
-            pronounce = if (mic) pronounce else null, onHint = if (canHint) onHint else null,
-            hintLit = listening && hintReady && !listenRevealed, hintOn = !listening || hintReady
+            pronounce = if (mic) pronounce else null, onHint = if (showHint) onHint else null,
+            hintLit = listening && hintReady && !listenRevealed, hintOn = canHint && (!listening || hintReady)
         )
     }
 }

@@ -27,7 +27,7 @@ fun MeaningBox(meaning: Meaning, onSpeak: Speak, modifier: Modifier = Modifier) 
     val shape = RoundedCornerShape(18.dp)
     Column(modifier.fillMaxWidth().clip(shape).background(cs.surfaceContainerHighest).border(1.dp, cs.outlineVariant, shape).padding(14.dp), Arrangement.spacedBy(8.dp)) {
         if (meaning.translation.isNotBlank()) Text(meaning.translation.capFirst(), style = type.headlineSmall.copy(fontWeight = FontWeight.SemiBold), color = cs.onSurface)
-        if (meaning.explanation.isNotBlank()) Text(meaning.explanation.capFirst(), style = type.bodyLarge, color = cs.onSurfaceVariant)
+        if (meaning.explanation.isNotBlank()) ExpandableNote(meaning.explanation)
         if (meaning.example.isNotBlank()) Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
             Text(meaning.example.capFirst(), Modifier.weight(1f), style = type.bodyLarge, color = cs.onSurface)
             SmallSpeaker(meaning.example, onSpeak)

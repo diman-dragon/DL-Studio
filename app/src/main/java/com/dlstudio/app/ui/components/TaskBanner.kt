@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -18,7 +19,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun TaskBanner(text: String, modifier: Modifier = Modifier) {
     val cs = MaterialTheme.colorScheme
-    Box(modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(cs.primaryContainer).padding(horizontal = 12.dp, vertical = 8.dp), Alignment.Center) {
+    Box(modifier.fillMaxWidth().shadow(5.dp, RoundedCornerShape(14.dp)).clip(RoundedCornerShape(14.dp)).background(cs.primaryContainer).padding(horizontal = 12.dp, vertical = 8.dp), Alignment.Center) {
         FitText(text.capFirst(), MaterialTheme.typography.titleMedium.copy(textAlign = TextAlign.Center), Modifier.fillMaxWidth(), cs.onPrimaryContainer, 11.sp, 2)
     }
 }

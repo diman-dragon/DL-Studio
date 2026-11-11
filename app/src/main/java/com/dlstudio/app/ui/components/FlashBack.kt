@@ -21,7 +21,7 @@ fun FlashBack(card: LibNode, mode: CardMode, onSpeak: Speak, pronounce: Pronounc
     Column(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxWidth().weight(1f), Alignment.Center) { CardWord(text, MaterialTheme.colorScheme.onSurface, heard = if (mode.reverse) pronounce.heard else "") }
         Column(Modifier.heightIn(max = 260.dp).verticalScroll(rememberScrollState())) {
-            if (card.explanation.isNotBlank()) CardNote(card.explanation, Modifier.padding(bottom = 8.dp), maxLines = 50)
+            if (card.explanation.isNotBlank()) ExpandableNote(card.explanation, Modifier.padding(bottom = 8.dp))
             if (card.example.isNotBlank()) SpeakNote(card.example, onSpeak, Modifier.padding(bottom = 8.dp))
         }
         if (mic) PronounceFeedback(pronounce)

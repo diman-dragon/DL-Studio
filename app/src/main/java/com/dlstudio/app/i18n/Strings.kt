@@ -35,6 +35,7 @@ interface Strings {
     val newRound: String
     val learn: String
     val sectionModes: String; val sectionHelpers: String; val modeLast: String; val pronounceSetting: String; val celebrateSetting: String
+    fun modesEnabled(count: Int, total: Int): String
     val statsBestStreak: String; val statsWeek: String; val statsWeekTrend: String
     val writeRight: String
     fun writeWrong(correct: String): String
@@ -53,6 +54,7 @@ interface Strings {
     val nothingDue: String
     val nothingDueHint: String
     val practiceMore: String
+    val previewCards: String
     val sessionDone: String
     val backToList: String
     val checkAnswer: String

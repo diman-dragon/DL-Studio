@@ -16,6 +16,7 @@ import com.dlstudio.app.study.SpeechLang
 import com.dlstudio.app.study.StudySession
 import com.dlstudio.app.ui.theme.LocalSpeechTag
 import com.dlstudio.app.ui.theme.LocalStudyOptions
+import com.dlstudio.app.ui.theme.LocalStrings
 import kotlinx.coroutines.delay
 
 /** Страница сессии: в библиотеке — простой просмотр; в плановой учёбе — режим по весам (`CardPlan`), ответ под карточкой. */
@@ -25,6 +26,7 @@ fun StudyCardPage(
     onFlip: (String, Grade?) -> Unit, onHint: () -> Unit, onSpeak: Speak
 ) {
     val study = LocalStudyOptions.current
+    val strings = LocalStrings.current
     val interactive = !Features.FLIP_ONLY && !session.random && card.back.isNotBlank()
     val plan = remember(card.id, page, interactive, study) { CardPlan.of(card, page, session.queue, interactive, study) }
     val mode = plan.mode
@@ -48,6 +50,7 @@ fun StudyCardPage(
         else if (hintReady) { listenRevealed = true; onHint() }
     }
     Column(Modifier.fillMaxSize(), Arrangement.spacedBy(14.dp), Alignment.CenterHorizontally) {
+        if (interactive && !mode.flip) TaskBanner(strings.taskText(mode))
         StudyFlashCard(
             card, plan, flipped, card.id in session.hinted, hintReady, listenRevealed, canFlip,
             { onFlip(card.id, grade) }, ::handleHint, onSpeak, pronounce, Modifier.weight(1f)
