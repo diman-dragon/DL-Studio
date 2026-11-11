@@ -3,6 +3,10 @@
 Версия лежит в `version.txt` и поднимается при **каждом** изменении: меняется последняя цифра (0.0.1 → 0.0.2 → …).
 Верхняя запись этого файла обязана совпадать с `version.txt` (проверяет `scripts/check.mjs`).
 
+## 0.1.25
+**Длинное пояснение на обороте**
+- [`FlashBack`](app/src/main/java/com/dlstudio/app/ui/components/FlashBack.kt): пояснение и пример под словом больше не режутся тремя строками — блок прокручивается (до 260dp), шрифт пояснения не сжимается. У [`CardNote`](app/src/main/java/com/dlstudio/app/ui/components/CardNote.kt) появился `maxLines` (по умолчанию 3, как раньше для подсказки). Рамки значений (`MeaningBox`) строк не ограничивали.
+
 ## 0.1.24
 **Исправление сборки**
 - [`FlipFront`](app/src/main/java/com/dlstudio/app/ui/components/FlipFront.kt): `maxHeight` читается в теле `BoxWithConstraints`, а не внутри вложенного `Column` (там неявный получатель недоступен — та же ошибка, что в 0.1.18).
