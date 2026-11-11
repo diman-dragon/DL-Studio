@@ -29,8 +29,9 @@ fun FlipFront(card: LibNode, hint: Boolean, onHint: () -> Unit, onSpeak: Speak, 
     Column(Modifier.fillMaxSize()) {
         BoxWithConstraints(Modifier.fillMaxWidth().weight(1f), Alignment.Center) {
             val spare = (if (card.ipa.isNotBlank()) 40 else 0) + (if (shown) 120 else 0)
+            val room = maxOf(48.dp, maxHeight - spare.dp)   // maxHeight читается здесь: внутри Column он недоступен (другой получатель)
             Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(4.dp), Alignment.CenterHorizontally) {
-                CardWord(card.name, MaterialTheme.colorScheme.onSurface, Modifier.heightIn(max = (maxHeight - spare.dp).coerceAtLeast(48.dp)), if (mic) pronounce.heard else "", fill = false)
+                CardWord(card.name, MaterialTheme.colorScheme.onSurface, Modifier.heightIn(max = room), if (mic) pronounce.heard else "", fill = false)
                 if (card.ipa.isNotBlank()) IpaText(card.ipa)
                 if (shown) CardNote(note, Modifier.padding(top = 10.dp))
             }
