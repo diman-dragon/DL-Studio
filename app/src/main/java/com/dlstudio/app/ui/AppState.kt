@@ -2,6 +2,7 @@ package com.dlstudio.app.ui
 
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AppLang
+import com.dlstudio.app.settings.FontSettings
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
 import com.dlstudio.app.study.StudyOptions
@@ -18,5 +19,6 @@ data class AppState(
     val sessionSize: Int = 20,
     val remindersEnabled: Boolean = false,
     val reminderHour: Int = 19,
-    val study: StudyOptions = StudyOptions()
+    val study: StudyOptions = StudyOptions(),
+    val fonts: FontSettings = FontSettings()
 )

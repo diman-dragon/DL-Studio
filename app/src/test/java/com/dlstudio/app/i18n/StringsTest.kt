@@ -2,6 +2,8 @@ package com.dlstudio.app.i18n
 
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AppLang
+import com.dlstudio.app.settings.FontChoice
+import com.dlstudio.app.settings.FontGroup
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
 import org.junit.Assert.assertEquals
@@ -11,7 +13,7 @@ import org.junit.Test
 class StringsTest {
     private fun texts(s: Strings): List<String> =
         Strings::class.java.methods.filter { it.parameterCount == 0 && it.returnType == String::class.java }.map { it.invoke(s) as String } +
-            ThemeMode.values().map(s::themeName) + AccentColor.values().map(s::accentName) +
+            ThemeMode.values().map(s::themeName) + FontGroup.values().map(s::fontGroupName) + FontChoice.values().map(s::fontChoiceName) + AccentColor.values().map(s::accentName) +
             (0..2).flatMap { listOf(s.importTitle(it), s.importOutcome(it)) } + s.importDone(5) + StorageStatus.values().filter { it != StorageStatus.NONE }.map(s::status)
 
     @Test fun noBlankTexts() {

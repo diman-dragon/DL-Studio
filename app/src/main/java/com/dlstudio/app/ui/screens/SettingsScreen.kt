@@ -25,6 +25,7 @@ import com.dlstudio.app.ui.AppState
 import com.dlstudio.app.ui.AppViewModel
 import com.dlstudio.app.ui.components.ScreenHeader
 import com.dlstudio.app.ui.components.SettingsData
+import com.dlstudio.app.ui.components.SettingsFonts
 import com.dlstudio.app.ui.components.SettingsLook
 import com.dlstudio.app.ui.components.SettingsModes
 import com.dlstudio.app.ui.components.SettingsSpeech
@@ -48,6 +49,7 @@ fun SettingsScreen(state: AppState, vm: AppViewModel, onFolder: () -> Unit) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), Arrangement.spacedBy(12.dp)) {
         ScreenHeader(s.tabSettings)
         SettingsLook(state, vm)
+        SettingsFonts(state, vm)
         SettingsSpeech(state, vm.uiLocale()) { chooseVoice = true; vm.loadVoices() }
         SettingsStudy(state, vm, denied, onReminders)
         SettingsModes(state, vm)

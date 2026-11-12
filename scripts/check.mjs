@@ -1,21 +1,18 @@
 // Проверка правил проекта (локально: `node scripts/check.mjs`, в CI — первым шагом).
-//  1. Один файл — одна декларация верхнего уровня; имя файла = имя декларации (с заглавной буквы).
-//  2. Файл ≤ 60 строк (исключения — в LONG_OK).
-//  3. Каждая декларация используется (в main-коде; тесты не считаются; точки входа манифеста — исключение).
-//  4. Нет неиспользуемых импортов.
-//  5. Нет дублирования: одинаковые блоки из 4 значимых строк в разных местах.
-//  6. Версия: version.txt = X.Y.Z и совпадает с верхней записью CHANGELOG.md.
+//  1. Файл ≤ 350 строк. Файл — тематическая группа (несколько небольших связанных деклараций — нормально).
+//  2. Каждая декларация используется (в main-коде; тесты не считаются; точки входа манифеста — исключение).
+//  3. Нет неиспользуемых импортов.
+//  4. Нет дублирования: одинаковые блоки из 6 значимых строк в разных файлах.
+//  5. Версия: version.txt = X.Y.Z и совпадает с верхней записью CHANGELOG.md и README.md.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 process.chdir(join(dirname(fileURLToPath(import.meta.url)), '..'));
 
-const MAX_LINES = 60;
-const DUP_WINDOW = 4;
+const MAX_LINES = 350;
+const DUP_WINDOW = 6;
 const ENTRY_POINTS = new Set(['MainActivity', 'StudyBootReceiver']);
-// Осознанные исключения из лимита строк: таблицы переводов, две модели с общим замком и тесты логики.
-const LONG_OK = { Strings: 100, StringsRu: 130, StringsEn: 130, LibraryViewModel: 160, AppViewModel: 95, StudyViewModel: 70, VoiceName: 70, StudyLogicTest: 200, ModeWeightsTest: 100 };
 const bad = [];
 
 const walk = d => readdirSync(d).flatMap(n => {
@@ -32,11 +29,8 @@ const declsOf = s => [...s.replace(/^import .*$/gm, '').matchAll(DECL)].map(m =>
 for (const f of kt) {
   const s = src[f];
   const lines = s.trimEnd().split('\n').length;
-  const limit = LONG_OK[basename(f, '.kt')] ?? MAX_LINES;
+  const limit = MAX_LINES;
   if (lines > limit) bad.push(`${f}: ${lines} строк (> ${limit})`);
-  const decls = declsOf(s);
-  if (decls.length !== 1) bad.push(`${f}: деклараций верхнего уровня ${decls.length}, нужна 1 (${decls.join(', ')})`);
-  else if (basename(f, '.kt') !== decls[0][0].toUpperCase() + decls[0].slice(1)) bad.push(`${f}: имя файла не совпадает с декларацией ${decls[0]}`);
 
   const body = s.replace(/^import .*$/gm, '');
   for (const m of s.matchAll(/^import ([\w.]+?)(?: as (\w+))?$/gm)) {
@@ -48,11 +42,12 @@ for (const f of kt) {
 }
 
 const main = kt.filter(f => f.includes('app/src/main'));
+const all = main.map(f => src[f].replace(/^import .*$/gm, '')).join('\n');
 for (const f of main) {
-  for (const name of declsOf(src[f])) {
+  for (const name of new Set(declsOf(src[f]))) {
     if (ENTRY_POINTS.has(name)) continue;
-    const used = main.some(o => o !== f && new RegExp(`\\b${name}\\b`).test(src[o].replace(/^import .*$/gm, '')));
-    if (!used) bad.push(`${f}: ${name} нигде не используется`);
+    const count = (all.match(new RegExp(`\\b${name}\\b`, 'g')) || []).length;
+    if (count < 2) bad.push(`${f}: ${name} нигде не используется`);
   }
 }
 

@@ -1,9 +1,16 @@
 package com.dlstudio.app.data
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AppLang
+import com.dlstudio.app.settings.FontChoice
+import com.dlstudio.app.settings.FontGroup
+import com.dlstudio.app.settings.FontSettings
+import com.dlstudio.app.settings.FontSpec
 import com.dlstudio.app.settings.ThemeMode
+import com.dlstudio.app.study.CardMode
+import com.dlstudio.app.study.StudyOptions
 import java.util.Locale
 
 /** Настройки приложения (SharedPreferences). */
@@ -51,4 +58,55 @@ class Prefs(context: Context) {
     var remindersEnabled: Boolean get() = sp.getBoolean("remindersEnabled", false); set(value) { sp.edit().putBoolean("remindersEnabled", value).apply() }
     var reminderHour: Int get() = sp.getInt("reminderHour", 19); set(value) { sp.edit().putInt("reminderHour", value).apply() }
     var reminderMinute: Int get() = sp.getInt("reminderMinute", 0); set(value) { sp.edit().putInt("reminderMinute", value).apply() }
+}
+
+/** Настройки учёбы в тех же SharedPreferences, что и `Prefs`: режимы карточек, доля переворотов, проверка произношения, поздравления. */
+class StudyPrefs(context: Context) {
+    private val sp = context.getSharedPreferences("dlstudio", Context.MODE_PRIVATE)
+
+    /** Выключенные режимы; у тех, кто сохранял прежний список включённых, новые режимы остаются включёнными. */
+    private fun disabled(): Set<String> {
+        sp.getString("modesOff", null)?.let { return it.split(',').toSet() }
+        val saved = sp.getString("modes", null)?.split(',') ?: return emptySet()
+        return LEGACY.filter { it !in saved }.toSet()
+    }
+
+    fun load(): StudyOptions {
+        val off = disabled()
+        val modes = CardMode.studied.filter { it.name !in off }.toSet().ifEmpty { CardMode.studied }
+        return StudyOptions(modes, sp.getBoolean("pronounce", true), sp.getBoolean("celebrate", true), sp.getInt("flipShare", StudyOptions.DEFAULT_FLIP_SHARE))
+    }
+
+    fun save(options: StudyOptions) {
+        sp.edit().putString("modesOff", CardMode.studied.filter { it !in options.modes }.joinToString(",") { it.name })
+            .putBoolean("pronounce", options.pronounce).putBoolean("celebrate", options.celebrate).putInt("flipShare", options.flipShare).apply()
+    }
+
+    private companion object { val LEGACY = listOf("CHOICE_FWD", "CHOICE_REV", "LISTEN", "WRITE_FWD", "WRITE_REV") }
+}
+
+/** Шрифты групп текста в тех же SharedPreferences, что и `Prefs`: семейство и размер на каждую группу. */
+class FontPrefs(context: Context) {
+    private val sp = context.getSharedPreferences("dlstudio", Context.MODE_PRIVATE)
+
+    fun load(): FontSettings = FontGroup.values().fold(FontSettings()) { all, group ->
+        val choice = sp.getEnum("font_${group.name}", FontChoice.SANS)
+        val scale = sp.getInt("fontScale_${group.name}", FontSpec.DEFAULT).coerceIn(FontSpec.SCALES.min(), FontSpec.SCALES.max())
+        all.changed(group, FontSpec(choice, scale))
+    }
+
+    fun save(group: FontGroup, spec: FontSpec) {
+        sp.edit().putString("font_${group.name}", spec.choice.name).putInt("fontScale_${group.name}", spec.scale).apply()
+    }
+}
+
+/** Значение перечисления из настроек; нет или повреждено — `default`. */
+inline fun <reified T : Enum<T>> SharedPreferences.getEnum(key: String, default: T): T {
+    val saved = getString(key, null)
+    return enumValues<T>().firstOrNull { it.name == saved } ?: default
+}
+
+/** Записывает строку (или удаляет ключ при null). */
+fun SharedPreferences.putPref(key: String, value: String?) {
+    edit().putString(key, value).apply()
 }
