@@ -106,9 +106,9 @@ data class StudyOptions(
 
     companion object {
         const val DEFAULT_FLIP_SHARE = 50
-        const val DEFAULT_SLOW_RATE = 75
+        const val DEFAULT_SLOW_RATE = 70
         const val DEFAULT_SLOW_PAUSE = 100
-        val SLOW_RATES = listOf(85, 75, 60, 50)
+        val SLOW_RATES = listOf(80, 70, 60, 50)
         val SLOW_PAUSES = listOf(0, 60, 100, 160)
     }
 }

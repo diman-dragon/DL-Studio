@@ -5,36 +5,30 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SlowSpeechTest {
-    @Test fun singleWordHasNoPause() {
+    @Test fun singleWordIsOnePartWithoutPause() {
         assertEquals(listOf(SlowSpeech.Part("cat", 0)), SlowSpeech.parts("cat"))
     }
 
-    @Test fun pausesAfterPunctuationAreLongerAfterSentenceEnd() {
-        val parts = SlowSpeech.parts("Well, I know. Really?")
-        assertEquals(listOf("Well,", "I know.", "Really?"), parts.map { it.text })
-        assertTrue(parts[1].pauseMs > parts[0].pauseMs)
+    @Test fun phraseWithCommasAndWordsIsNeverChopped() {
+        val text = "Well, I would like a cup of coffee please"
+        assertEquals(listOf(SlowSpeech.Part(text, 0)), SlowSpeech.parts(text))
+    }
+
+    @Test fun onlySentenceEndsGetPauses() {
+        val parts = SlowSpeech.parts("Well, I know. Really? Yes!")
+        assertEquals(listOf("Well, I know.", "Really?", "Yes!"), parts.map { it.text })
+        assertTrue(parts[0].pauseMs > 0 && parts[1].pauseMs > 0)
         assertEquals(0, parts.last().pauseMs)
     }
 
-    @Test fun longPhraseIsSplitIntoShortGroups() {
-        val parts = SlowSpeech.parts("I would like a cup of coffee please")
-        assertTrue(parts.size >= 2)
-        assertTrue(parts.all { it.text.split(" ").size <= 4 })
-        assertEquals("I would like a cup of coffee please", parts.joinToString(" ") { it.text })
-    }
-
-    @Test fun textWithoutLettersIsKeptAsIs() {
-        assertEquals(listOf(SlowSpeech.Part("...", 0)), SlowSpeech.parts("..."))
-    }
-
     @Test fun pauseScaleStretchesPauses() {
-        val normal = SlowSpeech.parts("Well, I know. Really?")
-        val longer = SlowSpeech.parts("Well, I know. Really?", 2f)
+        val normal = SlowSpeech.parts("One. Two.")
+        val longer = SlowSpeech.parts("One. Two.", 2f)
         assertEquals(normal[0].pauseMs * 2, longer[0].pauseMs)
     }
 
-    @Test fun zeroPauseReadsWholePhrase() {
-        assertEquals(listOf(SlowSpeech.Part("Well, I know. Really?", 0)), SlowSpeech.parts("Well, I know. Really?", 0f))
+    @Test fun zeroPauseReadsWholeText() {
+        assertEquals(listOf(SlowSpeech.Part("One. Two.", 0)), SlowSpeech.parts("One. Two.", 0f))
     }
 
     @Test fun sampleMatchesVoiceLanguage() {
