@@ -30,6 +30,7 @@ object StringsEn : Strings {
     override fun fontPresetName(preset: FontPreset) = listOf("System", "Adaptive", "Custom")[preset.ordinal]
     override fun fontPresetHint(preset: FontPreset) = listOf("One size everywhere: card word large, other text at system size, buttons small.", "Size fits the available area: the word and labels fill it.", "Adaptive size, with font and scale set for each group separately.")[preset.ordinal]
     override val sectionFonts = "Fonts"; override val fontFamilyLabel = "Font"; override val fontSizeLabel = "Size"; override val fontSample = "The quick brown fox jumps"
+    override fun modesEnabled(count: Int, total: Int) = "$count of $total enabled"
     override fun slowPauseName(percent: Int) = when { percent <= 0 -> "None"; percent < 90 -> "Short"; percent <= 120 -> "Normal"; else -> "Long" }
     override fun fontGroupName(group: FontGroup) = listOf("Interface", "Card word", "Transcription", "Notes and examples", "Buttons")[group.ordinal]
     override fun fontChoiceName(choice: FontChoice) = listOf("Sans", "Serif", "Monospace", "Script")[choice.ordinal]

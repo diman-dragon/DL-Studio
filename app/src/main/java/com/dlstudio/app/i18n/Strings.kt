@@ -50,6 +50,7 @@ interface Strings {
     val writeRight: String
     fun writeWrong(correct: String): String
     fun modeName(mode: CardMode): String
+    fun modesEnabled(count: Int, total: Int): String
     val sectionFrequency: String; val flipShare: String; val flipShareHint: String
     fun taskText(mode: CardMode): String
     val revealAnswer: String

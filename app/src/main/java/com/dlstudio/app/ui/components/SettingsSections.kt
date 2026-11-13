@@ -5,11 +5,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -78,27 +84,54 @@ fun SettingsLook(state: AppState, vm: AppViewModel) {
     }
 }
 
-/** Разделы частоты показов, режимов карточек и помощников. */
+/** Разделы частоты показов, режимов карточек (выбираются во всплывающем окне, как голос озвучки) и помощников. */
 @Composable
 fun SettingsModes(state: AppState, vm: AppViewModel) {
     val s = LocalStrings.current
     val study = state.study
     val shares = listOf(30, 50, 70, 90)
+    var picking by remember { mutableStateOf(false) }
     fun label(on: Boolean) = if (on) s.on else s.off
     SettingsSection(s.sectionFrequency) {
         CycleTile(s.flipShare, shares.map { "$it%" to it }, shares.minByOrNull { abs(it - study.flipShare) } ?: 50, { vm.setStudy(study.copy(flipShare = it)) })
         Text(s.flipShareHint, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
     SettingsSection(s.sectionModes) {
-        CardMode.studied.forEach { mode ->
-            val on = mode in study.modes
-            val last = study.isLastMode(mode)
-            SwitchTile(s.modeName(mode), if (last) s.modeLast else label(on), on, { vm.setStudy(study.withMode(mode, it)) }, enabled = !last)
-        }
+        SettingTile(s.sectionModes, s.modesEnabled(study.modes.size, CardMode.studied.size), { picking = true })
     }
     SettingsSection(s.sectionHelpers) {
         SwitchTile(s.pronounceSetting, label(study.pronounce), study.pronounce, { vm.setStudy(study.copy(pronounce = it)) })
         SwitchTile(s.celebrateSetting, label(study.celebrate), study.celebrate, { vm.setStudy(study.copy(celebrate = it)) })
+    }
+    if (picking) ModesPicker(study, { vm.setStudy(it) }) { picking = false }
+}
+
+/** Окно выбора режимов карточек: нажатие включает или выключает режим сразу; последний включённый выключить нельзя. */
+@Composable
+fun ModesPicker(study: StudyOptions, onChange: (StudyOptions) -> Unit, onClose: () -> Unit) {
+    val s = LocalStrings.current
+    val colors = MaterialTheme.colorScheme
+    DlModal.Shell(s.sectionModes, onClose) {
+        Column(Modifier.heightIn(max = 390.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            CardMode.studied.forEach { mode ->
+                val on = mode in study.modes
+                val last = study.isLastMode(mode)
+                Surface(
+                    Modifier.fillMaxWidth().toggleable(on, !last, Role.Checkbox) { onChange(study.withMode(mode, it)) }, RoundedCornerShape(16.dp),
+                    if (on) colors.primaryContainer else colors.surfaceVariant,
+                    border = BorderStroke(1.dp, if (on) colors.primary else colors.outlineVariant)
+                ) {
+                    Row(Modifier.padding(14.dp), Arrangement.SpaceBetween, Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(s.modeName(mode), style = MaterialTheme.typography.titleSmall)
+                            if (last) Text(s.modeLast, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+                        }
+                        Text(if (on) "✓" else "", style = MaterialTheme.typography.titleMedium, color = colors.primary)
+                    }
+                }
+            }
+        }
+        Row(Modifier.fillMaxWidth(), Arrangement.End) { DlModal.Action(s.close, onClose) }
     }
 }
 

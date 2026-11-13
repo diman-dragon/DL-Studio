@@ -30,6 +30,7 @@ object StringsRu : Strings {
     override fun fontPresetName(preset: FontPreset) = listOf("Системный", "Адаптивный", "Свой")[preset.ordinal]
     override fun fontPresetHint(preset: FontPreset) = listOf("Один размер везде: слово на карточке крупно, остальной текст системным, на кнопках мелким.", "Размер подбирается под область: слово и надписи занимают её целиком.", "Адаптивный размер, а шрифт и масштаб настраиваются для каждой группы отдельно.")[preset.ordinal]
     override val sectionFonts = "Шрифты"; override val fontFamilyLabel = "Шрифт"; override val fontSizeLabel = "Размер"; override val fontSample = "Съешь ещё этих мягких булок"
+    override fun modesEnabled(count: Int, total: Int) = "Включено $count из $total"
     override fun slowPauseName(percent: Int) = when { percent <= 0 -> "Без пауз"; percent < 90 -> "Короткие"; percent <= 120 -> "Обычные"; else -> "Длинные" }
     override fun fontGroupName(group: FontGroup) = listOf("Интерфейс", "Слово на карточке", "Транскрипция", "Пояснения и примеры", "Кнопки")[group.ordinal]
     override fun fontChoiceName(choice: FontChoice) = listOf("Обычный", "С засечками", "Моноширинный", "Рукописный")[choice.ordinal]
