@@ -6,6 +6,7 @@ import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.settings.FontChoice
 import com.dlstudio.app.settings.FontGroup
+import com.dlstudio.app.settings.FontPreset
 import com.dlstudio.app.settings.FontSettings
 import com.dlstudio.app.settings.FontSpec
 import com.dlstudio.app.settings.ThemeMode
@@ -74,12 +75,15 @@ class StudyPrefs(context: Context) {
     fun load(): StudyOptions {
         val off = disabled()
         val modes = CardMode.studied.filter { it.name !in off }.toSet().ifEmpty { CardMode.studied }
-        return StudyOptions(modes, sp.getBoolean("pronounce", true), sp.getBoolean("celebrate", true), sp.getInt("flipShare", StudyOptions.DEFAULT_FLIP_SHARE))
+        return StudyOptions(modes, sp.getBoolean("pronounce", true), sp.getBoolean("celebrate", true), sp.getInt("flipShare", StudyOptions.DEFAULT_FLIP_SHARE),
+            sp.getInt("slowRate", StudyOptions.DEFAULT_SLOW_RATE).takeIf { it in StudyOptions.SLOW_RATES } ?: StudyOptions.DEFAULT_SLOW_RATE,
+            sp.getInt("slowPause", StudyOptions.DEFAULT_SLOW_PAUSE).takeIf { it in StudyOptions.SLOW_PAUSES } ?: StudyOptions.DEFAULT_SLOW_PAUSE)
     }
 
     fun save(options: StudyOptions) {
         sp.edit().putString("modesOff", CardMode.studied.filter { it !in options.modes }.joinToString(",") { it.name })
-            .putBoolean("pronounce", options.pronounce).putBoolean("celebrate", options.celebrate).putInt("flipShare", options.flipShare).apply()
+            .putBoolean("pronounce", options.pronounce).putBoolean("celebrate", options.celebrate).putInt("flipShare", options.flipShare)
+            .putInt("slowRate", options.slowRate).putInt("slowPause", options.slowPause).apply()
     }
 
     private companion object { val LEGACY = listOf("CHOICE_FWD", "CHOICE_REV", "LISTEN", "WRITE_FWD", "WRITE_REV") }
@@ -89,10 +93,19 @@ class StudyPrefs(context: Context) {
 class FontPrefs(context: Context) {
     private val sp = context.getSharedPreferences("dlstudio", Context.MODE_PRIVATE)
 
-    fun load(): FontSettings = FontGroup.values().fold(FontSettings()) { all, group ->
+    fun load(): FontSettings = FontGroup.values().fold(FontSettings(sp.getEnum("fontPreset", FontPreset.SYSTEM))) { all, group ->
         val choice = sp.getEnum("font_${group.name}", FontChoice.SANS)
         val scale = sp.getInt("fontScale_${group.name}", FontSpec.DEFAULT).coerceIn(FontSpec.SCALES.min(), FontSpec.SCALES.max())
         all.changed(group, FontSpec(choice, scale))
+    }
+
+    fun savePreset(preset: FontPreset) { sp.edit().putString("fontPreset", preset.name).apply() }
+
+    /** Забывает режим и шрифты всех групп: дальше действуют значения по умолчанию. */
+    fun reset() {
+        val edit = sp.edit().remove("fontPreset")
+        FontGroup.values().forEach { edit.remove("font_${it.name}").remove("fontScale_${it.name}") }
+        edit.apply()
     }
 
     fun save(group: FontGroup, spec: FontSpec) {

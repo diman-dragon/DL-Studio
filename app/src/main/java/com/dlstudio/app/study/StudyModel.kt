@@ -87,13 +87,15 @@ enum class PronounceVerdict { OK, CLOSE, MISS }
 
 /**
  * Что включено в учёбе: режимы карточек (хотя бы один всегда включён), кнопка проверки произношения, поздравления с анимацией
- * и доля показов «выбора перевода» и «выбора слова» (`flipShare`, %). Все изменения возвращают новое значение; последний включённый режим выключить нельзя.
+ * и доля показов «выбора перевода» и «выбора слова» (`flipShare`, %). `slowRate` и `slowPause` — темп (%) и длина пауз (% от обычной) озвучки «помедленнее». Все изменения возвращают новое значение; последний включённый режим выключить нельзя.
  */
 data class StudyOptions(
     val modes: Set<CardMode> = CardMode.studied,
     val pronounce: Boolean = true,
     val celebrate: Boolean = true,
-    val flipShare: Int = DEFAULT_FLIP_SHARE
+    val flipShare: Int = DEFAULT_FLIP_SHARE,
+    val slowRate: Int = DEFAULT_SLOW_RATE,
+    val slowPause: Int = DEFAULT_SLOW_PAUSE
 ) {
     fun withMode(mode: CardMode, on: Boolean): StudyOptions {
         val next = if (on) modes + mode else modes - mode
@@ -102,7 +104,13 @@ data class StudyOptions(
 
     fun isLastMode(mode: CardMode): Boolean = modes.size == 1 && mode in modes
 
-    companion object { const val DEFAULT_FLIP_SHARE = 50 }
+    companion object {
+        const val DEFAULT_FLIP_SHARE = 50
+        const val DEFAULT_SLOW_RATE = 75
+        const val DEFAULT_SLOW_PAUSE = 100
+        val SLOW_RATES = listOf(85, 75, 60, 50)
+        val SLOW_PAUSES = listOf(0, 60, 100, 160)
+    }
 }
 
 /** Какие карточки учим: `null` вместо проекта — вся библиотека, `null` вместо колоды — все колоды проекта. */

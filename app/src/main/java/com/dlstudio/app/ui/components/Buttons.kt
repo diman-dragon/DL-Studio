@@ -134,7 +134,7 @@ fun AppIcon(@DrawableRes res: Int, tint: Color, size: Dp = 24.dp) {
     Icon(painterResource(res), contentDescription = null, modifier = Modifier.size(size), tint = tint)
 }
 
-/** Кнопка озвучки рядом с любым текстом на изучаемом языке; `slow` добавляет рядом «🐢» (для фраз и примеров). */
+/** Кнопка озвучки рядом с любым текстом на изучаемом языке; `slow` добавляет рядом «черепашку» (для фраз и примеров). */
 @Composable
 fun SmallSpeaker(text: String, onSpeak: Speak, modifier: Modifier = Modifier, slow: Boolean = false) {
     val c = MaterialTheme.colorScheme
@@ -147,16 +147,15 @@ fun SmallSpeaker(text: String, onSpeak: Speak, modifier: Modifier = Modifier, sl
     }
 }
 
-/** «🐢»: произнести текст помедленнее — чуть тише темп и паузы между фразами. Ставится рядом с динамиком. */
+/** Значок-черепаха: произнести текст помедленнее (темп и паузы — из настроек). Ставится рядом с динамиком. */
 @Composable
 fun SlowButton(text: String, modifier: Modifier = Modifier) {
+    val c = MaterialTheme.colorScheme
     val speak = LocalSpeakSlow.current
-    val label = LocalStrings.current.speakSlow
-    Box(
-        modifier.size(38.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer)
-            .clickable(role = Role.Button) { speak(text) }.semantics { contentDescription = label },
-        Alignment.Center
-    ) { EmojiText("🐢", role = TextRole.EMOJI_SMALL) }
+    ActionIconButton(
+        R.drawable.ic_turtle, { speak(text) }, modifier, size = 38.dp, iconSize = 24.dp, shape = CircleShape,
+        containerColor = c.primaryContainer, iconTint = c.primary, contentDescription = LocalStrings.current.speakSlow
+    )
 }
 
 /** Кнопка варианта ответа: слово с заглавной буквы максимально крупно, до 90% ширины и высоты кнопки, по краям небольшой зазор. */

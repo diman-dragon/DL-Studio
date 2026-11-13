@@ -7,6 +7,7 @@ import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AccentPalette
 import com.dlstudio.app.settings.FontChoice
 import com.dlstudio.app.settings.FontGroup
+import com.dlstudio.app.settings.FontPreset
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
 
@@ -18,20 +19,23 @@ object StringsEn : Strings {
     override val folderDefault = "App folder"; override val aboutTitle = "DL Studio"; override val aboutText = "Flashcards for learning languages. Works offline."; override val aboutCopyright = "© 2026 DataLaw DesignLab. All rights reserved."; override val close = "Close"
     override val viewCards = "Cards"; override val viewList = "List"; override val edit = "Edit"; override val delete = "Delete"; override val save = "Save"; override val cancel = "Cancel"
     override val cardBack = "Back side"; override val cardHint = "Hint (optional)"; override val cardExplanation = "Explanation (optional)"; override val cardExample = "Example (optional)"
-    override val showAnswer = "Show translation"; override val hintButton = "Hint"; override val speak = "Speak"; override val speakSlow = "Speak slowly"; override val previous = "Previous"; override val next = "Next"; override val noCards = "Add cards to your library to start studying here."
+    override val showAnswer = "Show translation"; override val hintButton = "Hint"; override val speak = "Speak"; override val speakSlow = "Speak slowly"; override val slowRate = "Slow pace"; override val slowPause = "Slow pauses"; override val slowTest = "Try it on a sample"; override val previous = "Previous"; override val next = "Next"; override val noCards = "Add cards to your library to start studying here."
     override val statsOverview = "Study overview"; override val statsProjects = "Projects"; override val statsDecks = "Decks"; override val statsCards = "Cards"; override val statsStudied = "Studied"; override val statsProgress = "Library progress"; override val statsEmpty = "Your progress will appear here after the first card."
     override val speechVoice = "Android speech"; override val dailyCards = "Cards per session"; override val reminders = "Study reminders"; override val reminderTime = "Reminder time"
     override val allDecks = "All decks"; override val allCards = "All cards"; override val chooseProject = "Choose a project"; override val chooseDeck = "Choose a deck"; override val flipHint = "Tap the card to flip it"; override val voicePreview = "Voice preview"; override val voicePackagesEmpty = "No system language packs found"; override val due = "due"; override val overdue = "overdue"; override val statsDue = "Due"; override val statsOverdue = "Overdue"; override val statsToday = "Reviews today"; override val statsAverage = "Average answer time"; override val statsStreak = "Day streak"; override val statsReviewsChart = "Reviews over 14 days"; override val statsIntervals = "Interval distribution"
     override val importFormat = "One card per line: a word and its translation separated by “;”, a tab or “ - ”, for example “cat;кот”. CSV, TSV, TXT (including Anki and Quizlet exports) and JSON work. A first row “word;translation;deck” splits the cards into decks."
     override val importPick = "Choose file"; override val importEmpty = "No cards found in the file. Lines like “word;translation” are expected."
     override val sectionLook = "Appearance"; override val sectionSpeech = "Speech"; override val sectionStudy = "Study"; override val sectionData = "Data"
-    override val sectionFonts = "Fonts"; override val fontsSummary = "Font and size: interface, cards, transcription, notes, buttons"; override val fontFamilyLabel = "font"; override val fontSizeLabel = "size"; override val fontSample = "The quick brown fox jumps"
+    override val fontPresetTitle = "Font mode"; override val fontReset = "Reset to default"; override val fontResetHint = "System mode, regular font, 100% scale"
+    override fun fontPresetName(preset: FontPreset) = listOf("System", "Adaptive", "Custom")[preset.ordinal]
+    override fun fontPresetHint(preset: FontPreset) = listOf("One size everywhere: card word large, other text at system size, buttons small.", "Size fits the available area: the word and labels fill it.", "Adaptive size, with font and scale set for each group separately.")[preset.ordinal]
+    override val sectionFonts = "Fonts"; override val fontFamilyLabel = "Font"; override val fontSizeLabel = "Size"; override val fontSample = "The quick brown fox jumps"
+    override fun slowPauseName(percent: Int) = when { percent <= 0 -> "None"; percent < 90 -> "Short"; percent <= 120 -> "Normal"; else -> "Long" }
     override fun fontGroupName(group: FontGroup) = listOf("Interface", "Card word", "Transcription", "Notes and examples", "Buttons")[group.ordinal]
     override fun fontChoiceName(choice: FontChoice) = listOf("Sans", "Serif", "Monospace", "Script")[choice.ordinal]
     override val yesterdayTitle = "Yesterday"; override val yesterdayEmpty = "No study yesterday"; override val streakTitle = "Streak"; override val forecastTitle = "Next 7 days"
     override val projectsTitle = "Projects"; override val doneWord = "Done"; override val newRound = "Round complete. Starting a new one in a different order…"; override val learn = "Study"
     override val sectionModes = "Card modes"; override val sectionHelpers = "Helpers"; override val modeLast = "At least one mode is required"
-    override fun modesEnabled(count: Int, total: Int) = "$count of $total enabled"
     override val pronounceSetting = "Pronunciation check (microphone)"; override val celebrateSetting = "Animations and cheers"
     override val statsBestStreak = "Best streak"; override val statsWeek = "Last 7 days"; override val statsWeekTrend = "vs previous week"
     override val writeRight = "Correct!"; override fun writeWrong(correct: String) = "Not quite: $correct"

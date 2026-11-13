@@ -14,9 +14,12 @@ import com.dlstudio.app.data.openParent
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.settings.FontGroup
+import com.dlstudio.app.settings.FontPreset
+import com.dlstudio.app.settings.FontSettings
 import com.dlstudio.app.settings.FontSpec
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
+import com.dlstudio.app.study.SlowSpeech
 import com.dlstudio.app.study.Speaker
 import com.dlstudio.app.study.StudyOptions
 import com.dlstudio.app.study.StudyReminderScheduler
@@ -56,6 +59,8 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     }
     fun setAccent(accent: AccentColor) { prefs.accent = accent; mutable.update { it.copy(accent = accent) } }
     fun setStudy(options: StudyOptions) { studyPrefs.save(options); mutable.update { it.copy(study = options) } }
+    fun setFontPreset(preset: FontPreset) { fontPrefs.savePreset(preset); mutable.update { it.copy(fonts = it.fonts.withPreset(preset)) } }
+    fun resetFonts() { fontPrefs.reset(); mutable.update { it.copy(fonts = FontSettings()) } }
     fun setFont(group: FontGroup, spec: FontSpec) { fontPrefs.save(group, spec); mutable.update { it.copy(fonts = it.fonts.changed(group, spec)) } }
     fun setSessionSize(size: Int) { prefs.sessionSize = size; mutable.update { it.copy(sessionSize = size) } }
     /** Язык интерфейса как Locale — на нём пишутся страны и языки голосов. */
@@ -69,7 +74,7 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     fun setReminderHour(hour: Int) { prefs.reminderHour = hour; prefs.reminderMinute = 0; StudyReminderScheduler.sync(app, prefs); mutable.update { it.copy(reminderHour = hour) } }
 
     fun speak(text: String) { if (text.isNotBlank()) speaker.speak(text, mutable.value.speechVoiceName) }
-    fun speakSlow(text: String) { if (text.isNotBlank()) speaker.speak(text, mutable.value.speechVoiceName, slow = true) }
+    fun speakSlow(text: String) { if (text.isNotBlank()) speaker.speak(text, mutable.value.speechVoiceName, mutable.value.study.let { SlowSpeech.Style(it.slowRate / 100f, it.slowPause / 100f) }) }
     fun loadVoices() { viewModelScope.launch(Dispatchers.Default) { voiceList.value = speaker.voices() } }
     fun preview(voice: Voice, text: String) = speaker.preview(voice, text)
 

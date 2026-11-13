@@ -50,8 +50,9 @@ import com.dlstudio.app.ui.theme.inFont
 import com.dlstudio.app.ui.theme.style
 
 /**
- * Текст по центру области, который занимает её максимально: кегль подбирается от размера роли (с учётом настроек) до её минимума так,
- * чтобы всё поместилось (по ширине и высоте области, не больше `maxLines` строк) и слова не рвались.
+ * Текст по центру области: кегль подбирается от размера роли (с учётом настроек) до её минимума так, чтобы всё поместилось.
+ * В адаптивном режиме это наибольший размер роли (текст занимает область максимально), в системном — фиксированный (только уменьшается, если не влезает);
+ * всё помещается (по ширине и высоте области, не больше `maxLines` строк) и слова не рвались.
  * Нужна ограниченная по ширине область; по высоте — желательно тоже. Внутри `IntrinsicSize` не использовать.
  */
 @Composable
@@ -186,8 +187,8 @@ fun GroupText(text: String, group: FontGroup, modifier: Modifier = Modifier, col
 
 /** Эмодзи единого размера: размер задан ролью, а не числом в месте вызова. */
 @Composable
-fun EmojiText(emoji: String, modifier: Modifier = Modifier, role: TextRole = TextRole.EMOJI) {
-    Text(emoji, modifier, fontSize = role.max.sp)
+fun EmojiText(emoji: String, modifier: Modifier = Modifier) {
+    Text(emoji, modifier, fontSize = TextRole.EMOJI.max.sp)
 }
 
 /** Строка состояния операции; при `busy` над ней идёт индикатор. */

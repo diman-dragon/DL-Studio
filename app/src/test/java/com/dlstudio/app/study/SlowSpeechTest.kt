@@ -26,4 +26,19 @@ class SlowSpeechTest {
     @Test fun textWithoutLettersIsKeptAsIs() {
         assertEquals(listOf(SlowSpeech.Part("...", 0)), SlowSpeech.parts("..."))
     }
+
+    @Test fun pauseScaleStretchesPauses() {
+        val normal = SlowSpeech.parts("Well, I know. Really?")
+        val longer = SlowSpeech.parts("Well, I know. Really?", 2f)
+        assertEquals(normal[0].pauseMs * 2, longer[0].pauseMs)
+    }
+
+    @Test fun zeroPauseReadsWholePhrase() {
+        assertEquals(listOf(SlowSpeech.Part("Well, I know. Really?", 0)), SlowSpeech.parts("Well, I know. Really?", 0f))
+    }
+
+    @Test fun sampleMatchesVoiceLanguage() {
+        assertTrue(SlowSpeech.sample("ru-RU").any { it in 'а'..'я' })
+        assertTrue(SlowSpeech.sample(null).none { it in 'а'..'я' })
+    }
 }

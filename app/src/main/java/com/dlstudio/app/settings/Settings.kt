@@ -54,9 +54,19 @@ data class FontSpec(val choice: FontChoice = FontChoice.SANS, val scale: Int = D
     }
 }
 
-/** Шрифты всех групп; для группы без записи действует шрифт по умолчанию. */
-data class FontSettings(private val specs: Map<FontGroup, FontSpec> = emptyMap()) {
-    operator fun get(group: FontGroup): FontSpec = specs[group] ?: FontSpec()
+/**
+ * Режим шрифтов: `SYSTEM` — размеры фиксированные (слово карточки крупно, всё остальное системным, кнопки мелким),
+ * `ADAPTIVE` — размер подбирается под область, `CUSTOM` — адаптивный размер плюс шрифт и масштаб каждой группы.
+ */
+enum class FontPreset { SYSTEM, ADAPTIVE, CUSTOM }
 
-    fun changed(group: FontGroup, spec: FontSpec): FontSettings = FontSettings(specs + (group to spec))
+/** Режим и шрифты групп. Настройки групп действуют только в режиме `CUSTOM`, но сохраняются и при других режимах. */
+data class FontSettings(val preset: FontPreset = FontPreset.SYSTEM, private val specs: Map<FontGroup, FontSpec> = emptyMap()) {
+    /** Действующий шрифт группы. */
+    operator fun get(group: FontGroup): FontSpec = if (preset == FontPreset.CUSTOM) specs[group] ?: FontSpec() else FontSpec()
+
+    fun changed(group: FontGroup, spec: FontSpec): FontSettings =
+        copy(specs = if (spec == FontSpec()) specs - group else specs + (group to spec))
+
+    fun withPreset(next: FontPreset): FontSettings = copy(preset = next)
 }

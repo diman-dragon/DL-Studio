@@ -1,12 +1,10 @@
 package com.dlstudio.app.ui.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,47 +18,38 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.settings.FontGroup
+import com.dlstudio.app.settings.FontPreset
+import com.dlstudio.app.settings.FontSettings
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
 import com.dlstudio.app.storage.StorageLayout
 import com.dlstudio.app.study.CardMode
+import com.dlstudio.app.study.SlowSpeech
+import com.dlstudio.app.study.SpeechLang
+import com.dlstudio.app.study.StudyOptions
 import com.dlstudio.app.ui.AppState
 import com.dlstudio.app.ui.AppViewModel
 import com.dlstudio.app.ui.theme.LocalStrings
 import java.util.Locale
 import kotlin.math.abs
 
-/** Раздел настроек: небольшой акцентный заголовок и плитки под ним. */
+/** Раздел настроек: небольшой акцентный заголовок и плитки под ним. Все разделы выглядят одинаково. */
 @Composable
-fun SettingsSection(title: String, collapsible: Boolean = false, summary: String = "", content: @Composable ColumnScope.() -> Unit) {
-    var expanded by rememberSaveable(title) { mutableStateOf(!collapsible) }
-    val colors = MaterialTheme.colorScheme
+fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        if (collapsible) {
-            Surface(Modifier.fillMaxWidth().clickable(role = Role.Button) { expanded = !expanded }, color = colors.surfaceVariant, shape = MaterialTheme.shapes.large) {
-                Row(Modifier.padding(horizontal = 16.dp, vertical = 13.dp), Arrangement.SpaceBetween, Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                        Text(title, style = MaterialTheme.typography.titleMedium, color = colors.onSurface)
-                        Text(summary, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
-                    }
-                    Text(if (expanded) "−" else "+", Modifier.padding(start = 12.dp), style = MaterialTheme.typography.titleLarge, color = colors.primary)
-                }
-            }
-        } else Text(title.uppercase(), Modifier.padding(start = 6.dp, top = 8.dp), style = MaterialTheme.typography.labelMedium, color = colors.primary)
-        if (expanded) content()
+        Text(title.uppercase(), Modifier.padding(start = 6.dp, top = 8.dp), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+        content()
     }
 }
 
@@ -76,13 +65,15 @@ fun SettingsData(state: AppState, onFolder: () -> Unit) {
     }
 }
 
-/** Раздел «Внешний вид»: тема, язык, акцентный цвет. */
+/** Раздел «Внешний вид»: тема и язык (плитки-кнопки по кругу), акцентный цвет. */
 @Composable
 fun SettingsLook(state: AppState, vm: AppViewModel) {
     val s = LocalStrings.current
     SettingsSection(s.sectionLook) {
-        OptionChips(s.settingTheme, ThemeMode.values().map { s.themeName(it) to it }, state.theme, vm::setTheme)
-        OptionChips(s.settingLanguage, AppLang.values().map { it.label to it }, state.lang, vm::setLang)
+        SettingRow {
+            CycleTile(s.settingTheme, ThemeMode.values().map { s.themeName(it) to it }, state.theme, vm::setTheme, Modifier.weight(1f))
+            CycleTile(s.settingLanguage, AppLang.values().map { it.label to it }, state.lang, vm::setLang, Modifier.weight(1f))
+        }
         AccentTile(s.settingAccent, state.accent, s::accentName, vm::setAccent)
     }
 }
@@ -95,15 +86,15 @@ fun SettingsModes(state: AppState, vm: AppViewModel) {
     val shares = listOf(30, 50, 70, 90)
     fun label(on: Boolean) = if (on) s.on else s.off
     SettingsSection(s.sectionFrequency) {
-            OptionChips(s.flipShare, shares.map { "$it%" to it }, shares.minByOrNull { abs(it - study.flipShare) } ?: 50, { vm.setStudy(study.copy(flipShare = it)) })
-            Text(s.flipShareHint, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        CycleTile(s.flipShare, shares.map { "$it%" to it }, shares.minByOrNull { abs(it - study.flipShare) } ?: 50, { vm.setStudy(study.copy(flipShare = it)) })
+        Text(s.flipShareHint, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
-        SettingsSection(s.sectionModes, collapsible = true, summary = s.modesEnabled(study.modes.size, CardMode.studied.size)) {
-            CardMode.studied.forEach { mode ->
-                val on = mode in study.modes
-                val last = study.isLastMode(mode)
-                SwitchTile(s.modeName(mode), if (last) s.modeLast else label(on), on, { vm.setStudy(study.withMode(mode, it)) }, enabled = !last)
-            }
+    SettingsSection(s.sectionModes) {
+        CardMode.studied.forEach { mode ->
+            val on = mode in study.modes
+            val last = study.isLastMode(mode)
+            SwitchTile(s.modeName(mode), if (last) s.modeLast else label(on), on, { vm.setStudy(study.withMode(mode, it)) }, enabled = !last)
+        }
     }
     SettingsSection(s.sectionHelpers) {
         SwitchTile(s.pronounceSetting, label(study.pronounce), study.pronounce, { vm.setStudy(study.copy(pronounce = it)) })
@@ -111,13 +102,20 @@ fun SettingsModes(state: AppState, vm: AppViewModel) {
     }
 }
 
-/** Раздел «Озвучка»: выбранный голос под его человеческим именем (так же, как в списке). */
+/** Раздел «Озвучка»: голос под его человеческим именем (так же, как в списке) и настройки «помедленнее»: темп, паузы и проверка на примере. */
 @Composable
-fun SettingsSpeech(state: AppState, ui: Locale, onVoice: () -> Unit) {
+fun SettingsSpeech(state: AppState, ui: Locale, vm: AppViewModel, onVoice: () -> Unit) {
     val s = LocalStrings.current
     val name = state.speechVoiceName
     SettingsSection(s.sectionSpeech) {
         SettingTile(s.speechVoice, state.speechVoiceLabel ?: name?.let { VoiceName.fallback(it, ui) } ?: state.lang.label, onVoice)
+        val o = state.study
+        SettingRow {
+            CycleTile(s.slowRate, StudyOptions.SLOW_RATES.map { "$it%" to it }, o.slowRate, { vm.setStudy(o.copy(slowRate = it)) }, Modifier.weight(1f))
+            CycleTile(s.slowPause, StudyOptions.SLOW_PAUSES.map { s.slowPauseName(it) to it }, o.slowPause, { vm.setStudy(o.copy(slowPause = it)) }, Modifier.weight(1f))
+        }
+        val sample = SlowSpeech.sample(SpeechLang.fromVoice(state.speechVoiceName))
+        SettingTile(s.slowTest, sample, { vm.speakSlow(sample) })
     }
 }
 
@@ -136,17 +134,24 @@ fun SettingsStudy(state: AppState, vm: AppViewModel, denied: Boolean, onReminder
         )
         SwitchTile(s.reminders, if (state.remindersEnabled) s.on else s.off, state.remindersEnabled, onReminders)
         if (denied) Text(s.notificationsNeeded, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-        if (state.remindersEnabled) OptionChips(s.reminderTime, listOf(8, 12, 18, 19, 21).map { "%02d:00".format(it) to it }, state.reminderHour, vm::setReminderHour)
+        if (state.remindersEnabled) CycleTile(s.reminderTime, listOf(8, 12, 18, 19, 21).map { "%02d:00".format(it) to it }, state.reminderHour, vm::setReminderHour)
     }
     if (custom) SessionSizeDialog(size, { vm.setSessionSize(it); custom = false }) { custom = false }
 }
 
-/** Раздел «Шрифты» (свёрнут по умолчанию): шрифт и размер для интерфейса, карточек, транскрипции, пояснений и кнопок. */
+/**
+ * Раздел «Шрифты»: режим (системный, адаптивный, свой) с пояснением; в режиме «Свой» — шрифт и размер каждой группы;
+ * «Вернуть по умолчанию» появляется, когда что-то изменено.
+ */
 @Composable
 fun SettingsFonts(state: AppState, vm: AppViewModel) {
     val s = LocalStrings.current
-    SettingsSection(s.sectionFonts, collapsible = true, summary = s.fontsSummary) {
-        FontGroup.values().forEach { group -> FontTile(group, state.fonts[group]) { vm.setFont(group, it) } }
+    val fonts = state.fonts
+    SettingsSection(s.sectionFonts) {
+        OptionChips(s.fontPresetTitle, FontPreset.values().map { s.fontPresetName(it) to it }, fonts.preset, vm::setFontPreset)
+        Text(s.fontPresetHint(fonts.preset), Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (fonts.preset == FontPreset.CUSTOM) FontGroup.values().forEach { group -> FontTile(group, fonts[group]) { vm.setFont(group, it) } }
+        if (fonts != FontSettings()) SettingTile(s.fontReset, s.fontResetHint, vm::resetFonts)
     }
 }
 

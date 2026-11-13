@@ -7,6 +7,7 @@ import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AccentPalette
 import com.dlstudio.app.settings.FontChoice
 import com.dlstudio.app.settings.FontGroup
+import com.dlstudio.app.settings.FontPreset
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
 
@@ -18,13 +19,17 @@ interface Strings {
     val settingTheme: String; val settingLanguage: String; val settingAccent: String; val settingFolder: String; val settingAbout: String
     val folderDefault: String; val aboutTitle: String; val aboutText: String; val aboutCopyright: String; val close: String; val viewCards: String; val viewList: String
     val edit: String; val delete: String; val save: String; val cancel: String; val cardBack: String; val cardHint: String
-    val cardExplanation: String; val cardExample: String; val showAnswer: String; val hintButton: String; val speak: String; val speakSlow: String
+    val cardExplanation: String; val cardExample: String; val showAnswer: String; val hintButton: String; val speak: String; val speakSlow: String; val slowRate: String; val slowPause: String; val slowTest: String
+    fun slowPauseName(percent: Int): String
     val previous: String; val next: String; val noCards: String; val statsOverview: String; val statsProjects: String; val statsDecks: String
     val statsCards: String; val statsStudied: String; val statsProgress: String; val statsEmpty: String; val speechVoice: String
     val dailyCards: String; val reminders: String; val reminderTime: String; val importFormat: String; val importPick: String; val importEmpty: String
     val allDecks: String; val allCards: String; val chooseProject: String; val chooseDeck: String; val flipHint: String; val voicePreview: String; val voicePackagesEmpty: String; val due: String; val overdue: String; val statsDue: String; val statsOverdue: String; val statsToday: String; val statsAverage: String; val statsStreak: String; val statsReviewsChart: String; val statsIntervals: String
     val sectionLook: String
-    val sectionFonts: String; val fontsSummary: String; val fontFamilyLabel: String; val fontSizeLabel: String; val fontSample: String
+    val fontPresetTitle: String; val fontReset: String; val fontResetHint: String
+    fun fontPresetName(preset: FontPreset): String
+    fun fontPresetHint(preset: FontPreset): String
+    val sectionFonts: String; val fontFamilyLabel: String; val fontSizeLabel: String; val fontSample: String
     fun fontGroupName(group: FontGroup): String
     fun fontChoiceName(choice: FontChoice): String
     val sectionSpeech: String
@@ -41,7 +46,6 @@ interface Strings {
     val newRound: String
     val learn: String
     val sectionModes: String; val sectionHelpers: String; val modeLast: String; val pronounceSetting: String; val celebrateSetting: String
-    fun modesEnabled(count: Int, total: Int): String
     val statsBestStreak: String; val statsWeek: String; val statsWeekTrend: String
     val writeRight: String
     fun writeWrong(correct: String): String

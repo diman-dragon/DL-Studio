@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.sp
 import com.dlstudio.app.settings.FontChoice
 import com.dlstudio.app.settings.FontGroup
+import com.dlstudio.app.settings.FontPreset
 
 /**
  * Единые правила набора для любого стиля: наш шрифт и вес; перенос только по границам слов,
@@ -80,26 +81,31 @@ fun TextStyle.inFont(group: FontGroup): TextStyle {
     )
 }
 
+private const val WORD = 40f
+private const val TEXT = 16f
+private const val BUTTON_SIZE = 14f
+
 /**
- * Все «ручные» размеры текста в одном месте: группа настроек, наибольший и наименьший кегль (sp), вес и межстрочный коэффициент.
+ * Все «ручные» размеры текста в одном месте: группа настроек, наибольший и наименьший кегль (sp) для адаптивного режима,
+ * `fixed` — единственный размер режима «Системный» (их всего три: слово, текст, кнопки), вес и межстрочный коэффициент.
  * Компоненты берут размер отсюда (`style()`), а не пишут числа в месте вызова.
  */
-enum class TextRole(val group: FontGroup, val max: Float, val min: Float, val weight: FontWeight, val ratio: Float = 1.15f) {
-    CARD_WORD(FontGroup.CARD, 72f, 18f, FontWeight.SemiBold),
-    CARD_MINI(FontGroup.CARD, 28f, 18f, FontWeight.SemiBold),
-    CARD_INPUT(FontGroup.CARD, 16f, 16f, FontWeight.Normal, 1.3f),
-    IPA(FontGroup.IPA, 26f, 14f, FontWeight.SemiBold, 1.2f),
-    NOTE(FontGroup.NOTE, 24f, 13f, FontWeight.Normal, 1.25f),
-    FEEDBACK(FontGroup.NOTE, 16f, 12f, FontWeight.Normal, 1.25f),
-    BUTTON(FontGroup.BUTTON, 44f, 14f, FontWeight.SemiBold),
-    BUTTON_BIG(FontGroup.BUTTON, 36f, 14f, FontWeight.SemiBold),
-    BUTTON_CHIP(FontGroup.BUTTON, 20f, 10f, FontWeight.SemiBold),
-    EMOJI(FontGroup.UI, 28f, 28f, FontWeight.Normal),
-    EMOJI_SMALL(FontGroup.UI, 20f, 20f, FontWeight.Normal)
+enum class TextRole(val group: FontGroup, val max: Float, val min: Float, val fixed: Float, val weight: FontWeight, val ratio: Float = 1.15f) {
+    CARD_WORD(FontGroup.CARD, 72f, 18f, WORD, FontWeight.SemiBold),
+    CARD_MINI(FontGroup.CARD, 28f, 18f, TEXT, FontWeight.SemiBold),
+    CARD_INPUT(FontGroup.CARD, 16f, 16f, TEXT, FontWeight.Normal, 1.3f),
+    IPA(FontGroup.IPA, 26f, 14f, TEXT, FontWeight.SemiBold, 1.2f),
+    NOTE(FontGroup.NOTE, 24f, 13f, TEXT, FontWeight.Normal, 1.25f),
+    FEEDBACK(FontGroup.NOTE, 16f, 12f, TEXT, FontWeight.Normal, 1.25f),
+    BUTTON(FontGroup.BUTTON, 44f, 14f, BUTTON_SIZE, FontWeight.SemiBold),
+    BUTTON_BIG(FontGroup.BUTTON, 36f, 14f, BUTTON_SIZE, FontWeight.SemiBold),
+    BUTTON_CHIP(FontGroup.BUTTON, 20f, 10f, BUTTON_SIZE, FontWeight.SemiBold),
+    EMOJI(FontGroup.UI, 28f, 28f, 28f, FontWeight.Normal)
 }
 
-/** Стиль роли: размер и вес из `TextRole`, шрифт и масштаб — из настроек её группы. */
+/** Стиль роли: вес из `TextRole`, размер — наибольший (адаптивный режим) или фиксированный (системный), шрифт и масштаб — из настроек её группы. */
 @Composable
-fun TextRole.style(): TextStyle = MaterialTheme.typography.bodyLarge.copy(
-    fontSize = max.sp, lineHeight = (max * ratio).sp, fontWeight = weight, letterSpacing = 0.sp
-).inFont(group)
+fun TextRole.style(): TextStyle {
+    val size = if (LocalFonts.current.preset == FontPreset.SYSTEM) fixed else max
+    return MaterialTheme.typography.bodyLarge.copy(fontSize = size.sp, lineHeight = (size * ratio).sp, fontWeight = weight, letterSpacing = 0.sp).inFont(group)
+}

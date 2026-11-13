@@ -29,13 +29,13 @@ class Speaker(private val context: Context) {
         queued = null
     }.also { tts = it }
 
-    /** `slow` — чуть медленнее и с паузами между фразами (см. `SlowSpeech`). */
-    fun speak(text: String, voiceName: String?, slow: Boolean = false) {
+    /** `slow` — темп и паузы «помедленнее» и с паузами между фразами (см. `SlowSpeech`). */
+    fun speak(text: String, voiceName: String?, slow: SlowSpeech.Style? = null) {
         val e = engine()
         val run = {
-            e.setSpeechRate(if (slow) SlowSpeech.RATE else 1f); e.setPitch(1f)
+            e.setSpeechRate(slow?.rate ?: 1f); e.setPitch(1f)
             voiceName?.let { n -> e.voices?.firstOrNull { it.name == n }?.let(e::setVoice) }
-            if (slow) SlowSpeech.parts(text).forEachIndexed { i, p ->
+            if (slow != null) SlowSpeech.parts(text, slow.pause).forEachIndexed { i, p ->
                 e.speak(p.text, if (i == 0) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD, null, "dl$i")
                 if (p.pauseMs > 0) e.playSilentUtterance(p.pauseMs.toLong(), TextToSpeech.QUEUE_ADD, "dl$i-pause")
             } else e.speak(text, TextToSpeech.QUEUE_FLUSH, null, "dl")
@@ -73,25 +73,33 @@ object SpeechLang {
 
 /**
  * Медленная озвучка: фраза делится на куски, между ними вставляются паузы (после запятой короче, после точки длиннее).
- * Длинный отрывок без знаков препинания делится на группы не больше четырёх слов. Скорость речи — `RATE`.
+ * Длинный отрывок без знаков препинания делится на группы не больше четырёх слов. Темп и длина пауз задаются `Style` (из настроек);
+ * при нулевых паузах фраза читается целиком, только медленнее.
  */
 object SlowSpeech {
-    const val RATE = 0.75f
     private const val MAX_WORDS = 4
     private const val GROUP_PAUSE = 300
     private const val COMMA_PAUSE = 450
     private const val STOP_PAUSE = 800
     private val CLAUSE = Regex("[^,;:.!?…]+[,;:.!?…]*")
 
+    /** `rate` — доля обычного темпа (0,75 = на четверть медленнее), `pause` — множитель пауз (1 = как задумано). */
+    data class Style(val rate: Float, val pause: Float)
+
     data class Part(val text: String, val pauseMs: Int)
 
-    fun parts(text: String): List<Part> {
+    /** Фраза для проверки настроек на языке выбранного голоса. */
+    fun sample(voiceTag: String?): String =
+        if (voiceTag?.startsWith("ru") == true) "Я хочу чашку кофе, пожалуйста." else "I would like a cup of coffee, please."
+
+    fun parts(text: String, pause: Float = 1f): List<Part> {
+        if (pause <= 0f) return listOf(Part(text, 0))
         val parts = CLAUSE.findAll(text).map { it.value.trim() }.filter { c -> c.any { it.isLetterOrDigit() } }.flatMap { clause ->
             val words = clause.split(Regex("\\s+"))
             val count = (words.size + MAX_WORDS - 1) / MAX_WORDS
             val groups = words.chunked((words.size + count - 1) / count).map { it.joinToString(" ") }
             val end = if (clause.last() in ".!?…") STOP_PAUSE else COMMA_PAUSE
-            groups.mapIndexed { i, g -> Part(g, if (i < groups.lastIndex) GROUP_PAUSE else end) }
+            groups.mapIndexed { i, g -> Part(g, ((if (i < groups.lastIndex) GROUP_PAUSE else end) * pause).toInt()) }
         }.toList()
         return if (parts.isEmpty()) listOf(Part(text, 0)) else parts.dropLast(1) + parts.last().copy(pauseMs = 0)
     }

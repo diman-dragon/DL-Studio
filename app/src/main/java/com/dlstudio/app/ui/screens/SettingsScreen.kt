@@ -50,7 +50,7 @@ fun SettingsScreen(state: AppState, vm: AppViewModel, onFolder: () -> Unit) {
         ScreenHeader(s.tabSettings)
         SettingsLook(state, vm)
         SettingsFonts(state, vm)
-        SettingsSpeech(state, vm.uiLocale()) { chooseVoice = true; vm.loadVoices() }
+        SettingsSpeech(state, vm.uiLocale(), vm) { chooseVoice = true; vm.loadVoices() }
         SettingsStudy(state, vm, denied, onReminders)
         SettingsModes(state, vm)
         SettingsData(state, onFolder)
