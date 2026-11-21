@@ -27,7 +27,6 @@ import com.dlstudio.app.ui.components.ActionIconButton
 import com.dlstudio.app.ui.components.AppIcon
 import com.dlstudio.app.ui.components.FitText
 import com.dlstudio.app.ui.components.SmallSpeaker
-import com.dlstudio.app.ui.components.StudyPlayButton
 import com.dlstudio.app.ui.components.capFirst
 import com.dlstudio.app.ui.theme.LocalStrings
 
@@ -47,7 +46,6 @@ fun ItemTile(node: LibNode, level: Int, actions: ItemActions) {
         Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(6.dp)) {
             Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.Bottom) {
                 ItemText(node, level, Modifier.weight(1f).padding(end = 10.dp))
-                if (cards(node, level) > 0) StudyPlayButton({ actions.onStudy(node) }, Modifier.padding(end = 10.dp))
             }
             if (level == 2) SmallSpeaker(node.name, actions.onSpeak)
         }
@@ -68,7 +66,6 @@ fun ItemRow(node: LibNode, level: Int, actions: ItemActions) {
             ItemText(node, level)
             if (level == 2) SmallSpeaker(node.name, actions.onSpeak)
         }
-        if (cards(node, level) > 0) StudyPlayButton({ actions.onStudy(node) })
         ItemMenu(node, actions)
     }
 }
@@ -127,7 +124,6 @@ class ItemActions(
     val onOpen: (LibNode) -> Unit,
     val onEdit: (LibNode) -> Unit,
     val onDelete: (LibNode) -> Unit,
-    val onStudy: (LibNode) -> Unit,
     val onSpeak: Speak
 )
 
@@ -141,9 +137,3 @@ object LevelLook {
     val icons = listOf(R.drawable.ic_lv_project, R.drawable.ic_lv_deck, R.drawable.ic_lv_card)
 }
 
-/** Сколько карточек лежит в проекте (уровень 0) или колоде (уровень 1); у самой карточки — 0. */
-fun cards(node: LibNode, level: Int): Int = when (level) {
-    0 -> node.children.sumOf { it.children.size }
-    1 -> node.children.size
-    else -> 0
-}

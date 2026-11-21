@@ -7,9 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.dlstudio.app.data.Prefs
 import com.dlstudio.app.data.openParent
 import com.dlstudio.app.learning.LearningCatalog
-import com.dlstudio.app.study.Answer
-import com.dlstudio.app.study.DayMath
-import com.dlstudio.app.study.StatsCalc
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -40,17 +37,11 @@ class LibraryViewModel(private val app: Application) : AndroidViewModel(app) {
         database = db
         val items = db?.let { runCatching { it.nodes.load() }.getOrNull() }
         if (db == null || items == null) { mutable.update { it.copy(loaded = true, failed = true) }; return }
-        val resume = runCatching { db.sessions.latest() }.getOrNull()
-        mutable.update { it.copy(items = items, loaded = true, failed = false, path = emptyList(), resume = resume) }
-        refreshDerived(db)
+        mutable.update { it.copy(items = items, loaded = true, failed = false, path = emptyList()) }
     }
 
     private fun refreshDerived(db: LibraryDatabase) {
-        val today = DayMath.dayNumber(System.currentTimeMillis())
-        val states = db.reviews.states()
-        val total = db.nodes.cardCount()
-        val stats = StatsCalc.compute(total, states.values, db.reviews.perDay(today - StatsCalc.DAYS + 1), db.reviews.activeDays(today - 365), today)
-        mutable.update { it.copy(states = states, stats = stats, today = today, motivation = LearningCatalog.motivation(emptyList())) }
+        mutable.update { it.copy(motivation = LearningCatalog.motivation(emptyList())) }
     }
 
     private fun schedulePush() {
@@ -110,31 +101,12 @@ class LibraryViewModel(private val app: Application) : AndroidViewModel(app) {
         if (!canEdit) return
         val path = mutable.value.path + id
         mutable.update { s -> s.copy(items = s.items.editAt(path) { null }) }
-        change { db -> db.reviews.forget(db.nodes.delete(id)) }
+        change { db -> db.nodes.delete(id) }
     }
 
     private fun change(refresh: Boolean = true, op: (LibraryDatabase) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             lock.withLock { database?.let { db -> runCatching { db.write { op(db) } }; if (refresh) refreshDerived(db) } }
-            schedulePush()
-        }
-    }
-
-    /** Состав и порядок карточек сессии пишется в базу сразу и больше не меняется. */
-    fun startSession(id: String, cardIds: List<String>, random: Boolean = false) { change(refresh = false) { db -> db.sessions.start(id, System.currentTimeMillis(), cardIds, random) } }
-
-    /** Позиция в сессии: только запись, без пересчёта статистики — иначе каждый свайп перерисовывал бы экраны. */
-    fun savePosition(id: String, position: Int) { change(refresh = false) { db -> db.sessions.position(id, position) } }
-
-    /** Записывает ответ: журнал и новое расписание карточки; один раз за показ (см. `StudySession`). */
-    fun grade(answer: Answer) {
-        viewModelScope.launch(Dispatchers.IO) {
-            lock.withLock {
-                val db = database ?: return@withLock
-                val now = System.currentTimeMillis(); val day = DayMath.dayNumber(now)
-                runCatching { db.write { db.reviews.record(answer, now, day) } }
-                refreshDerived(db)
-            }
             schedulePush()
         }
     }

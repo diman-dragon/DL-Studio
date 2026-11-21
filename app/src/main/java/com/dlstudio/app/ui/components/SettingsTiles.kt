@@ -15,12 +15,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -95,20 +93,6 @@ fun <T> CycleTile(title: String, options: List<Pair<String, T>>, selected: T, on
 @Composable
 fun SettingRow(content: @Composable RowScope.() -> Unit) {
     Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(12.dp), content = content)
-}
-
-/** Плитка с переключателем: название, пояснение и Switch; нажимается вся плитка (`enabled = false` — переключатель заблокирован). */
-@Composable
-fun SwitchTile(title: String, value: String, checked: Boolean, onChange: (Boolean) -> Unit, enabled: Boolean = true) {
-    SettingCard(Modifier.fillMaxWidth().toggleable(checked, enabled, Role.Switch, onChange)) {
-        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
-            Column(Modifier.weight(1f), Arrangement.spacedBy(3.dp)) {
-                Text(title, style = MaterialTheme.typography.titleMedium)
-                Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
-            }
-            Switch(checked, null, enabled = enabled)
-        }
-    }
 }
 
 /** Плитка «Акцентный цвет»: ряд образцов и название выбранного цвета под ним. */

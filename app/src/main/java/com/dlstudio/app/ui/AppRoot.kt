@@ -11,7 +11,6 @@ import com.dlstudio.app.study.SpeechLang
 import com.dlstudio.app.ui.theme.DlTheme
 import com.dlstudio.app.ui.theme.LocalSpeakSlow
 import com.dlstudio.app.ui.theme.LocalSpeechTag
-import com.dlstudio.app.ui.theme.LocalStudyOptions
 import com.dlstudio.app.ui.theme.LocalStrings
 
 /** Корень интерфейса: тема и язык из состояния, дальше — каркас с экранами. */
@@ -19,7 +18,7 @@ import com.dlstudio.app.ui.theme.LocalStrings
 fun AppRoot(vm: AppViewModel, onFolder: () -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
     val speakSlow = remember(vm) { { text: String -> vm.speakSlow(text) } }
-    CompositionLocalProvider(LocalStrings provides stringsFor(state.lang), LocalSpeechTag provides SpeechLang.fromVoice(state.speechVoiceName), LocalStudyOptions provides state.study, LocalSpeakSlow provides speakSlow) {
+    CompositionLocalProvider(LocalStrings provides stringsFor(state.lang), LocalSpeechTag provides SpeechLang.fromVoice(state.speechVoiceName), LocalSpeakSlow provides speakSlow) {
         DlTheme(dark = state.theme == ThemeMode.DARK, accent = state.accent, fonts = state.fonts) { AppScaffold(state, vm, onFolder) }
     }
 }

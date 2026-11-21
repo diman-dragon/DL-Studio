@@ -1,6 +1,5 @@
 package com.dlstudio.app.ui.theme
 
-import android.graphics.Typeface
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
@@ -58,14 +57,6 @@ fun FontChoice.family(): FontFamily = when (this) {
     FontChoice.SERIF -> FontFamily.Serif
     FontChoice.MONO -> FontFamily.Monospace
     FontChoice.CURSIVE -> FontFamily.Cursive
-}
-
-/** Тот же шрифт для обычных Android-виджетов (поле ввода). */
-fun FontChoice.face(): Typeface = when (this) {
-    FontChoice.SANS -> Typeface.DEFAULT
-    FontChoice.SERIF -> Typeface.SERIF
-    FontChoice.MONO -> Typeface.MONOSPACE
-    FontChoice.CURSIVE -> Typeface.create("cursive", Typeface.NORMAL)
 }
 
 /** Применяет к стилю шрифт и размер выбранной группы из настроек (группа «Интерфейс» уже учтена в теме). */

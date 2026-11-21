@@ -3,19 +3,11 @@ package com.dlstudio.app.study
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import android.speech.tts.Voice
-import com.dlstudio.app.library.LibNode
 import java.util.Locale
-import kotlin.random.Random
 import kotlinx.coroutines.delay
 
 /** Озвучить текст выбранным голосом. */
 typealias Speak = (String) -> Unit
-
-/** Что произносит диктор и что нужно сказать в режимах голоса: в «Повторе» — предложение-пример (если есть, в половине случаев) или слово. */
-object SpeakTarget {
-    fun of(card: LibNode, mode: CardMode, index: Int): String =
-        if (mode == CardMode.REPEAT && card.example.isNotBlank() && Random(card.id.hashCode() * 17L + index).nextBoolean()) card.example else card.name
-}
 
 /** Один движок озвучки на приложение: создаётся при первой озвучке, а не при каждом входе на экран. */
 class Speaker(private val context: Context) {

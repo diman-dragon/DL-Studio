@@ -7,7 +7,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dlstudio.app.data.FontPrefs
 import com.dlstudio.app.data.Prefs
-import com.dlstudio.app.data.StudyPrefs
 import com.dlstudio.app.data.folderName
 import com.dlstudio.app.data.moveToFolder
 import com.dlstudio.app.data.openParent
@@ -19,9 +18,7 @@ import com.dlstudio.app.settings.FontSettings
 import com.dlstudio.app.settings.FontSpec
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
-import com.dlstudio.app.study.SlowSpeech
 import com.dlstudio.app.study.Speaker
-import com.dlstudio.app.study.StudyOptions
 import com.dlstudio.app.ui.components.VoiceName
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
@@ -35,12 +32,11 @@ import com.dlstudio.app.storage.ensureLayout
 /** Настройки приложения и озвучка. Каждая настройка пишется в `Prefs` и сразу отражается в состоянии. */
 class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val prefs = Prefs(app)
-    private val studyPrefs = StudyPrefs(app)
     private val fontPrefs = FontPrefs(app)
     private val speaker = Speaker(app)
     private val mutable = MutableStateFlow(
         AppState(prefs.theme, prefs.lang, prefs.accent, folderName(app, prefs), prefs.speechVoiceName, prefs.speechVoiceLabel,
-            sessionSize = prefs.sessionSize, remindersEnabled = prefs.remindersEnabled, reminderHour = prefs.reminderHour, study = studyPrefs.load(), fonts = fontPrefs.load())
+            fonts = fontPrefs.load())
     )
     val state: StateFlow<AppState> = mutable.asStateFlow()
     private val voiceList = MutableStateFlow<List<Voice>>(emptyList())
@@ -57,11 +53,9 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
         mutable.update { it.copy(lang = lang, speechVoiceLabel = label) }
     }
     fun setAccent(accent: AccentColor) { prefs.accent = accent; mutable.update { it.copy(accent = accent) } }
-    fun setStudy(options: StudyOptions) { studyPrefs.save(options); mutable.update { it.copy(study = options) } }
     fun setFontPreset(preset: FontPreset) { fontPrefs.savePreset(preset); mutable.update { it.copy(fonts = it.fonts.withPreset(preset)) } }
     fun resetFonts() { fontPrefs.reset(); mutable.update { it.copy(fonts = FontSettings()) } }
     fun setFont(group: FontGroup, spec: FontSpec) { fontPrefs.save(group, spec); mutable.update { it.copy(fonts = it.fonts.changed(group, spec)) } }
-    fun setSessionSize(size: Int) { prefs.sessionSize = size; mutable.update { it.copy(sessionSize = size) } }
     /** Язык интерфейса как Locale — на нём пишутся страны и языки голосов. */
     fun uiLocale(): Locale = Locale(mutable.value.lang.name.lowercase())
     fun setSpeechVoice(voice: Voice) {
@@ -69,11 +63,9 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
         prefs.speechVoiceName = voice.name; prefs.speechVoiceLabel = label
         mutable.update { it.copy(speechVoiceName = voice.name, speechVoiceLabel = label) }
     }
-    fun setReminders(enabled: Boolean) { prefs.remindersEnabled = enabled; mutable.update { it.copy(remindersEnabled = enabled) } }
-    fun setReminderHour(hour: Int) { prefs.reminderHour = hour; prefs.reminderMinute = 0; mutable.update { it.copy(reminderHour = hour) } }
 
     fun speak(text: String) { if (text.isNotBlank()) speaker.speak(text, mutable.value.speechVoiceName) }
-    fun speakSlow(text: String) { if (text.isNotBlank()) speaker.speak(text, mutable.value.speechVoiceName, mutable.value.study.let { SlowSpeech.Style(it.slowRate / 100f, it.slowPause / 100f) }) }
+    fun speakSlow(text: String) { speak(text) }
     fun loadVoices() { viewModelScope.launch(Dispatchers.Default) { voiceList.value = speaker.voices() } }
     fun preview(voice: Voice, text: String) = speaker.preview(voice, text)
 

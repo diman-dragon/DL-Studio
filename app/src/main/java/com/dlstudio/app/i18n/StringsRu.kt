@@ -1,8 +1,5 @@
 package com.dlstudio.app.i18n
 
-import com.dlstudio.app.study.CardMode
-import com.dlstudio.app.study.MotivationKind
-import com.dlstudio.app.study.PraiseKind
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AccentPalette
 import com.dlstudio.app.settings.FontChoice
@@ -40,48 +37,11 @@ object StringsRu : Strings {
     override val pronounceSetting = "Проверка произношения (микрофон)"; override val celebrateSetting = "Анимации и поздравления"
     override val statsBestStreak = "Рекорд серии"; override val statsWeek = "За 7 дней"; override val statsWeekTrend = "К прошлой неделе"
     override val writeRight = "Правильно!"; override fun writeWrong(correct: String) = "Неправильно: $correct"
-    override fun modeName(mode: CardMode) = when (mode) {
-        CardMode.FLIP_FWD -> "Просмотр карточки"
-        CardMode.CHOICE_FWD -> "Выбор перевода"
-        CardMode.CHOICE_REV -> "Выбор слова по переводу"
-        CardMode.LISTEN -> "Аудирование: слово на слух"
-        CardMode.WRITE_FWD -> "Ввод перевода с клавиатуры"
-        CardMode.WRITE_REV -> "Ввод слова с клавиатуры"
-        CardMode.PRONOUNCE -> "Произношение: скажите слово"
-        CardMode.REPEAT -> "Повтор за диктором"
-    }
     override val sectionFrequency = "Частота показов"; override val flipShare = "Выбор перевода и выбор слова"
     override val flipShareHint = "Доля показов «слово → перевод» и «перевод → слово»; остальное распределяется по режимам ниже."
-    override fun taskText(mode: CardMode) = when (mode) {
-        CardMode.FLIP_FWD -> "Переверните карточку"
-        CardMode.CHOICE_FWD, CardMode.CHOICE_REV -> "Выберите правильный вариант"
-        CardMode.LISTEN -> "Прослушайте и выберите правильный вариант"
-        CardMode.WRITE_FWD, CardMode.WRITE_REV -> "Введите ответ"
-        CardMode.PRONOUNCE -> "Произнесите слово"
-        CardMode.REPEAT -> "Повторите слово или фразу"
-    }
     override val revealAnswer = "Показать ответ"
     override val customSize = "Своё"; override val customSizeTitle = "Своё число карточек"; override val customSizeHint = "От 1 до 500"
     override fun pronounceError(code: Int) = "Не удалось включить распознавание речи (код $code). Попробуйте ещё раз"
-    override fun praise(kind: PraiseKind, n: Int) = when (kind) {
-        PraiseKind.RECORD_DAY -> "Лучший день за две недели: $n повторов. Так держать!"
-        PraiseKind.UP_TODAY -> "Сегодня на $n больше повторов, чем вчера. Так держать!"
-        PraiseKind.BEST_STREAK -> "Рекорд! $n ${ruPlural(n, "день", "дня", "дней")} подряд. Не останавливайтесь!"
-        PraiseKind.WEEK_UP -> "За неделю на $n% больше повторов, чем на прошлой. Отличный темп!"
-        PraiseKind.ACCURACY -> "Точность $n%: вы отлично запоминаете. Так держать!"
-        PraiseKind.KEEP -> "Каждый повтор — шаг вперёд. Так держать!"
-    }
-    override fun sessionPraise(level: Int) = listOf("Главное, что вы занимались. Повтор закрепит!", "Хорошая работа, с каждым разом лучше!", "Отличный результат! Так держать!")[level]
-    override fun reviewsCount(n: Int) = "$n ${ruPlural(n, "повтор", "повтора", "повторов")}"
-    override fun motivation(kind: MotivationKind, n: Int) = when (kind) {
-        MotivationKind.EMPTY -> "Добавьте первые карточки в библиотеке, и начнём."
-        MotivationKind.START -> "Первая сессия самая важная. Хватит и пяти минут."
-        MotivationKind.DONE_TODAY -> "Сегодня уже ${reviewsCount(n)}. План выполнен, так держать!"
-        MotivationKind.STREAK -> "Серия: $n ${ruPlural(n, "день", "дня", "дней")}. Одна сессия сегодня сохранит её."
-        MotivationKind.CATCH_UP -> "Просрочено: $n. Разберите их сегодня, и память скажет спасибо."
-        MotivationKind.MATURE -> "Выучено $n ${ruPlural(n, "карточка", "карточки", "карточек")}. Каждый день делает вас сильнее."
-        MotivationKind.KEEP -> "Маленькие шаги каждый день дают большой результат."
-    }
     override val tapToContinue = "Листайте карточки свайпом"; override val tapToFlip = "Нажмите, чтобы увидеть перевод"
     override val startStudy = "Начать"; override val studyAll = "Вся библиотека"; override val nothingDue = "На сегодня всё!"; override val nothingDueHint = "Новые карточки и повторы появятся здесь, когда придёт срок."
     override val practiceMore = "Позаниматься сверх плана"; override val previewCards = "Просто просмотреть"; override val sessionDone = "Сессия завершена"; override val backToList = "К списку"

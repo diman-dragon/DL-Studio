@@ -5,7 +5,6 @@ import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.settings.FontSettings
 import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
-import com.dlstudio.app.study.StudyOptions
 
 /** Всё, что показывают настройки; `folderName` null — папка приложения по умолчанию. */
 data class AppState(
@@ -16,9 +15,5 @@ data class AppState(
     val speechVoiceName: String? = null,
     val speechVoiceLabel: String? = null,
     val status: StorageStatus = StorageStatus.NONE,
-    val sessionSize: Int = 20,
-    val remindersEnabled: Boolean = false,
-    val reminderHour: Int = 19,
-    val study: StudyOptions = StudyOptions(),
     val fonts: FontSettings = FontSettings()
 )

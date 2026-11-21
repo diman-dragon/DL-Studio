@@ -6,7 +6,6 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import com.dlstudio.app.settings.AccentColor
-import com.dlstudio.app.study.Grade
 
 /**
  * Цвета темы с выбранным акцентом: на чёрном — светлый оттенок, на светлом фоне — насыщенный.
@@ -68,9 +67,3 @@ val LightColors = lightColorScheme(
 /** Два цвета градиента акцента: от яркого к глубокому. */
 fun AccentColor.gradientColors(): List<Color> = listOf(Color(main), Color(deep))
 
-/** Цвет оценки: красный — «Не знал», янтарный — «Трудно», зелёный — «Знал». */
-fun Grade.tint(): Color = when (this) {
-    Grade.AGAIN -> Color(0xFFFF5C6C)
-    Grade.HARD -> Color(0xFFFFB02E)
-    Grade.KNOW -> Color(0xFF3DC768)
-}

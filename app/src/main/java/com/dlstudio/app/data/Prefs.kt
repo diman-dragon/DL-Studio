@@ -10,8 +10,6 @@ import com.dlstudio.app.settings.FontPreset
 import com.dlstudio.app.settings.FontSettings
 import com.dlstudio.app.settings.FontSpec
 import com.dlstudio.app.settings.ThemeMode
-import com.dlstudio.app.study.CardMode
-import com.dlstudio.app.study.StudyOptions
 import java.util.Locale
 
 /** Настройки приложения (SharedPreferences). */
@@ -51,38 +49,6 @@ class Prefs(context: Context) {
         set(value) = sp.putPref("speechVoiceLabelV2", value)
 
     /** Размер одной учебной сессии: 10, 50 или своё число. */
-    var sessionSize: Int get() = sp.getInt("dailyCards", 20); set(value) { sp.edit().putInt("dailyCards", value).apply() }
-    var remindersEnabled: Boolean get() = sp.getBoolean("remindersEnabled", false); set(value) { sp.edit().putBoolean("remindersEnabled", value).apply() }
-    var reminderHour: Int get() = sp.getInt("reminderHour", 19); set(value) { sp.edit().putInt("reminderHour", value).apply() }
-    var reminderMinute: Int get() = sp.getInt("reminderMinute", 0); set(value) { sp.edit().putInt("reminderMinute", value).apply() }
-}
-
-/** Настройки учёбы в тех же SharedPreferences, что и `Prefs`: режимы карточек, доля переворотов, проверка произношения, поздравления. */
-class StudyPrefs(context: Context) {
-    private val sp = context.getSharedPreferences("dlstudio", Context.MODE_PRIVATE)
-
-    /** Выключенные режимы; у тех, кто сохранял прежний список включённых, новые режимы остаются включёнными. */
-    private fun disabled(): Set<String> {
-        sp.getString("modesOff", null)?.let { return it.split(',').toSet() }
-        val saved = sp.getString("modes", null)?.split(',') ?: return emptySet()
-        return LEGACY.filter { it !in saved }.toSet()
-    }
-
-    fun load(): StudyOptions {
-        val off = disabled()
-        val modes = CardMode.studied.filter { it.name !in off }.toSet().ifEmpty { CardMode.studied }
-        return StudyOptions(modes, sp.getBoolean("pronounce", true), sp.getBoolean("celebrate", true), sp.getInt("flipShare", StudyOptions.DEFAULT_FLIP_SHARE),
-            sp.getInt("slowRate", StudyOptions.DEFAULT_SLOW_RATE).takeIf { it in StudyOptions.SLOW_RATES } ?: StudyOptions.DEFAULT_SLOW_RATE,
-            sp.getInt("slowPause", StudyOptions.DEFAULT_SLOW_PAUSE).takeIf { it in StudyOptions.SLOW_PAUSES } ?: StudyOptions.DEFAULT_SLOW_PAUSE)
-    }
-
-    fun save(options: StudyOptions) {
-        sp.edit().putString("modesOff", CardMode.studied.filter { it !in options.modes }.joinToString(",") { it.name })
-            .putBoolean("pronounce", options.pronounce).putBoolean("celebrate", options.celebrate).putInt("flipShare", options.flipShare)
-            .putInt("slowRate", options.slowRate).putInt("slowPause", options.slowPause).apply()
-    }
-
-    private companion object { val LEGACY = listOf("CHOICE_FWD", "CHOICE_REV", "LISTEN", "WRITE_FWD", "WRITE_REV") }
 }
 
 /** Шрифты групп текста в тех же SharedPreferences, что и `Prefs`: семейство и размер на каждую группу. */

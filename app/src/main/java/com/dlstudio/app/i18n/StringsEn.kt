@@ -1,8 +1,5 @@
 package com.dlstudio.app.i18n
 
-import com.dlstudio.app.study.CardMode
-import com.dlstudio.app.study.MotivationKind
-import com.dlstudio.app.study.PraiseKind
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AccentPalette
 import com.dlstudio.app.settings.FontChoice
@@ -40,48 +37,11 @@ object StringsEn : Strings {
     override val pronounceSetting = "Pronunciation check (microphone)"; override val celebrateSetting = "Animations and cheers"
     override val statsBestStreak = "Best streak"; override val statsWeek = "Last 7 days"; override val statsWeekTrend = "vs previous week"
     override val writeRight = "Correct!"; override fun writeWrong(correct: String) = "Not quite: $correct"
-    override fun modeName(mode: CardMode) = when (mode) {
-        CardMode.FLIP_FWD -> "Card preview"
-        CardMode.CHOICE_FWD -> "Choose the translation"
-        CardMode.CHOICE_REV -> "Choose the word"
-        CardMode.LISTEN -> "Listening: word by ear"
-        CardMode.WRITE_FWD -> "Type the translation"
-        CardMode.WRITE_REV -> "Type the word"
-        CardMode.PRONOUNCE -> "Pronunciation: say the word"
-        CardMode.REPEAT -> "Repeat after the speaker"
-    }
     override val sectionFrequency = "Frequency"; override val flipShare = "Choose translation / choose word"
     override val flipShareHint = "Share of \"word → translation\" and \"translation → word\"; the rest is spread across the modes below."
-    override fun taskText(mode: CardMode) = when (mode) {
-        CardMode.FLIP_FWD -> "Flip the card"
-        CardMode.CHOICE_FWD, CardMode.CHOICE_REV -> "Choose the correct option"
-        CardMode.LISTEN -> "Listen and choose the correct option"
-        CardMode.WRITE_FWD, CardMode.WRITE_REV -> "Type the answer"
-        CardMode.PRONOUNCE -> "Say the word"
-        CardMode.REPEAT -> "Repeat the word or phrase"
-    }
     override val revealAnswer = "Show answer"
     override val customSize = "Custom"; override val customSizeTitle = "Custom number of cards"; override val customSizeHint = "From 1 to 500"
     override fun pronounceError(code: Int) = "Speech recognition failed to start (code $code). Please try again"
-    override fun praise(kind: PraiseKind, n: Int) = when (kind) {
-        PraiseKind.RECORD_DAY -> "Best day in two weeks: $n reviews. Keep it up!"
-        PraiseKind.UP_TODAY -> "$n more reviews than yesterday. Keep it up!"
-        PraiseKind.BEST_STREAK -> "New record! $n ${if (n == 1) "day" else "days"} in a row. Don't stop!"
-        PraiseKind.WEEK_UP -> "$n% more reviews than last week. Great pace!"
-        PraiseKind.ACCURACY -> "Accuracy $n%: you remember really well. Keep it up!"
-        PraiseKind.KEEP -> "Every review is a step forward. Keep it up!"
-    }
-    override fun sessionPraise(level: Int) = listOf("What matters is that you practised. Repetition will help!", "Good work, better each time!", "Excellent result! Keep it up!")[level]
-    override fun reviewsCount(n: Int) = "$n ${if (n == 1) "review" else "reviews"}"
-    override fun motivation(kind: MotivationKind, n: Int) = when (kind) {
-        MotivationKind.EMPTY -> "Add your first cards in the library and we will begin."
-        MotivationKind.START -> "The first session matters most. Five minutes is enough."
-        MotivationKind.DONE_TODAY -> "${reviewsCount(n)} done today. Plan complete, keep it up!"
-        MotivationKind.STREAK -> "Streak: $n ${if (n == 1) "day" else "days"}. One session today keeps it alive."
-        MotivationKind.CATCH_UP -> "$n overdue. Clear them today and your memory will thank you."
-        MotivationKind.MATURE -> "$n ${if (n == 1) "card" else "cards"} learned. Every day makes you stronger."
-        MotivationKind.KEEP -> "Small steps every day add up to big results."
-    }
     override val tapToContinue = "Swipe to move between cards"; override val tapToFlip = "Tap to see the translation"
     override val startStudy = "Start"; override val studyAll = "Whole library"; override val nothingDue = "All done for today!"; override val nothingDueHint = "New cards and reviews will appear here when they are due."
     override val practiceMore = "Practice anyway"; override val previewCards = "Preview cards"; override val sessionDone = "Session complete"; override val backToList = "Back to list"
