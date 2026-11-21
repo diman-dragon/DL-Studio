@@ -1,0 +1,48 @@
+{
+  "topics": [
+    {
+      "id": "en-family",
+      "course": "English",
+      "group": "A1",
+      "n": 3,
+      "title": "Семья",
+      "cards": 8,
+      "pack": "topics/en-family.json",
+      "size": 2748,
+      "sha256": "5d708a77253a31bcc71f94833fb936e3b0e70dcde763c3870e3b052d4f83ca92"
+    },
+    {
+      "id": "en-greetings",
+      "course": "English",
+      "group": "A1",
+      "n": 1,
+      "title": "Приветствия и знакомство",
+      "cards": 8,
+      "pack": "topics/en-greetings.json",
+      "size": 3660,
+      "sha256": "f3847228dbcc6666b52c9c15fe0792de3cbdca24dc73205fe22041fb8aef7d59"
+    },
+    {
+      "id": "en-to-be",
+      "course": "English",
+      "group": "A1",
+      "n": 2,
+      "title": "Глагол to be",
+      "cards": 8,
+      "pack": "topics/en-to-be.json",
+      "size": 2850,
+      "sha256": "52ca2123151fcab8cbfa5a084978c913e27ba5997dca947d56bd31506645a119"
+    },
+    {
+      "id": "math-fractions",
+      "course": "Математика",
+      "group": "5 класс",
+      "n": 1,
+      "title": "Обыкновенные дроби",
+      "cards": 8,
+      "pack": "topics/math-fractions.json",
+      "size": 3162,
+      "sha256": "586df10fd6b7a676f7ea7dd8e0190d8b75b20f4668df380c716e6783227a65d4"
+    }
+  ]
+}

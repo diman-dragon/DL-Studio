@@ -12,17 +12,14 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Density
 import androidx.core.view.WindowCompat
 import com.dlstudio.app.settings.AccentColor
-import com.dlstudio.app.settings.FontGroup
-import com.dlstudio.app.settings.FontSettings
 
-/** Тема (цвета с акцентом) + шрифты из настроек. Масштаб шрифта системы ограничен 1.15, чтобы вёрстка не разваливалась. */
+/** Тема (цвета с акцентом). Масштаб шрифта системы ограничен 1.15, чтобы вёрстка не разваливалась. */
 @Composable
-fun DlTheme(dark: Boolean, accent: AccentColor, fonts: FontSettings, content: @Composable () -> Unit) {
+fun DlTheme(dark: Boolean, accent: AccentColor, content: @Composable () -> Unit) {
     val system = LocalDensity.current
     val density = remember(system) { Density(system.density, system.fontScale.coerceAtMost(1.15f)) }
-    val ui = fonts[FontGroup.UI]
-    val typography = remember(ui) { dlTypography(ui.choice.family(), ui.scale / 100f) }
-    CompositionLocalProvider(LocalDensity provides density, LocalAccent provides accent, LocalFonts provides fonts) {
+    val typography = remember { dlTypography() }
+    CompositionLocalProvider(LocalDensity provides density, LocalAccent provides accent) {
         MaterialTheme(colorScheme = accentScheme(dark, accent), typography = typography) {
             SystemBars(dark)
             content()

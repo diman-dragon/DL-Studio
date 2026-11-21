@@ -4,15 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AppLang
-import com.dlstudio.app.settings.FontChoice
-import com.dlstudio.app.settings.FontGroup
-import com.dlstudio.app.settings.FontPreset
-import com.dlstudio.app.settings.FontSettings
-import com.dlstudio.app.settings.FontSpec
 import com.dlstudio.app.settings.ThemeMode
 import java.util.Locale
 
-/** Настройки приложения (SharedPreferences). */
+/** Настройки и прогресс (SharedPreferences). Прогресс хранится одной JSON-строкой: см. progress/Progress.kt. */
 class Prefs(context: Context) {
     private val sp = context.getSharedPreferences("dlstudio", Context.MODE_PRIVATE)
     private val systemLang = if (Locale.getDefault().language == "ru") AppLang.RU else AppLang.EN
@@ -29,53 +24,22 @@ class Prefs(context: Context) {
         get() = sp.getEnum("accent", AccentColor.VIOLET)
         set(value) = sp.putPref("accent", value.name)
 
-    /** Дерево SAF, которое выбрал пользователь; null — папка приложения по умолчанию. */
-    var storageUri: String?
-        get() = sp.getString("storage", null)
-        set(value) = sp.putPref("storage", value)
+    /** Адрес папки с course.json; пусто — каталог не задан. */
+    var catalogUrl: String
+        get() = sp.getString("catalogUrl", "").orEmpty()
+        set(value) = sp.putPref("catalogUrl", value.trim())
 
-    /** Вид библиотеки: true — карточки, false — список. */
-    var libraryGrid: Boolean
-        get() = sp.getBoolean("libraryGrid", true)
-        set(value) { sp.edit().putBoolean("libraryGrid", value).apply() }
+    /** Встроенные темы уже скопированы при первом запуске (удалённые не возвращаются). */
+    var seeded: Boolean
+        get() = sp.getBoolean("seeded", false)
+        set(value) { sp.edit().putBoolean("seeded", value).apply() }
 
-    var speechVoiceName: String?
-        get() = sp.getString("speechVoice", null)
-        set(value) = sp.putPref("speechVoice", value)
-
-    /** Человеческое имя выбранного голоса — ровно то, что пользователь выбрал в списке. */
-    var speechVoiceLabel: String?
-        get() = sp.getString("speechVoiceLabelV2", null)
-        set(value) = sp.putPref("speechVoiceLabelV2", value)
-
-    /** Размер одной учебной сессии: 10, 50 или своё число. */
+    var progressJson: String?
+        get() = sp.getString("progress", null)
+        set(value) = sp.putPref("progress", value)
 }
 
-/** Шрифты групп текста в тех же SharedPreferences, что и `Prefs`: семейство и размер на каждую группу. */
-class FontPrefs(context: Context) {
-    private val sp = context.getSharedPreferences("dlstudio", Context.MODE_PRIVATE)
-
-    fun load(): FontSettings = FontGroup.values().fold(FontSettings(sp.getEnum("fontPreset", FontPreset.SYSTEM))) { all, group ->
-        val choice = sp.getEnum("font_${group.name}", FontChoice.SANS)
-        val scale = sp.getInt("fontScale_${group.name}", FontSpec.DEFAULT).coerceIn(FontSpec.SCALES.min(), FontSpec.SCALES.max())
-        all.changed(group, FontSpec(choice, scale))
-    }
-
-    fun savePreset(preset: FontPreset) { sp.edit().putString("fontPreset", preset.name).apply() }
-
-    /** Забывает режим и шрифты всех групп: дальше действуют значения по умолчанию. */
-    fun reset() {
-        val edit = sp.edit().remove("fontPreset")
-        FontGroup.values().forEach { edit.remove("font_${it.name}").remove("fontScale_${it.name}") }
-        edit.apply()
-    }
-
-    fun save(group: FontGroup, spec: FontSpec) {
-        sp.edit().putString("font_${group.name}", spec.choice.name).putInt("fontScale_${group.name}", spec.scale).apply()
-    }
-}
-
-/** Значение перечисления из настроек; нет или повреждено — `default`. */
+/** Значение перечисления из настроек; нет или повреждено — default. */
 inline fun <reified T : Enum<T>> SharedPreferences.getEnum(key: String, default: T): T {
     val saved = getString(key, null)
     return enumValues<T>().firstOrNull { it.name == saved } ?: default

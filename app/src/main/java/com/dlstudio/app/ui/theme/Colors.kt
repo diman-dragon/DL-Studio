@@ -66,4 +66,3 @@ val LightColors = lightColorScheme(
 
 /** Два цвета градиента акцента: от яркого к глубокому. */
 fun AccentColor.gradientColors(): List<Color> = listOf(Color(main), Color(deep))
-

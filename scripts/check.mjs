@@ -12,7 +12,7 @@ process.chdir(join(dirname(fileURLToPath(import.meta.url)), '..'));
 
 const MAX_LINES = 350;
 const DUP_WINDOW = 6;
-const ENTRY_POINTS = new Set(['MainActivity', 'StudyBootReceiver']);
+const ENTRY_POINTS = new Set(['MainActivity']);
 const bad = [];
 
 const walk = d => readdirSync(d).flatMap(n => {

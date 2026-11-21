@@ -2,99 +2,42 @@ package com.dlstudio.app.i18n
 
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AccentPalette
-import com.dlstudio.app.settings.FontChoice
-import com.dlstudio.app.settings.FontGroup
-import com.dlstudio.app.settings.FontPreset
-import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
 
 /** Все тексты интерфейса. Новый язык = новая реализация; забытая строка не соберётся. */
 interface Strings {
-    val tabStudy: String; val tabStats: String; val tabLibrary: String; val tabSettings: String; val stubHint: String
-    val cardIpa: String; val modeFlipHint: String; val modesLater: String; val studyPausedHint: String
-    fun modesSoon(count: Int): String
-    val settingTheme: String; val settingLanguage: String; val settingAccent: String; val settingFolder: String; val settingAbout: String
-    val folderDefault: String; val aboutTitle: String; val aboutText: String; val aboutCopyright: String; val close: String; val viewCards: String; val viewList: String
-    val edit: String; val delete: String; val save: String; val cancel: String; val cardBack: String; val cardHint: String
-    val cardExplanation: String; val cardExample: String; val showAnswer: String; val hintButton: String; val speak: String; val speakSlow: String; val slowRate: String; val slowPause: String; val slowTest: String
-    fun slowPauseName(percent: Int): String
-    val previous: String; val next: String; val noCards: String; val statsOverview: String; val statsProjects: String; val statsDecks: String
-    val statsCards: String; val statsStudied: String; val statsProgress: String; val statsEmpty: String; val speechVoice: String
-    val dailyCards: String; val reminders: String; val reminderTime: String; val importFormat: String; val importPick: String; val importEmpty: String
-    val allDecks: String; val allCards: String; val chooseProject: String; val chooseDeck: String; val flipHint: String; val voicePreview: String; val voicePackagesEmpty: String; val due: String; val overdue: String; val statsDue: String; val statsOverdue: String; val statsToday: String; val statsAverage: String; val statsStreak: String; val statsReviewsChart: String; val statsIntervals: String
-    val sectionLook: String
-    val fontPresetTitle: String; val fontReset: String; val fontResetHint: String
-    fun fontPresetName(preset: FontPreset): String
-    fun fontPresetHint(preset: FontPreset): String
-    val sectionFonts: String; val fontFamilyLabel: String; val fontSizeLabel: String; val fontSample: String
-    fun fontGroupName(group: FontGroup): String
-    fun fontChoiceName(choice: FontChoice): String
-    val sectionSpeech: String
-    val sectionStudy: String
-    val sectionData: String
-    val tapToFlip: String
-    val tapToContinue: String
-    val yesterdayTitle: String
-    val yesterdayEmpty: String
-    val streakTitle: String
-    val forecastTitle: String
-    val projectsTitle: String
-    val doneWord: String
-    val newRound: String
-    val learn: String
-    val sectionModes: String; val sectionHelpers: String; val modeLast: String; val pronounceSetting: String; val celebrateSetting: String
-    val statsBestStreak: String; val statsWeek: String; val statsWeekTrend: String
-    val writeRight: String
-    fun writeWrong(correct: String): String
-    fun modesEnabled(count: Int, total: Int): String
-    val sectionFrequency: String; val flipShare: String; val flipShareHint: String
-    val revealAnswer: String
-    val customSize: String; val customSizeTitle: String; val customSizeHint: String
-    fun pronounceError(code: Int): String
-    val startStudy: String
-    val studyAll: String
-    val nothingDue: String
-    val nothingDueHint: String
-    val practiceMore: String
-    val previewCards: String
-    val sessionDone: String
-    val backToList: String
-    val checkAnswer: String
-    val listenPrompt: String
-    val pronounceListening: String; val pronounceOk: String; val pronounceClose: String; val pronounceMiss: String
-    val pronounceNoSpeech: String; val pronounceUnavailable: String; val pronounceDenied: String
-    fun pronounceHeard(text: String): String
-    val writePrompt: String
-    val todayTitle: String
-    val freshWord: String
-    val statsNew: String
-    val statsAccuracy: String
-    val statsMature: String
-    val secondsShort: String
-    val daysShort: String
-    val libraryFailed: String
-    val reminderChannel: String
-    val reminderText: String
-    val on: String
-    val off: String
-    val notificationsNeeded: String
-    val statsReviewsTitle: String
-    val weekdays: List<String>
-    fun reminderDue(n: Int): String
-    fun sessionProgress(done: Int, total: Int): String
-    fun sessionSummary(know: Int, hard: Int, again: Int): String
-    /** Тексты библиотеки по уровню: 0 — проект, 1 — колода, 2 — карточка. */
-    fun addTitle(level: Int): String
-    fun editTitle(level: Int): String
-    fun nameLabel(level: Int): String
-    fun emptyText(level: Int): String
-    fun contentCount(level: Int, n: Int): String
-    fun deleteQuestion(level: Int, name: String): String
-    fun importTitle(level: Int): String
-    fun importOutcome(level: Int): String
-    fun importDone(n: Int): String
+    val tabMap: String; val tabProgress: String; val tabSettings: String
+
+    val mapEmptyTitle: String; val mapEmptyHint: String; val openSettings: String; val noGroup: String
+    fun groupProgress(done: Int, total: Int): String
+    fun cardsCount(n: Int): String
+
+    val stageTheory: String; val stageCards: String; val stagePractice: String
+    val previous: String; val next: String; val finish: String; val speak: String
+    val tapToFlip: String; val know: String; val again: String
+    fun cardCounter(index: Int, total: Int, known: Int): String
+    val correct: String
+    fun wrongAnswer(answer: String): String
+    fun quizResult(ok: Int, total: Int): String
+    val retry: String; val stageDone: String; val topicDone: String; val seeResult: String
+
+    fun levelTitle(level: Int): String
+    fun xpToNext(xp: Int): String
+    fun streakDays(n: Int): String
+    fun topicsDone(done: Int, total: Int): String
+    val xpRulesTitle: String; val xpRules: String; val sealsTitle: String
+
+    val sectionLook: String; val settingTheme: String; val settingLanguage: String; val settingAccent: String
+    fun themeName(mode: ThemeMode): String
     fun accentName(accent: AccentColor): String
     fun accentPaletteName(palette: AccentPalette): String
-    fun themeName(mode: ThemeMode): String
-    fun status(status: StorageStatus): String
+
+    val sectionTopics: String; val catalogAddress: String; val catalogNotSet: String; val catalogHint: String
+    val refreshCatalog: String; val fromFile: String; val downloadAll: String; val download: String
+    val availableTitle: String; val installedTitle: String; val remove: String
+    val catalogLoading: String; val catalogFailed: String; val downloadFailed: String; val fileFailed: String; val nothingNew: String
+    fun removeQuestion(title: String): String
+    val cancel: String; val save: String
+
+    val aboutTitle: String; val aboutText: String; val aboutCopyright: String
 }

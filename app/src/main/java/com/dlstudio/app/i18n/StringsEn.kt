@@ -2,98 +2,48 @@ package com.dlstudio.app.i18n
 
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AccentPalette
-import com.dlstudio.app.settings.FontChoice
-import com.dlstudio.app.settings.FontGroup
-import com.dlstudio.app.settings.FontPreset
-import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
 
 object StringsEn : Strings {
-    override val tabStudy = "Study"; override val tabStats = "Stats"; override val tabLibrary = "Library"; override val tabSettings = "Settings"; override val stubHint = "Coming soon"
-    override val cardIpa = "Transcription (optional)"; override val modeFlipHint = "Word → translation, tap to flip"; override val modesLater = "Other modes"
-    override val studyPausedHint = "Cards open from the Library for now: tap ▶ on a deck"; override fun modesSoon(count: Int) = "Soon · $count"
-    override val settingTheme = "Theme"; override val settingLanguage = "App language"; override val settingAccent = "Accent color"; override val settingFolder = "Storage folder"; override val settingAbout = "About"
-    override val folderDefault = "App folder"; override val aboutTitle = "DL Studio"; override val aboutText = "Flashcards for learning languages. Works offline."; override val aboutCopyright = "© 2026 DataLaw DesignLab. All rights reserved."; override val close = "Close"
-    override val viewCards = "Cards"; override val viewList = "List"; override val edit = "Edit"; override val delete = "Delete"; override val save = "Save"; override val cancel = "Cancel"
-    override val cardBack = "Back side"; override val cardHint = "Hint (optional)"; override val cardExplanation = "Explanation (optional)"; override val cardExample = "Example (optional)"
-    override val showAnswer = "Show translation"; override val hintButton = "Hint"; override val speak = "Speak"; override val speakSlow = "Speak slowly"; override val slowRate = "Slow pace"; override val slowPause = "Pauses between sentences"; override val slowTest = "Try it on a sample"; override val previous = "Previous"; override val next = "Next"; override val noCards = "Add cards to your library to start studying here."
-    override val statsOverview = "Study overview"; override val statsProjects = "Projects"; override val statsDecks = "Decks"; override val statsCards = "Cards"; override val statsStudied = "Studied"; override val statsProgress = "Library progress"; override val statsEmpty = "Your progress will appear here after the first card."
-    override val speechVoice = "Android speech"; override val dailyCards = "Cards per session"; override val reminders = "Study reminders"; override val reminderTime = "Reminder time"
-    override val allDecks = "All decks"; override val allCards = "All cards"; override val chooseProject = "Choose a project"; override val chooseDeck = "Choose a deck"; override val flipHint = "Tap the card to flip it"; override val voicePreview = "Voice preview"; override val voicePackagesEmpty = "No system language packs found"; override val due = "due"; override val overdue = "overdue"; override val statsDue = "Due"; override val statsOverdue = "Overdue"; override val statsToday = "Reviews today"; override val statsAverage = "Average answer time"; override val statsStreak = "Day streak"; override val statsReviewsChart = "Reviews over 14 days"; override val statsIntervals = "Interval distribution"
-    override val importFormat = "One card per line: a word and its translation separated by “;”, a tab or “ - ”, for example “cat;кот”. CSV, TSV, TXT (including Anki and Quizlet exports) and JSON work. A first row “word;translation;deck” splits the cards into decks."
-    override val importPick = "Choose file"; override val importEmpty = "No cards found in the file. Lines like “word;translation” are expected."
-    override val sectionLook = "Appearance"; override val sectionSpeech = "Speech"; override val sectionStudy = "Study"; override val sectionData = "Data"
-    override val fontPresetTitle = "Font mode"; override val fontReset = "Reset to default"; override val fontResetHint = "System mode, regular font, 100% scale"
-    override fun fontPresetName(preset: FontPreset) = listOf("System", "Adaptive", "Custom")[preset.ordinal]
-    override fun fontPresetHint(preset: FontPreset) = listOf("One size everywhere: card word large, other text at system size, buttons small.", "Size fits the available area: the word and labels fill it.", "Adaptive size, with font and scale set for each group separately.")[preset.ordinal]
-    override val sectionFonts = "Fonts"; override val fontFamilyLabel = "Font"; override val fontSizeLabel = "Size"; override val fontSample = "The quick brown fox jumps"
-    override fun modesEnabled(count: Int, total: Int) = "$count of $total enabled"
-    override fun slowPauseName(percent: Int) = when { percent <= 0 -> "None"; percent < 90 -> "Short"; percent <= 120 -> "Normal"; else -> "Long" }
-    override fun fontGroupName(group: FontGroup) = listOf("Interface", "Card word", "Transcription", "Notes and examples", "Buttons")[group.ordinal]
-    override fun fontChoiceName(choice: FontChoice) = listOf("Sans", "Serif", "Monospace", "Script")[choice.ordinal]
-    override val yesterdayTitle = "Yesterday"; override val yesterdayEmpty = "No study yesterday"; override val streakTitle = "Streak"; override val forecastTitle = "Next 7 days"
-    override val projectsTitle = "Projects"; override val doneWord = "Done"; override val newRound = "Round complete. Starting a new one in a different order…"; override val learn = "Study"
-    override val sectionModes = "Card modes"; override val sectionHelpers = "Helpers"; override val modeLast = "At least one mode is required"
-    override val pronounceSetting = "Pronunciation check (microphone)"; override val celebrateSetting = "Animations and cheers"
-    override val statsBestStreak = "Best streak"; override val statsWeek = "Last 7 days"; override val statsWeekTrend = "vs previous week"
-    override val writeRight = "Correct!"; override fun writeWrong(correct: String) = "Not quite: $correct"
-    override val sectionFrequency = "Frequency"; override val flipShare = "Choose translation / choose word"
-    override val flipShareHint = "Share of \"word → translation\" and \"translation → word\"; the rest is spread across the modes below."
-    override val revealAnswer = "Show answer"
-    override val customSize = "Custom"; override val customSizeTitle = "Custom number of cards"; override val customSizeHint = "From 1 to 500"
-    override fun pronounceError(code: Int) = "Speech recognition failed to start (code $code). Please try again"
-    override val tapToContinue = "Swipe to move between cards"; override val tapToFlip = "Tap to see the translation"
-    override val startStudy = "Start"; override val studyAll = "Whole library"; override val nothingDue = "All done for today!"; override val nothingDueHint = "New cards and reviews will appear here when they are due."
-    override val practiceMore = "Practice anyway"; override val previewCards = "Preview cards"; override val sessionDone = "Session complete"; override val backToList = "Back to list"
-    override val checkAnswer = "Check"; override val listenPrompt = "Listen to the word"; override val writePrompt = "Type the answer"
-    override val todayTitle = "Today"
-    override val freshWord = "new"
-    override val statsNew = "New"
-    override val statsAccuracy = "Accuracy"
-    override val statsMature = "Mature"
-    override val secondsShort = "s"
-    override val daysShort = "d"
-    override val libraryFailed = "Could not open the database. Your data is untouched and editing is disabled. Check the storage folder in settings."
-    override val reminderChannel = "Study"
-    override val reminderText = "Time to review your cards"
-    override val on = "On"
-    override val off = "Off"
-    override val pronounceListening = "Listening… say it out loud"; override val pronounceOk = "Great, that sounded right"; override val pronounceClose = "Almost there, try once more"; override val pronounceMiss = "Not quite, listen and repeat"
-    override val pronounceNoSpeech = "Could not hear you. Tap the microphone and speak louder"; override val pronounceUnavailable = "No speech recognition service found. Turn on Google voice input in Android settings"; override val pronounceDenied = "Allow the microphone in Android settings"
-    override fun pronounceHeard(text: String) = "Heard: “$text”"
-    override val notificationsNeeded = "Allow notifications in Android settings, or reminders will not arrive."
-    override val statsReviewsTitle = "Reviews, 14 days"
-    override val weekdays = listOf("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
-    override fun reminderDue(n: Int) = "$n ${if (n == 1) "card" else "cards"} to review"
-    override fun sessionProgress(done: Int, total: Int) = "$done of $total"
-    override fun sessionSummary(know: Int, hard: Int, again: Int) = "Know: $know · Hard: $hard · Again: $again"
-    override fun addTitle(level: Int) = listOf("New project", "New deck", "New card")[level]
-    override fun editTitle(level: Int) = listOf("Edit project", "Edit deck", "Edit card")[level]
-    override fun nameLabel(level: Int) = listOf("Project name", "Deck name", "Front side")[level]
-    override fun emptyText(level: Int) = listOf(
-        "No projects yet. Create the first one, for example “English B1”.",
-        "This project has no decks yet. Create the first one.",
-        "This deck has no cards yet. Add the first one."
-    )[level]
-    override fun contentCount(level: Int, n: Int) =
-        if (level == 0) "$n ${if (n == 1) "deck" else "decks"}" else "$n ${if (n == 1) "card" else "cards"}"
-    override fun deleteQuestion(level: Int, name: String) =
-        "Delete the ${listOf("project", "deck", "card")[level]} “$name”?" + if (level < 2) " Everything inside will be deleted too." else ""
-    override fun importTitle(level: Int) = listOf("Import project from file", "Import deck from file", "Import cards from file")[level]
-    override fun importOutcome(level: Int) = listOf(
-        "The file becomes a new project named after the file, with decks and cards inside.",
-        "The file becomes a new deck in this project.",
-        "The cards from the file are added to this deck."
-    )[level]
-    override fun importDone(n: Int) = "Added $n ${if (n == 1) "card" else "cards"}"
+    override val tabMap = "Map"; override val tabProgress = "Progress"; override val tabSettings = "Settings"
+
+    override val mapEmptyTitle = "No topics yet"; override val mapEmptyHint = "Download topics in settings or install a topic file."
+    override val openSettings = "Open settings"; override val noGroup = "Topics"
+    override fun groupProgress(done: Int, total: Int) = "$done of $total ${if (total == 1) "topic" else "topics"}"
+    override fun cardsCount(n: Int) = "$n ${if (n == 1) "card" else "cards"}"
+
+    override val stageTheory = "Theory"; override val stageCards = "Cards"; override val stagePractice = "Practice"
+    override val previous = "Back"; override val next = "Next"; override val finish = "Done"; override val speak = "Speak"
+    override val tapToFlip = "Tap the card to flip it"; override val know = "Know it"; override val again = "Again"
+    override fun cardCounter(index: Int, total: Int, known: Int) = "$index of $total · known $known"
+    override val correct = "Correct!"
+    override fun wrongAnswer(answer: String) = "Correct answer: $answer"
+    override fun quizResult(ok: Int, total: Int) = "$ok of $total correct"
+    override val retry = "Try again"; override val stageDone = "Stage complete"; override val topicDone = "Topic complete!"; override val seeResult = "Result"
+
+    override fun levelTitle(level: Int) = "Level $level"
+    override fun xpToNext(xp: Int) = "To next level: $xp XP"
+    override fun streakDays(n: Int) = "$n ${if (n == 1) "day" else "days"} in a row"
+    override fun topicsDone(done: Int, total: Int) = "Topics completed: $done of $total"
+    override val xpRulesTitle = "How to earn XP"
+    override val xpRules = "Theory +10 · card marked “Know it” +2 · correct answer +5 · whole topic +50. Repeating finished work gives no XP."
+    override val sealsTitle = "Level seals"
+
+    override val sectionLook = "Appearance"; override val settingTheme = "Theme"; override val settingLanguage = "App language"; override val settingAccent = "Accent color"
+    override fun themeName(mode: ThemeMode) = if (mode == ThemeMode.DARK) "Dark (AMOLED)" else "Light"
     override fun accentName(accent: AccentColor) = listOf("Violet", "Blue", "Green", "Amber", "Red", "Lavender", "Sky", "Mint", "Peach", "Crimson", "Plum", "Turquoise", "Lime", "Orange", "Magenta")[accent.ordinal]
     override fun accentPaletteName(palette: AccentPalette) = listOf("Classic", "Soft", "Bright")[palette.ordinal]
-    override fun themeName(mode: ThemeMode) = if (mode == ThemeMode.DARK) "Dark (AMOLED)" else "Light"
-    override fun status(status: StorageStatus) = when (status) {
-        StorageStatus.NONE -> ""
-        StorageStatus.MOVING -> "Moving files…"
-        StorageStatus.MOVED -> "Done: files moved, old folder deleted"
-        StorageStatus.ERROR_INSIDE -> "Pick a folder outside of DL-Studio"
-        StorageStatus.ERROR_IO -> "Move failed, your data stayed in the old place"
-    }
+
+    override val sectionTopics = "Topics"; override val catalogAddress = "Catalog address"; override val catalogNotSet = "Not set"
+    override val catalogHint = "An https folder that contains course.json. Topics download one by one, each checked against its checksum."
+    override val refreshCatalog = "Refresh catalog"; override val fromFile = "From file"; override val downloadAll = "Download all"; override val download = "Download"
+    override val availableTitle = "Available topics"; override val installedTitle = "Installed topics"; override val remove = "Remove"
+    override val catalogLoading = "Loading the catalog…"; override val catalogFailed = "Couldn’t get the catalog. Check the address and your connection."
+    override val downloadFailed = "Some topics didn’t download. Try again."; override val fileFailed = "That file doesn’t look like a topic: it needs a json or a zip with a topic."
+    override val nothingNew = "All topics from the catalog are installed."
+    override fun removeQuestion(title: String) = "Remove the topic “$title”? Your progress is kept."
+    override val cancel = "Cancel"; override val save = "Save"
+
+    override val aboutTitle = "DL Studio"; override val aboutText = "Courses by topic: theory, flashcards and practice. Works offline."
+    override val aboutCopyright = "© 2026 DataLaw DesignLab. All rights reserved."
 }

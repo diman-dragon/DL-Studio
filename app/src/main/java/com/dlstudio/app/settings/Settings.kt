@@ -1,7 +1,5 @@
 package com.dlstudio.app.settings
 
-
-
 /** Акцентный цвет приложения: светлый оттенок, основной и глубокий цвет градиента. */
 enum class AccentColor(val soft: Long, val main: Long, val deep: Long) {
     VIOLET(0xFFB69CFF, 0xFF8A66FF, 0xFF5B3FD6),
@@ -34,39 +32,5 @@ enum class AccentPalette(val colors: List<AccentColor>) {
 /** Язык интерфейса; `label` — название языка на нём самом. */
 enum class AppLang(val label: String) { RU("Русский"), EN("English") }
 
-/** Состояние операции со папкой хранения; показывается в настройках. */
-enum class StorageStatus { NONE, MOVING, MOVED, ERROR_INSIDE, ERROR_IO }
-
 /** Тема приложения: тёмная (чёрный AMOLED) или светлая. */
 enum class ThemeMode { DARK, LIGHT }
-
-/** Группы текста, для которых шрифт и размер настраиваются отдельно. */
-enum class FontGroup { UI, CARD, IPA, NOTE, BUTTON }
-
-/** Доступные семейства: системные шрифты Android, поэтому работают без интернета и не раздувают приложение. */
-enum class FontChoice { SANS, SERIF, MONO, CURSIVE }
-
-/** Шрифт и размер (в процентах от базового) одной группы текста. */
-data class FontSpec(val choice: FontChoice = FontChoice.SANS, val scale: Int = DEFAULT) {
-    companion object {
-        const val DEFAULT = 100
-        val SCALES = listOf(85, 100, 115, 130)
-    }
-}
-
-/**
- * Режим шрифтов: `SYSTEM` — размеры фиксированные (слово карточки крупно, всё остальное системным, кнопки мелким),
- * `ADAPTIVE` — размер подбирается под область, `CUSTOM` — адаптивный размер плюс шрифт и масштаб каждой группы.
- */
-enum class FontPreset { SYSTEM, ADAPTIVE, CUSTOM }
-
-/** Режим и шрифты групп. Настройки групп действуют только в режиме `CUSTOM`, но сохраняются и при других режимах. */
-data class FontSettings(val preset: FontPreset = FontPreset.SYSTEM, private val specs: Map<FontGroup, FontSpec> = emptyMap()) {
-    /** Действующий шрифт группы. */
-    operator fun get(group: FontGroup): FontSpec = if (preset == FontPreset.CUSTOM) specs[group] ?: FontSpec() else FontSpec()
-
-    fun changed(group: FontGroup, spec: FontSpec): FontSettings =
-        copy(specs = if (spec == FontSpec()) specs - group else specs + (group to spec))
-
-    fun withPreset(next: FontPreset): FontSettings = copy(preset = next)
-}

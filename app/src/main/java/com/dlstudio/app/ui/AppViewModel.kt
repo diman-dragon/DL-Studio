@@ -2,84 +2,110 @@ package com.dlstudio.app.ui
 
 import android.app.Application
 import android.net.Uri
-import android.speech.tts.Voice
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.dlstudio.app.data.FontPrefs
+import com.dlstudio.app.content.CatalogEntry
+import com.dlstudio.app.content.Remote
+import com.dlstudio.app.content.Topic
+import com.dlstudio.app.content.TopicStore
 import com.dlstudio.app.data.Prefs
-import com.dlstudio.app.data.folderName
-import com.dlstudio.app.data.moveToFolder
-import com.dlstudio.app.data.openParent
+import com.dlstudio.app.progress.ProgressJson
+import com.dlstudio.app.progress.Reward
+import com.dlstudio.app.progress.Xp
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AppLang
-import com.dlstudio.app.settings.FontGroup
-import com.dlstudio.app.settings.FontPreset
-import com.dlstudio.app.settings.FontSettings
-import com.dlstudio.app.settings.FontSpec
-import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
-import com.dlstudio.app.study.Speaker
-import com.dlstudio.app.ui.components.VoiceName
-import java.util.Locale
+import com.dlstudio.app.speech.Speaker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.dlstudio.app.storage.ensureLayout
 
-/** Настройки приложения и озвучка. Каждая настройка пишется в `Prefs` и сразу отражается в состоянии. */
+/** Состояние приложения: настройки, темы на устройстве, прогресс и загрузка каталога. Тяжёлое (файлы, сеть) — не на главном потоке. */
 class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val prefs = Prefs(app)
-    private val fontPrefs = FontPrefs(app)
+    private val store = TopicStore(app, prefs)
     private val speaker = Speaker(app)
-    private val mutable = MutableStateFlow(
-        AppState(prefs.theme, prefs.lang, prefs.accent, folderName(app, prefs), prefs.speechVoiceName, prefs.speechVoiceLabel,
-            fonts = fontPrefs.load())
-    )
+    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, prefs.catalogUrl, ProgressJson.decode(prefs.progressJson)))
     val state: StateFlow<AppState> = mutable.asStateFlow()
-    private val voiceList = MutableStateFlow<List<Voice>>(emptyList())
-    val voices: StateFlow<List<Voice>> = voiceList.asStateFlow()
 
-    init { viewModelScope.launch(Dispatchers.IO) { runCatching { ensureLayout(openParent(app, prefs)) } } }
-
-    fun setTheme(theme: ThemeMode) { prefs.theme = theme; mutable.update { it.copy(theme = theme) } }
-    fun setLang(lang: AppLang) {
-        prefs.lang = lang
-        val name = mutable.value.speechVoiceName
-        val label = name?.let { VoiceName.fallback(it, Locale(lang.name.lowercase())) }
-        prefs.speechVoiceLabel = label
-        mutable.update { it.copy(lang = lang, speechVoiceLabel = label) }
-    }
-    fun setAccent(accent: AccentColor) { prefs.accent = accent; mutable.update { it.copy(accent = accent) } }
-    fun setFontPreset(preset: FontPreset) { fontPrefs.savePreset(preset); mutable.update { it.copy(fonts = it.fonts.withPreset(preset)) } }
-    fun resetFonts() { fontPrefs.reset(); mutable.update { it.copy(fonts = FontSettings()) } }
-    fun setFont(group: FontGroup, spec: FontSpec) { fontPrefs.save(group, spec); mutable.update { it.copy(fonts = it.fonts.changed(group, spec)) } }
-    /** Язык интерфейса как Locale — на нём пишутся страны и языки голосов. */
-    fun uiLocale(): Locale = Locale(mutable.value.lang.name.lowercase())
-    fun setSpeechVoice(voice: Voice) {
-        val label = VoiceName.labels(voiceList.value, uiLocale())[voice.name] ?: VoiceName.fallback(voice.name, uiLocale())
-        prefs.speechVoiceName = voice.name; prefs.speechVoiceLabel = label
-        mutable.update { it.copy(speechVoiceName = voice.name, speechVoiceLabel = label) }
-    }
-
-    fun speak(text: String) { if (text.isNotBlank()) speaker.speak(text, mutable.value.speechVoiceName) }
-    fun speakSlow(text: String) { speak(text) }
-    fun loadVoices() { viewModelScope.launch(Dispatchers.Default) { voiceList.value = speaker.voices() } }
-    fun preview(voice: Voice, text: String) = speaker.preview(voice, text)
-
-    /** Перенос папки хранения: база закрывается до переноса (`before`) и открывается на новом месте (`after`). */
-    fun pickFolder(tree: Uri, before: suspend () -> Unit, after: suspend () -> Unit) {
-        if (mutable.value.status == StorageStatus.MOVING) return
-        mutable.update { it.copy(status = StorageStatus.MOVING) }
-        viewModelScope.launch {
-            before()
-            val status = moveToFolder(app, prefs, tree)
-            after()
-            mutable.update { it.copy(folderName = folderName(app, prefs), status = status) }
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            store.seed()
+            reload()
         }
     }
 
-    override fun onCleared() { speaker.shutdown(); super.onCleared() }
+    private fun reload() {
+        val topics = store.installed()
+        mutable.update { it.copy(topics = topics) }
+    }
+
+    fun setTheme(theme: ThemeMode) { prefs.theme = theme; mutable.update { it.copy(theme = theme) } }
+    fun setLang(lang: AppLang) { prefs.lang = lang; mutable.update { it.copy(lang = lang) } }
+    fun setAccent(accent: AccentColor) { prefs.accent = accent; mutable.update { it.copy(accent = accent) } }
+
+    fun setCatalogUrl(url: String) {
+        prefs.catalogUrl = url
+        mutable.update { it.copy(catalogUrl = prefs.catalogUrl, catalog = emptyList(), catalogFailed = false) }
+    }
+
+    fun refreshCatalog() {
+        val url = mutable.value.catalogUrl
+        if (url.isBlank() || mutable.value.catalogLoading) return
+        mutable.update { it.copy(catalogLoading = true, catalogFailed = false) }
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = runCatching { Remote.catalog(url) }
+            mutable.update { it.copy(catalogLoading = false, catalog = result.getOrDefault(it.catalog), catalogFailed = result.isFailure) }
+        }
+    }
+
+    /** Скачивает выбранные темы по одной; ошибка одной не мешает остальным. */
+    fun download(entries: List<CatalogEntry>) {
+        val url = mutable.value.catalogUrl
+        if (entries.isEmpty() || mutable.value.busy.isNotEmpty()) return
+        mutable.update { it.copy(busy = entries.map(CatalogEntry::id).toSet(), notice = Notice.NONE) }
+        viewModelScope.launch(Dispatchers.IO) {
+            var failed = false
+            entries.forEach { entry ->
+                if (runCatching { store.install(Remote.download(url, entry)) }.getOrNull() == null) failed = true
+                mutable.update { it.copy(busy = it.busy - entry.id) }
+            }
+            val topics = store.installed()
+            mutable.update { it.copy(topics = topics, busy = emptySet(), notice = if (failed) Notice.DOWNLOAD_FAILED else Notice.NONE) }
+        }
+    }
+
+    fun installFile(uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val bytes = runCatching { app.contentResolver.openInputStream(uri)?.use { it.readBytes() } }.getOrNull()
+            val installed = bytes?.let(store::install)
+            val topics = store.installed()
+            mutable.update { it.copy(topics = topics, notice = if (installed == null) Notice.FILE_FAILED else Notice.NONE) }
+        }
+    }
+
+    fun remove(topic: Topic) {
+        viewModelScope.launch(Dispatchers.IO) {
+            store.remove(topic.id)
+            reload()
+        }
+    }
+
+    private fun reward(r: Reward) {
+        if (r.gained == 0) return
+        prefs.progressJson = ProgressJson.encode(r.progress)
+        mutable.update { it.copy(progress = r.progress, gain = Gain(r.gained, r.finished, (it.gain?.id ?: 0) + 1)) }
+    }
+
+    fun finishTheory(topic: Topic) = reward(Xp.theory(mutable.value.progress, topic, Xp.dayNumber()))
+    fun knowCard(topic: Topic, index: Int) = reward(Xp.card(mutable.value.progress, topic, index, Xp.dayNumber()))
+    fun answer(topic: Topic, index: Int, correct: Boolean) = reward(Xp.answer(mutable.value.progress, topic, index, correct, Xp.dayNumber()))
+    fun clearGain() = mutable.update { it.copy(gain = null) }
+
+    fun speak(text: String, tag: String) = speaker.speak(text, tag)
+
+    override fun onCleared() { speaker.shutdown() }
 }

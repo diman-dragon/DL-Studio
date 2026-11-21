@@ -2,98 +2,48 @@ package com.dlstudio.app.i18n
 
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AccentPalette
-import com.dlstudio.app.settings.FontChoice
-import com.dlstudio.app.settings.FontGroup
-import com.dlstudio.app.settings.FontPreset
-import com.dlstudio.app.settings.StorageStatus
 import com.dlstudio.app.settings.ThemeMode
 
 object StringsRu : Strings {
-    override val tabStudy = "Учёба"; override val tabStats = "Статистика"; override val tabLibrary = "Библиотека"; override val tabSettings = "Настройки"; override val stubHint = "Раздел в разработке"
-    override val cardIpa = "Транскрипция (необязательно)"; override val modeFlipHint = "Слово → перевод, тап переворачивает"; override val modesLater = "Другие режимы"
-    override val studyPausedHint = "Карточки пока открываются из Библиотеки: нажмите ▶ у колоды"; override fun modesSoon(count: Int) = "Скоро · $count"
-    override val settingTheme = "Тема"; override val settingLanguage = "Язык приложения"; override val settingAccent = "Акцентный цвет"; override val settingFolder = "Папка хранения"; override val settingAbout = "О нас"
-    override val folderDefault = "Папка приложения"; override val aboutTitle = "DL Studio"; override val aboutText = "Карточки для изучения языков. Работает без интернета."; override val aboutCopyright = "© 2026 DataLaw DesignLab. Все права защищены."; override val close = "Закрыть"
-    override val viewCards = "Карточки"; override val viewList = "Список"; override val edit = "Изменить"; override val delete = "Удалить"; override val save = "Сохранить"; override val cancel = "Отмена"
-    override val cardBack = "Обратная сторона"; override val cardHint = "Подсказка (необязательно)"; override val cardExplanation = "Пояснение (необязательно)"; override val cardExample = "Пример (необязательно)"
-    override val showAnswer = "Показать перевод"; override val hintButton = "Подсказка"; override val speak = "Озвучить"; override val speakSlow = "Озвучить медленно"; override val slowRate = "Темп замедления"; override val slowPause = "Паузы между фразами"; override val slowTest = "Проверить на примере"; override val previous = "Назад"; override val next = "Дальше"; override val noCards = "Добавьте карточки в библиотеку — и здесь начнётся учёба."
-    override val statsOverview = "Обзор обучения"; override val statsProjects = "Проекты"; override val statsDecks = "Колоды"; override val statsCards = "Карточки"; override val statsStudied = "Изучено"; override val statsProgress = "Прогресс библиотеки"; override val statsEmpty = "Здесь появится прогресс после первой просмотренной карточки."
-    override val speechVoice = "Озвучка Android"; override val dailyCards = "Карточек в сессии"; override val reminders = "Напоминания об учёбе"; override val reminderTime = "Время напоминания"
-    override val allDecks = "Все колоды"; override val allCards = "Все карточки"; override val chooseProject = "Выберите проект"; override val chooseDeck = "Выберите колоду"; override val flipHint = "Нажмите на карточку, чтобы перевернуть"; override val voicePreview = "Пример произношения"; override val voicePackagesEmpty = "Системные языковые пакеты не найдены"; override val due = "к повтору"; override val overdue = "просрочено"; override val statsDue = "К повтору"; override val statsOverdue = "Просрочено"; override val statsToday = "Повторов сегодня"; override val statsAverage = "Среднее время ответа"; override val statsStreak = "Серия дней"; override val statsReviewsChart = "Повторы за 14 дней"; override val statsIntervals = "Распределение интервалов"
-    override val importFormat = "Одна карточка в строке: слово и перевод через «;», табуляцию или « - », например «cat;кот». Подходят CSV, TSV, TXT (в том числе экспорт Anki и Quizlet) и JSON. Первая строка «слово;перевод;колода» разложит карточки по колодам."
-    override val importPick = "Выбрать файл"; override val importEmpty = "В файле не нашлось карточек. Нужны строки вида «слово;перевод»."
-    override val sectionLook = "Внешний вид"; override val sectionSpeech = "Озвучка"; override val sectionStudy = "Учёба"; override val sectionData = "Данные"
-    override val fontPresetTitle = "Режим шрифтов"; override val fontReset = "Вернуть по умолчанию"; override val fontResetHint = "Системный режим, обычный шрифт, масштаб 100%"
-    override fun fontPresetName(preset: FontPreset) = listOf("Системный", "Адаптивный", "Свой")[preset.ordinal]
-    override fun fontPresetHint(preset: FontPreset) = listOf("Один размер везде: слово на карточке крупно, остальной текст системным, на кнопках мелким.", "Размер подбирается под область: слово и надписи занимают её целиком.", "Адаптивный размер, а шрифт и масштаб настраиваются для каждой группы отдельно.")[preset.ordinal]
-    override val sectionFonts = "Шрифты"; override val fontFamilyLabel = "Шрифт"; override val fontSizeLabel = "Размер"; override val fontSample = "Съешь ещё этих мягких булок"
-    override fun modesEnabled(count: Int, total: Int) = "Включено $count из $total"
-    override fun slowPauseName(percent: Int) = when { percent <= 0 -> "Без пауз"; percent < 90 -> "Короткие"; percent <= 120 -> "Обычные"; else -> "Длинные" }
-    override fun fontGroupName(group: FontGroup) = listOf("Интерфейс", "Слово на карточке", "Транскрипция", "Пояснения и примеры", "Кнопки")[group.ordinal]
-    override fun fontChoiceName(choice: FontChoice) = listOf("Обычный", "С засечками", "Моноширинный", "Рукописный")[choice.ordinal]
-    override val yesterdayTitle = "Вчера"; override val yesterdayEmpty = "Вчера занятий не было"; override val streakTitle = "Серия"; override val forecastTitle = "Ближайшие 7 дней"
-    override val projectsTitle = "Проекты"; override val doneWord = "Сделано"; override val newRound = "Круг пройден. Начинаем новый, порядок будет другим…"; override val learn = "Учить"
-    override val sectionModes = "Режимы карточек"; override val sectionHelpers = "Помощники"; override val modeLast = "Нужен хотя бы один режим"
-    override val pronounceSetting = "Проверка произношения (микрофон)"; override val celebrateSetting = "Анимации и поздравления"
-    override val statsBestStreak = "Рекорд серии"; override val statsWeek = "За 7 дней"; override val statsWeekTrend = "К прошлой неделе"
-    override val writeRight = "Правильно!"; override fun writeWrong(correct: String) = "Неправильно: $correct"
-    override val sectionFrequency = "Частота показов"; override val flipShare = "Выбор перевода и выбор слова"
-    override val flipShareHint = "Доля показов «слово → перевод» и «перевод → слово»; остальное распределяется по режимам ниже."
-    override val revealAnswer = "Показать ответ"
-    override val customSize = "Своё"; override val customSizeTitle = "Своё число карточек"; override val customSizeHint = "От 1 до 500"
-    override fun pronounceError(code: Int) = "Не удалось включить распознавание речи (код $code). Попробуйте ещё раз"
-    override val tapToContinue = "Листайте карточки свайпом"; override val tapToFlip = "Нажмите, чтобы увидеть перевод"
-    override val startStudy = "Начать"; override val studyAll = "Вся библиотека"; override val nothingDue = "На сегодня всё!"; override val nothingDueHint = "Новые карточки и повторы появятся здесь, когда придёт срок."
-    override val practiceMore = "Позаниматься сверх плана"; override val previewCards = "Просто просмотреть"; override val sessionDone = "Сессия завершена"; override val backToList = "К списку"
-    override val checkAnswer = "Проверить"; override val listenPrompt = "Послушайте слово"; override val writePrompt = "Введите ответ"
-    override val todayTitle = "Сегодня"
-    override val freshWord = "новых"
-    override val statsNew = "Новые"
-    override val statsAccuracy = "Точность"
-    override val statsMature = "Выучено"
-    override val secondsShort = "с"
-    override val daysShort = "д"
-    override val libraryFailed = "Не удалось открыть базу. Данные не тронуты — правки отключены. Проверьте папку хранения в настройках."
-    override val reminderChannel = "Учёба"
-    override val reminderText = "Время повторить карточки"
-    override val on = "Включены"
-    override val off = "Выключены"
-    override val pronounceListening = "Слушаю… Скажите вслух"; override val pronounceOk = "Отлично, произношение верное"; override val pronounceClose = "Почти получилось, попробуйте ещё раз"; override val pronounceMiss = "Не то, послушайте и повторите"
-    override val pronounceNoSpeech = "Не расслышал. Нажмите на микрофон и скажите громче"; override val pronounceUnavailable = "Служба распознавания речи не найдена. Включите голосовой ввод Google в настройках Android"; override val pronounceDenied = "Разрешите микрофон в настройках Android"
-    override fun pronounceHeard(text: String) = "Услышано: «$text»"
-    override val notificationsNeeded = "Разрешите уведомления в настройках Android, иначе напоминания не придут."
-    override val statsReviewsTitle = "Повторы за 14 дней"
-    override val weekdays = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс")
-    override fun reminderDue(n: Int) = "К повтору: $n ${ruPlural(n, "карточка", "карточки", "карточек")}"
-    override fun sessionProgress(done: Int, total: Int) = "$done из $total"
-    override fun sessionSummary(know: Int, hard: Int, again: Int) = "Знал: $know · Трудно: $hard · Не знал: $again"
-    override fun addTitle(level: Int) = listOf("Новый проект", "Новая колода", "Новая карточка")[level]
-    override fun editTitle(level: Int) = listOf("Изменить проект", "Изменить колоду", "Изменить карточку")[level]
-    override fun nameLabel(level: Int) = listOf("Название проекта", "Название колоды", "Лицевая сторона")[level]
-    override fun emptyText(level: Int) = listOf(
-        "Проектов пока нет. Создайте первый, например «Английский B1».",
-        "В проекте пока нет колод. Создайте первую.",
-        "В колоде пока нет карточек. Добавьте первую."
-    )[level]
-    override fun contentCount(level: Int, n: Int) =
-        if (level == 0) "$n ${ruPlural(n, "колода", "колоды", "колод")}" else "$n ${ruPlural(n, "карточка", "карточки", "карточек")}"
-    override fun deleteQuestion(level: Int, name: String) =
-        "Удалить ${listOf("проект", "колоду", "карточку")[level]} «$name»?" + if (level < 2) " Всё внутри тоже будет удалено." else ""
-    override fun importTitle(level: Int) = listOf("Импорт проекта из файла", "Импорт колоды из файла", "Импорт карточек из файла")[level]
-    override fun importOutcome(level: Int) = listOf(
-        "Файл станет новым проектом: название — по имени файла, внутри будут колоды и карточки.",
-        "Файл станет новой колодой в этом проекте.",
-        "Карточки из файла добавятся в эту колоду."
-    )[level]
-    override fun importDone(n: Int) = "Добавлено: $n ${ruPlural(n, "карточка", "карточки", "карточек")}"
+    override val tabMap = "Карта"; override val tabProgress = "Прогресс"; override val tabSettings = "Настройки"
+
+    override val mapEmptyTitle = "Пока нет тем"; override val mapEmptyHint = "Скачайте темы в настройках или поставьте файл темы."
+    override val openSettings = "Открыть настройки"; override val noGroup = "Темы"
+    override fun groupProgress(done: Int, total: Int) = "$done из $total ${ruPlural(total, "темы", "тем", "тем")}"
+    override fun cardsCount(n: Int) = "$n ${ruPlural(n, "карточка", "карточки", "карточек")}"
+
+    override val stageTheory = "Теория"; override val stageCards = "Карточки"; override val stagePractice = "Практика"
+    override val previous = "Назад"; override val next = "Дальше"; override val finish = "Готово"; override val speak = "Озвучить"
+    override val tapToFlip = "Нажмите на карточку, чтобы перевернуть"; override val know = "Знаю"; override val again = "Ещё раз"
+    override fun cardCounter(index: Int, total: Int, known: Int) = "$index из $total · знаю $known"
+    override val correct = "Верно!"
+    override fun wrongAnswer(answer: String) = "Правильно: $answer"
+    override fun quizResult(ok: Int, total: Int) = "Верно $ok из $total"
+    override val retry = "Пройти снова"; override val stageDone = "Этап пройден"; override val topicDone = "Тема пройдена!"; override val seeResult = "Результат"
+
+    override fun levelTitle(level: Int) = "Уровень $level"
+    override fun xpToNext(xp: Int) = "До следующего уровня: $xp XP"
+    override fun streakDays(n: Int) = "$n ${ruPlural(n, "день", "дня", "дней")} подряд"
+    override fun topicsDone(done: Int, total: Int) = "Пройдено тем: $done из $total"
+    override val xpRulesTitle = "Как получить XP"
+    override val xpRules = "Теория +10 · карточка «Знаю» +2 · верный ответ +5 · тема целиком +50. За повтор уже пройденного XP не даётся."
+    override val sealsTitle = "Печати уровней"
+
+    override val sectionLook = "Внешний вид"; override val settingTheme = "Тема"; override val settingLanguage = "Язык приложения"; override val settingAccent = "Акцентный цвет"
+    override fun themeName(mode: ThemeMode) = if (mode == ThemeMode.DARK) "Тёмная (AMOLED)" else "Светлая"
     override fun accentName(accent: AccentColor) = listOf("Фиолетовый", "Синий", "Зелёный", "Янтарный", "Красный", "Лавандовый", "Небесный", "Мятный", "Персиковый", "Малиновый", "Сливовый", "Бирюзовый", "Лаймовый", "Оранжевый", "Маджента")[accent.ordinal]
     override fun accentPaletteName(palette: AccentPalette) = listOf("Классика", "Мягкие", "Яркие")[palette.ordinal]
-    override fun themeName(mode: ThemeMode) = if (mode == ThemeMode.DARK) "Тёмная (AMOLED)" else "Светлая"
-    override fun status(status: StorageStatus) = when (status) {
-        StorageStatus.NONE -> ""
-        StorageStatus.MOVING -> "Переношу файлы…"
-        StorageStatus.MOVED -> "Готово: файлы перенесены, старая папка удалена"
-        StorageStatus.ERROR_INSIDE -> "Нельзя выбрать папку внутри DL-Studio"
-        StorageStatus.ERROR_IO -> "Не удалось перенести, данные остались на старом месте"
-    }
+
+    override val sectionTopics = "Темы"; override val catalogAddress = "Адрес каталога"; override val catalogNotSet = "Не задан"
+    override val catalogHint = "Адрес https-папки, где лежит course.json. Темы скачиваются по одной, каждая проверяется по контрольной сумме."
+    override val refreshCatalog = "Обновить каталог"; override val fromFile = "Из файла"; override val downloadAll = "Скачать все"; override val download = "Скачать"
+    override val availableTitle = "Доступные темы"; override val installedTitle = "Установленные темы"; override val remove = "Удалить"
+    override val catalogLoading = "Загружаем каталог…"; override val catalogFailed = "Не удалось получить каталог. Проверьте адрес и сеть."
+    override val downloadFailed = "Не все темы скачались. Попробуйте ещё раз."; override val fileFailed = "Файл не похож на тему: нужен json или zip с темой."
+    override val nothingNew = "Все темы из каталога уже установлены."
+    override fun removeQuestion(title: String) = "Удалить тему «$title»? Прогресс сохранится."
+    override val cancel = "Отмена"; override val save = "Сохранить"
+
+    override val aboutTitle = "DL Studio"; override val aboutText = "Курсы по темам: теория, карточки и практика. Работает без интернета."
+    override val aboutCopyright = "© 2026 DataLaw DesignLab. Все права защищены."
 }
