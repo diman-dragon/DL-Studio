@@ -8,15 +8,11 @@ import com.dlstudio.app.storage.ensureLayout
 import com.dlstudio.app.study.Answer
 import com.dlstudio.app.study.CardState
 import com.dlstudio.app.study.DayAgg
-import com.dlstudio.app.study.DayMath
 import com.dlstudio.app.study.Grade
 import com.dlstudio.app.study.SavedSession
 import java.io.Closeable
 import java.io.File
 import java.io.IOException
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
 
 fun databaseFile(parent: StorageNode, create: Boolean): StorageNode? {
     val dir = ensureLayout(parent).child("library") ?: return null
@@ -64,15 +60,21 @@ class DatabaseSync(context: Context, private val parent: StorageNode) {
     }.getOrDefault(false)
 }
 
-/** Схема базы и переход со старых версий (до 0.1.0 расписание хранилось только в журнале повторов). */
+/** Current schema: content plus a transparent action journal. */
 object DbSchema {
-    private const val VERSION = 2
-    private const val MIGRATED_MAX_INTERVAL = 6
+    private const val VERSION = 3
 
     fun migrate(db: SQLiteDatabase) {
         db.execSQL("CREATE TABLE IF NOT EXISTS nodes(id TEXT PRIMARY KEY,parent_id TEXT,type INTEGER,name TEXT,back TEXT,hint TEXT,explanation TEXT,example TEXT,ipa TEXT,meanings TEXT)")
+        // New learning foundation. These tables record structure and actions only;
+        // no knowledge score, due date, interval, or automatic review queue exists here.
+        db.execSQL("CREATE TABLE IF NOT EXISTS subjects(id TEXT PRIMARY KEY,name TEXT NOT NULL,description TEXT NOT NULL DEFAULT '',metadata TEXT NOT NULL DEFAULT '{}')")
+        db.execSQL("CREATE TABLE IF NOT EXISTS courses(id TEXT PRIMARY KEY,subject_id TEXT NOT NULL,name TEXT NOT NULL,description TEXT NOT NULL DEFAULT '',structure TEXT NOT NULL,metadata TEXT NOT NULL DEFAULT '{}')")
+        db.execSQL("CREATE TABLE IF NOT EXISTS topics(id TEXT PRIMARY KEY,course_id TEXT NOT NULL,name TEXT NOT NULL,description TEXT NOT NULL DEFAULT '',topic_order INTEGER NOT NULL DEFAULT 0,status TEXT NOT NULL,dependencies TEXT NOT NULL DEFAULT '[]',metadata TEXT NOT NULL DEFAULT '{}')")
+        db.execSQL("CREATE TABLE IF NOT EXISTS materials(id TEXT PRIMARY KEY,topic_id TEXT NOT NULL,type TEXT NOT NULL,title TEXT NOT NULL,position INTEGER NOT NULL DEFAULT 0,payload TEXT NOT NULL DEFAULT '{}')")
+        db.execSQL("CREATE TABLE IF NOT EXISTS progress_events(id TEXT PRIMARY KEY,topic_id TEXT NOT NULL,material_id TEXT,action TEXT NOT NULL,occurred_at INTEGER NOT NULL,duration_ms INTEGER,metadata TEXT NOT NULL DEFAULT '{}')")
+        db.execSQL("CREATE TABLE IF NOT EXISTS motivation_events(id TEXT PRIMARY KEY,action TEXT NOT NULL,hp INTEGER NOT NULL DEFAULT 0,xp INTEGER NOT NULL DEFAULT 0,occurred_at INTEGER NOT NULL)")
         db.execSQL("CREATE TABLE IF NOT EXISTS reviews(id INTEGER PRIMARY KEY AUTOINCREMENT,card_id TEXT,seen_at INTEGER,face_ms INTEGER,back_ms INTEGER)")
-        db.execSQL("CREATE TABLE IF NOT EXISTS card_state(card_id TEXT PRIMARY KEY,interval_days INTEGER,ease REAL,reps INTEGER,lapses INTEGER,due_day INTEGER,last_day INTEGER)")
         db.execSQL("CREATE TABLE IF NOT EXISTS study_sessions(id TEXT PRIMARY KEY,started_at INTEGER,scope_id TEXT,all_decks INTEGER,position INTEGER)")
         db.execSQL("CREATE TABLE IF NOT EXISTS study_session_cards(session_id TEXT,position INTEGER,card_id TEXT,PRIMARY KEY(session_id,position))")
         addNodeColumns(db)
@@ -81,7 +83,7 @@ object DbSchema {
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_nodes_parent ON nodes(parent_id)")
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_reviews_card ON reviews(card_id)")
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_reviews_day ON reviews(day)")
-        if (old) { db.beginTransaction(); try { backfill(db); db.version = VERSION; db.setTransactionSuccessful() } finally { db.endTransaction() } }
+        if (old) db.version = VERSION
     }
 
     /** Базы до 0.1.22 без транскрипции и значений: колонки дописываются при открытии, данные не трогаются. */
@@ -97,17 +99,6 @@ object DbSchema {
         if ("grade" !in have) db.execSQL("ALTER TABLE reviews ADD COLUMN grade INTEGER")
     }
 
-    private fun backfill(db: SQLiteDatabase) {
-        val rows = db.rawQuery("SELECT id,card_id,seen_at FROM reviews WHERE day IS NULL ORDER BY id", null).use { c -> buildList { while (c.moveToNext()) add(Triple(c.getLong(0), c.getString(1), c.getLong(2))) } }
-        rows.forEach { (id, _, seen) -> db.execSQL("UPDATE reviews SET day=?,grade=? WHERE id=?", arrayOf(DayMath.dayNumber(seen), Grade.KNOW.ordinal, id)) }
-        if (!db.rawQuery("PRAGMA table_info(reviews)", null).use { c -> generateSequence { if (c.moveToNext()) c.getString(1) else null }.any { it == "ease" } }) return
-        val latest = db.rawQuery("SELECT card_id,interval_days,ease,day,(SELECT COUNT(*) FROM reviews r2 WHERE r2.card_id=r.card_id) FROM reviews r WHERE id IN (SELECT MAX(id) FROM reviews GROUP BY card_id)", null)
-        latest.use { c -> while (c.moveToNext()) {
-            val interval = min(MIGRATED_MAX_INTERVAL, max(1, c.getDouble(1).roundToInt())); val last = c.getLong(3)
-            val s = CardState(interval, c.getDouble(2).coerceIn(1.3, 2.8), min(2, c.getInt(4)), 0, last + interval, last)
-            db.execSQL("INSERT OR IGNORE INTO card_state VALUES(?,?,?,?,?,?,?)", arrayOf(c.getString(0), s.intervalDays, s.ease, s.reps, s.lapses, s.dueDay, s.lastDay))
-        } }
-    }
 }
 
 /** База библиотеки: дерево, расписание и журнал. Не потокобезопасна — все вызовы идут под одним замком модели. */
@@ -168,19 +159,16 @@ class NodeStore(private val db: SQLiteDatabase) {
     fun cardCount(): Int = db.rawQuery("SELECT COUNT(*) FROM nodes WHERE type=2", null).use { it.moveToFirst(); it.getInt(0) }
 }
 
-/** Расписание карточек (`card_state`) и журнал ответов (`reviews`); статистика читает только индексированные поля. */
+/** Transparent action journal; it does not maintain a learning schedule. */
 class ReviewStore(private val db: SQLiteDatabase) {
-    fun states(): Map<String, CardState> = db.rawQuery("SELECT card_id,interval_days,ease,reps,lapses,due_day,last_day FROM card_state", null).use { c ->
-        buildMap { while (c.moveToNext()) put(c.getString(0), CardState(c.getInt(1), c.getDouble(2), c.getInt(3), c.getInt(4), c.getLong(5), c.getLong(6))) }
-    }
+    fun states(): Map<String, CardState> = emptyMap()
 
-    fun save(a: Answer, now: Long, day: Long, s: CardState) {
-        db.beginTransaction()
-        try {
-            db.insertOrThrow("reviews", null, ContentValues().apply { put("card_id", a.cardId); put("seen_at", now); put("day", day); put("grade", a.grade.ordinal); put("face_ms", a.faceMs); put("back_ms", a.backMs) })
-            db.execSQL("INSERT OR REPLACE INTO card_state VALUES(?,?,?,?,?,?,?)", arrayOf(a.cardId, s.intervalDays, s.ease, s.reps, s.lapses, s.dueDay, s.lastDay))
-            db.setTransactionSuccessful()
-        } finally { db.endTransaction() }
+    /** Records a user action only; it never creates or updates a future schedule. */
+    fun record(a: Answer, now: Long, day: Long) {
+        db.insertOrThrow("reviews", null, ContentValues().apply {
+            put("card_id", a.cardId); put("seen_at", now); put("day", day)
+            put("grade", 0); put("face_ms", a.faceMs); put("back_ms", a.backMs)
+        })
     }
 
     fun perDay(fromDay: Long): Map<Long, DayAgg> = db.rawQuery("SELECT day,COUNT(*),SUM(face_ms),SUM(grade>0) FROM reviews WHERE day>=? GROUP BY day", arrayOf(fromDay.toString())).use { c ->
@@ -191,7 +179,7 @@ class ReviewStore(private val db: SQLiteDatabase) {
 
     fun lastDay(): Long = db.rawQuery("SELECT COALESCE(MAX(day),0) FROM reviews", null).use { it.moveToFirst(); it.getLong(0) }
 
-    fun forget(cardIds: List<String>) = cardIds.forEach { db.delete("card_state", "card_id=?", arrayOf(it)); db.delete("reviews", "card_id=?", arrayOf(it)) }
+    fun forget(cardIds: List<String>) = cardIds.forEach { db.delete("reviews", "card_id=?", arrayOf(it)) }
 }
 
 /** Учебные сессии в базе: состав и порядок карточек фиксируются при старте и не меняются до конца сессии. */

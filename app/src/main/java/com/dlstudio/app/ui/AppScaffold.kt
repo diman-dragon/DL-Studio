@@ -41,7 +41,7 @@ fun AppScaffold(state: AppState, vm: AppViewModel, onFolder: () -> Unit, study: 
     }
     val openOverdue: () -> Unit = {
         val current = library.state.value
-        val cards = StudyScope.cards(current.items, null, null).filter { current.states[it.id]?.dueDay ?: Long.MAX_VALUE < current.today }
+        val cards = StudyScope.cards(current.items, null, null)
         study.begin(cards)?.let { library.startSession(it.id, it.queue.map(LibNode::id)); scope.launch { pager.animateScrollToPage(0) } }
         Unit
     }

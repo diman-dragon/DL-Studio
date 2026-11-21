@@ -3,6 +3,7 @@ package com.dlstudio.app.library
 import com.dlstudio.app.study.CardState
 import com.dlstudio.app.study.SavedSession
 import com.dlstudio.app.study.StudyStats
+import com.dlstudio.app.learning.MotivationTotals
 
 /**
  * Состояние библиотеки: дерево, открытый узел (путь из id), вид, загрузка, расписание карточек и статистика.
@@ -19,4 +20,5 @@ data class LibraryState(
     val today: Long = 0,
     val report: ImportReport? = null,
     val resume: SavedSession? = null
+    val motivation: MotivationTotals = MotivationTotals()
 )

@@ -5,12 +5,12 @@ import com.dlstudio.app.library.LibNode
 /** Один ответ пользователя: что записать в журнал и как пересчитать расписание. */
 data class Answer(val cardId: String, val grade: Grade, val faceMs: Long, val backMs: Long)
 
-/** Сводка по набору карточек: новые, к повтору (включая просроченные) и просроченные — одинаково везде. */
+/** Simple content counts; progress is based on recorded actions only. */
 data class CardCounts(val total: Int, val fresh: Int, val due: Int, val overdue: Int) {
     companion object {
         fun of(cards: List<LibNode>, states: Map<String, CardState>, today: Long): CardCounts {
             val known = cards.mapNotNull { states[it.id] }
-            return CardCounts(cards.size, cards.size - known.size, known.count { it.dueDay <= today }, known.count { it.dueDay < today })
+            return CardCounts(cards.size, cards.size - known.size, 0, 0)
         }
     }
 }
@@ -60,20 +60,10 @@ data class CardPlan(val mode: CardMode, val target: String, val correct: String,
     }
 }
 
-/**
- * Расписание одной карточки. Все даты — номера локальных дней (см. `DayMath`), поэтому
- * «к повтору» и «просрочено» считаются от начала дня, а не от текущей минуты.
- */
-data class CardState(
-    val intervalDays: Int,
-    val ease: Double,
-    val reps: Int,
-    val lapses: Int,
-    val dueDay: Long,
-    val lastDay: Long
-)
+/** Compatibility container for the UI; only the last recorded action is retained. */
+data class CardState(val lastActivityDay: Long = 0)
 
-/** Оценка ответа после переворота карточки; `quality` — шкала SM-2 (0–5). */
+/** UI action marker, not a knowledge assessment. */
 enum class Grade(val quality: Int) { AGAIN(1), HARD(3), KNOW(5) }
 
 /** Какую похвалу показать на экране статистики. */

@@ -46,11 +46,5 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
-        <receiver android:name=".study.StudyReminderReceiver" android:exported="false" />
-        <receiver android:name=".study.StudyBootReceiver" android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
     </application>
 </manifest>

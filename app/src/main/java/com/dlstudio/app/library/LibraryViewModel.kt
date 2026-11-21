@@ -6,11 +6,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dlstudio.app.data.Prefs
 import com.dlstudio.app.data.openParent
+import com.dlstudio.app.learning.LearningCatalog
 import com.dlstudio.app.study.Answer
 import com.dlstudio.app.study.DayMath
-import com.dlstudio.app.study.ReminderSnapshot
-import com.dlstudio.app.study.LauncherIcon
-import com.dlstudio.app.study.Sm2
 import com.dlstudio.app.study.StatsCalc
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -52,9 +50,7 @@ class LibraryViewModel(private val app: Application) : AndroidViewModel(app) {
         val states = db.reviews.states()
         val total = db.nodes.cardCount()
         val stats = StatsCalc.compute(total, states.values, db.reviews.perDay(today - StatsCalc.DAYS + 1), db.reviews.activeDays(today - 365), today)
-        prefs.reminderSnapshot = ReminderSnapshot.of(stats.newCards, db.reviews.lastDay(), states.values).encode()
-        LauncherIcon.sync(app, states.values.any { it.dueDay < today })
-        mutable.update { it.copy(states = states, stats = stats, today = today) }
+        mutable.update { it.copy(states = states, stats = stats, today = today, motivation = LearningCatalog.motivation(emptyList())) }
     }
 
     private fun schedulePush() {
@@ -136,8 +132,7 @@ class LibraryViewModel(private val app: Application) : AndroidViewModel(app) {
             lock.withLock {
                 val db = database ?: return@withLock
                 val now = System.currentTimeMillis(); val day = DayMath.dayNumber(now)
-                val next = Sm2.next(db.reviews.states()[answer.cardId], answer.grade, day)
-                runCatching { db.write { db.reviews.save(answer, now, day, next) } }
+                runCatching { db.write { db.reviews.record(answer, now, day) } }
                 refreshDerived(db)
             }
             schedulePush()

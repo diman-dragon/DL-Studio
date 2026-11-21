@@ -22,7 +22,6 @@ import com.dlstudio.app.settings.ThemeMode
 import com.dlstudio.app.study.SlowSpeech
 import com.dlstudio.app.study.Speaker
 import com.dlstudio.app.study.StudyOptions
-import com.dlstudio.app.study.StudyReminderScheduler
 import com.dlstudio.app.ui.components.VoiceName
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +46,7 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val voiceList = MutableStateFlow<List<Voice>>(emptyList())
     val voices: StateFlow<List<Voice>> = voiceList.asStateFlow()
 
-    init { StudyReminderScheduler.sync(app, prefs); viewModelScope.launch(Dispatchers.IO) { runCatching { ensureLayout(openParent(app, prefs)) } } }
+    init { viewModelScope.launch(Dispatchers.IO) { runCatching { ensureLayout(openParent(app, prefs)) } } }
 
     fun setTheme(theme: ThemeMode) { prefs.theme = theme; mutable.update { it.copy(theme = theme) } }
     fun setLang(lang: AppLang) {
@@ -70,8 +69,8 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
         prefs.speechVoiceName = voice.name; prefs.speechVoiceLabel = label
         mutable.update { it.copy(speechVoiceName = voice.name, speechVoiceLabel = label) }
     }
-    fun setReminders(enabled: Boolean) { prefs.remindersEnabled = enabled; StudyReminderScheduler.sync(app, prefs); mutable.update { it.copy(remindersEnabled = enabled) } }
-    fun setReminderHour(hour: Int) { prefs.reminderHour = hour; prefs.reminderMinute = 0; StudyReminderScheduler.sync(app, prefs); mutable.update { it.copy(reminderHour = hour) } }
+    fun setReminders(enabled: Boolean) { prefs.remindersEnabled = enabled; mutable.update { it.copy(remindersEnabled = enabled) } }
+    fun setReminderHour(hour: Int) { prefs.reminderHour = hour; prefs.reminderMinute = 0; mutable.update { it.copy(reminderHour = hour) } }
 
     fun speak(text: String) { if (text.isNotBlank()) speaker.speak(text, mutable.value.speechVoiceName) }
     fun speakSlow(text: String) { if (text.isNotBlank()) speaker.speak(text, mutable.value.speechVoiceName, mutable.value.study.let { SlowSpeech.Style(it.slowRate / 100f, it.slowPause / 100f) }) }

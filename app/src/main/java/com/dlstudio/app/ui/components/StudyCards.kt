@@ -32,7 +32,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.R
 import com.dlstudio.app.library.LibNode
-import com.dlstudio.app.study.AutoGrade
 import com.dlstudio.app.study.CardMode
 import com.dlstudio.app.study.CardPlan
 import com.dlstudio.app.study.Grade
@@ -131,7 +130,7 @@ fun StudyCardPage(
     var submitted by remember(card.id) { mutableStateOf(false) }
     val flipped = card.id in session.flipped
     val canFlip = !interactive || mode.flip || selected != null || submitted || flipped || (mode.speaks && pronounce.phase.finished)
-    val grade = if (mode.speaks) AutoGrade.ofSpeech(pronounce.phase.verdict, card.id in session.hinted) else null
+    val grade = null
 
     LaunchedEffect(isCurrent, card.id, plan) {
         if (!isCurrent || !interactive) return@LaunchedEffect
