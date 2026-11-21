@@ -1,7 +1,7 @@
 # DL Studio
 
 Курсы по темам: теория, карточки и практика. Работает без интернета, темы можно докачивать.
-Kotlin + Jetpack Compose. Версия — в `version.txt` (сейчас 0.3.0). История изменений — в `CHANGELOG.md`.
+Kotlin + Jetpack Compose. Версия — в `version.txt` (сейчас 0.3.1). История изменений — в `CHANGELOG.md`.
 
 ## Как устроено
 
@@ -40,6 +40,10 @@ Kotlin + Jetpack Compose. Версия — в `version.txt` (сейчас 0.3.0)
 
 - `node scripts/check.mjs` — структура (файл ≤ 350 строк, нет мёртвого кода и неиспользуемых импортов, версия совпадает в `version.txt`, `CHANGELOG.md`, `README.md`).
 - `./gradlew testDebugUnitTest lint assembleRelease` — тесты и сборка (то же делает CI).
+
+## Сборка на GitHub
+
+Workflow лежит в `.github/workflows/build.yml` (копия — `ci/build.yml`). Если папки `.github` в репозитории нет, создайте файл с таким путём вручную: «Add file → Create new file», в имени введите `.github/workflows/build.yml` и вставьте содержимое `ci/build.yml`.
 
 ## Правило версии
 
