@@ -109,13 +109,15 @@ class NodeStore(private val db: SQLiteDatabase) {
 
     private fun android.database.Cursor.text(index: Int) = getString(index) ?: ""
 
-    fun insert(parentId: String?, level: Int, nodes: List<LibNode>) = nodes.forEach { node ->
-        db.insertOrThrow("nodes", null, ContentValues().apply {
-            put("id", node.id); put("parent_id", parentId); put("type", level); put("name", node.name)
-            put("back", node.back); put("hint", node.hint); put("explanation", node.explanation); put("example", node.example)
-            put("ipa", node.ipa); put("meanings", MeaningsJson.encode(node.meanings))
-        })
-        insert(node.id, level + 1, node.children)
+    fun insert(parentId: String?, level: Int, nodes: List<LibNode>) {
+        nodes.forEach { node ->
+            db.insertOrThrow("nodes", null, ContentValues().apply {
+                put("id", node.id); put("parent_id", parentId); put("type", level); put("name", node.name)
+                put("back", node.back); put("hint", node.hint); put("explanation", node.explanation); put("example", node.example)
+                put("ipa", node.ipa); put("meanings", MeaningsJson.encode(node.meanings))
+            })
+            insert(node.id, level + 1, node.children)
+        }
     }
 
     fun update(node: LibNode) {
