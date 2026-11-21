@@ -19,6 +19,6 @@ data class LibraryState(
     val stats: StudyStats = StudyStats(),
     val today: Long = 0,
     val report: ImportReport? = null,
-    val resume: SavedSession? = null
+    val resume: SavedSession? = null,
     val motivation: MotivationTotals = MotivationTotals()
 )

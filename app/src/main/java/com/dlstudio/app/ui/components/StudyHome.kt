@@ -110,7 +110,7 @@ fun StudyDashboard(lib: LibraryState, sessionSize: Int, study: StudyViewModel, o
             StreakCard(lib.stats, lib.today, Modifier.weight(1f))
             YesterdayCard(lib.stats, Modifier.weight(1f))
         }
-        StatsChartCard(s.forecastTitle) { StatsBarChart(forecast, forecast.indices.map { s.weekdays[DayMath.weekday(lib.today + 1 + it)] }) }
+        StatsChartCard(s.forecastTitle) { StatsBarChart(forecast, forecast.indices.map { offset -> s.weekdays[DayMath.weekday(lib.today + 1 + offset)] }) }
     }
 }
 

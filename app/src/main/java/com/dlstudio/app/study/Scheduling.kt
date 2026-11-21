@@ -41,6 +41,11 @@ object StatsCalc {
     }
 }
 
+/** Kept as a zero-valued dashboard series; learning has no future schedule. */
+object Forecast {
+    fun next(states: Collection<CardState>, today: Long, days: Int = 7): List<Int> = List(days) { 0 }
+}
+
 object Streak {
     fun count(activeDays: Set<Long>, today: Long): Int { var day = if (today in activeDays) today else today - 1; var result = 0; while (day in activeDays) { result++; day-- }; return result }
     fun longest(activeDays: Set<Long>): Int = activeDays.sorted().fold(0 to 0) { (best, current), day ->
