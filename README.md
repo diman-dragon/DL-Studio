@@ -1,7 +1,7 @@
 # DL Studio
 
 Курсы по темам: теория, карточки и практика. Работает без интернета, темы можно докачивать.
-Kotlin + Jetpack Compose. Версия — в `version.txt` (сейчас 0.4.0). История изменений — в `CHANGELOG.md`.
+Kotlin + Jetpack Compose. Версия — в `version.txt` (сейчас 0.4.1). История изменений — в `CHANGELOG.md`.
 
 ## Как устроено
 

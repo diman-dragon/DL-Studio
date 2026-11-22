@@ -43,10 +43,19 @@ class ContentTest {
     }
 
     @Test fun progressSurvivesRoundTripAndGarbage() {
-        val p = Progress(120, 3, 77, mapOf("a-1" to TopicProgress(true, setOf(0, 2), setOf(1), false)))
+        val p = Progress(120, 3, 77, mapOf("a-1" to TopicProgress(true, setOf(0, 2), setOf(1), false)), bestStreak = 5, history = mapOf(76L to 20, 77L to 35))
         assertEquals(p, ProgressJson.decode(ProgressJson.encode(p)))
         assertEquals(Progress(), ProgressJson.decode("not json"))
         assertEquals(Progress(), ProgressJson.decode(null))
+    }
+
+    /** Старое сохранение (до 0.4.0) без лучшей серии и истории читается: лучшая серия не меньше текущей. */
+    @Test fun legacyProgressWithoutBestStreakIsRead() {
+        val old = """{"xp":120,"streak":3,"day":77,"topics":{"a-1":{"t":true,"k":[0,2],"q":[1],"b":false}}}"""
+        val p = ProgressJson.decode(old)
+        assertEquals(3, p.bestStreak)
+        assertTrue(p.history.isEmpty())
+        assertEquals(TopicProgress(true, setOf(0, 2), setOf(1), false), p.topics["a-1"])
     }
 
     /** Встроенные темы проекта должны читаться, а каталог — совпадать с ними по числу и контрольным суммам. */
