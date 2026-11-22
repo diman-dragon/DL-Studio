@@ -1,6 +1,5 @@
 package com.dlstudio.app.ui.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,24 +26,32 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.R
 import com.dlstudio.app.content.Topic
+import com.dlstudio.app.progress.TopicGraph
 import com.dlstudio.app.progress.TopicProgress
 import com.dlstudio.app.progress.Xp
 import com.dlstudio.app.ui.AppState
 import com.dlstudio.app.ui.components.AppIcon
+import com.dlstudio.app.ui.components.ContinueCard
 import com.dlstudio.app.ui.components.GradientButton
 import com.dlstudio.app.ui.components.Pill
-import com.dlstudio.app.ui.components.Ring
+import com.dlstudio.app.ui.components.TopicGraphView
+import com.dlstudio.app.ui.components.Trail
 import com.dlstudio.app.ui.components.ScreenHeader
 import com.dlstudio.app.ui.theme.LocalStrings
 
-/** Карта: темы выбранного курса по группам (уровням). Группа закрывается «печатью», когда пройдены все её темы. */
+/**
+ * Карта: сверху карточка «Продолжить», ниже для каждой группы (уровня) выбранного курса — тропа из тем
+ * или граф, если у тем есть предпосылки. Группа закрывается «печатью», когда пройдены все её темы.
+ */
 @Composable
 fun MapScreen(state: AppState, onOpen: (String) -> Unit, onSettings: () -> Unit) {
     val s = LocalStrings.current
     val courses = state.topics.map { it.course }.distinct()
     var chosen by rememberSaveable { mutableStateOf("") }
     val course = if (chosen in courses) chosen else courses.firstOrNull().orEmpty()
-    val groups = state.topics.filter { it.course == course }.groupBy { it.group }
+    val inCourse = state.topics.filter { it.course == course }
+    val groups = inCourse.groupBy { it.group }
+    val next = TopicGraph.open(inCourse, state.progress.topics).firstOrNull()
     val today = Xp.dayNumber()
 
     LazyColumn(Modifier.fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -56,6 +63,9 @@ fun MapScreen(state: AppState, onOpen: (String) -> Unit, onSettings: () -> Unit)
                 Pill(s.streakDays(Xp.currentStreak(state.progress, today)))
             }
         }
+        if (next != null) item {
+            ContinueCard(next, Xp.stagesDone(next, state.progress.topics[next.id] ?: TopicProgress())) { onOpen(next.id) }
+        }
         if (courses.size > 1) item {
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(courses) { name -> CourseChip(name, name == course) { chosen = name } }
@@ -64,7 +74,9 @@ fun MapScreen(state: AppState, onOpen: (String) -> Unit, onSettings: () -> Unit)
         if (state.topics.isEmpty()) item { EmptyMap(onSettings) }
         groups.forEach { (group, topics) ->
             item(key = "g$course/$group") { GroupHeader(group.ifBlank { s.noGroup }, topics, state) }
-            items(topics, key = { it.id }) { topic -> TopicCard(topic, state.progress.topics[topic.id] ?: TopicProgress()) { onOpen(topic.id) } }
+            item(key = "t$course/$group") {
+                if (TopicGraph.isGraph(topics)) TopicGraphView(topics, state.progress.topics, onOpen) else Trail(topics, state.progress.topics, onOpen)
+            }
         }
     }
 }
@@ -85,25 +97,6 @@ private fun GroupHeader(group: String, topics: List<Topic>, state: AppState) {
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
             if (done == topics.size) AppIcon(R.drawable.ic_check, MaterialTheme.colorScheme.primary, 20.dp)
             Text(s.groupProgress(done, topics.size), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
-}
-
-@Composable
-private fun TopicCard(topic: Topic, progress: TopicProgress, onClick: () -> Unit) {
-    val s = LocalStrings.current
-    val colors = MaterialTheme.colorScheme
-    val stages = Xp.stagesDone(topic, progress)
-    Surface(Modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick), RoundedCornerShape(24.dp), colors.surfaceVariant, border = BorderStroke(1.dp, colors.outlineVariant)) {
-        Row(Modifier.padding(16.dp), Arrangement.spacedBy(14.dp), Alignment.CenterVertically) {
-            Ring(stages / 3f, 52.dp, 5.dp) {
-                if (stages == 3) AppIcon(R.drawable.ic_check, colors.primary, 26.dp) else Text("$stages/3", style = MaterialTheme.typography.labelLarge)
-            }
-            Column(Modifier.weight(1f), Arrangement.spacedBy(2.dp)) {
-                Text(topic.title, style = MaterialTheme.typography.titleMedium, maxLines = 2)
-                Text(s.cardsCount(topic.cards.size), style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
-            }
-            AppIcon(R.drawable.ic_play, colors.primary, 26.dp)
         }
     }
 }

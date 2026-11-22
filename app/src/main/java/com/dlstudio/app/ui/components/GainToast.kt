@@ -11,6 +11,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.ui.Gain
@@ -19,11 +21,16 @@ import com.dlstudio.app.ui.theme.LocalStrings
 import com.dlstudio.app.ui.theme.gradientColors
 import kotlinx.coroutines.delay
 
-/** Всплывашка «+N XP» (и «Тема пройдена!») на пару секунд после награды. */
+/** Всплывашка «+N XP» (и «Тема пройдена!» с лёгкой вибрацией) на пару секунд после награды. */
 @Composable
 fun GainToast(gain: Gain?, onDone: () -> Unit, modifier: Modifier = Modifier) {
+    val haptic = LocalHapticFeedback.current
     LaunchedEffect(gain?.id) {
-        if (gain != null) { delay(2000); onDone() }
+        if (gain != null) {
+            if (gain.finished) haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            delay(if (gain.finished) 2800 else 1800)
+            onDone()
+        }
     }
     if (gain == null) return
     val s = LocalStrings.current

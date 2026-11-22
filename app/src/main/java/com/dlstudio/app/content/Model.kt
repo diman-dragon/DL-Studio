@@ -15,10 +15,11 @@ data class QuizItem(val question: String, val answer: String, val options: List<
 /**
  * Тема = одна колода: теория, карточки и практика. `course` — название курса, `group` — метка уровня («A1»…),
  * `n` — порядок внутри курса, `tag` — язык озвучки карточек (en-US) или пусто, если озвучивать нечего.
+ * `requires` — `id` тем, которые нужно пройти раньше (у курсов-графов); пусто — тема стоит на тропе без условий.
  */
 data class Topic(
     val id: String, val course: String, val group: String, val n: Int, val title: String, val tag: String,
-    val theory: List<TheoryPage>, val cards: List<Card>, val quiz: List<QuizItem>
+    val theory: List<TheoryPage>, val cards: List<Card>, val quiz: List<QuizItem>, val requires: List<String> = emptyList()
 )
 
 /** Строка каталога: что скачать (`path` относительно папки каталога) и как проверить. */
@@ -40,7 +41,8 @@ object TopicJson {
             id, o.optString("course"), o.optString("group"), o.optInt("n"), o.getString("title"), o.optString("tag"),
             o.optJSONArray("theory").objects().map { TheoryPage(it.optString("h"), it.optJSONArray("p").strings()) }.filter { it.paragraphs.isNotEmpty() },
             o.optJSONArray("cards").objects().map { Card(it.getString("front"), it.getString("back"), it.optString("ipa"), it.optString("example")) },
-            o.optJSONArray("quiz").objects().map { QuizItem(it.getString("q"), it.getString("a"), it.optJSONArray("options").strings()) }.filter { it.answer in it.options }
+            o.optJSONArray("quiz").objects().map { QuizItem(it.getString("q"), it.getString("a"), it.optJSONArray("options").strings()) }.filter { it.answer in it.options },
+            requires = o.optJSONArray("requires").strings().filter { safeId.matches(it) }
         )
         require(topic.theory.isNotEmpty() || topic.cards.isNotEmpty() || topic.quiz.isNotEmpty()) { "empty topic" }
         return topic

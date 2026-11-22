@@ -7,6 +7,7 @@ import com.dlstudio.app.settings.ThemeMode
 object StringsEn : Strings {
     override val tabMap = "Map"; override val tabProgress = "Progress"; override val tabSettings = "Settings"
 
+    override val continueLabel = "Continue"
     override val mapEmptyTitle = "No topics yet"; override val mapEmptyHint = "Download topics in settings or install a topic file."
     override val openSettings = "Open settings"; override val noGroup = "Topics"
     override fun groupProgress(done: Int, total: Int) = "$done of $total ${if (total == 1) "topic" else "topics"}"

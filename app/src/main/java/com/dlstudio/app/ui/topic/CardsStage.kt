@@ -23,6 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontStyle
@@ -70,7 +72,9 @@ private fun FlipCard(card: Card, flipped: Boolean, speak: Speak?, modifier: Modi
     val angle by animateFloatAsState(if (flipped) 180f else 0f, tween(350), label = "flip")
     Box(
         modifier.fillMaxWidth().graphicsLayer { rotationY = angle; cameraDistance = 14f * density }
-            .clip(shape).background(colors.surfaceVariant).border(1.dp, colors.primary.copy(alpha = 0.4f), shape)
+            .shadow(20.dp, shape, ambientColor = colors.primary, spotColor = colors.primary).clip(shape)
+            .background(Brush.linearGradient(listOf(colors.primaryContainer.copy(alpha = 0.55f), colors.surfaceVariant)))
+            .border(1.dp, colors.primary.copy(alpha = 0.4f), shape)
             .clickable(role = Role.Button, onClick = onFlip).padding(24.dp),
         contentAlignment = Alignment.Center
     ) {

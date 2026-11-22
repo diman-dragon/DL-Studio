@@ -7,6 +7,7 @@ import com.dlstudio.app.settings.ThemeMode
 object StringsRu : Strings {
     override val tabMap = "Карта"; override val tabProgress = "Прогресс"; override val tabSettings = "Настройки"
 
+    override val continueLabel = "Продолжить"
     override val mapEmptyTitle = "Пока нет тем"; override val mapEmptyHint = "Скачайте темы в настройках или поставьте файл темы."
     override val openSettings = "Открыть настройки"; override val noGroup = "Темы"
     override fun groupProgress(done: Int, total: Int) = "$done из $total ${ruPlural(total, "темы", "тем", "тем")}"

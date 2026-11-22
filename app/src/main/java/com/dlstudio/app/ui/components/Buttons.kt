@@ -1,10 +1,15 @@
 package com.dlstudio.app.ui.components
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,12 +26,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -43,9 +51,10 @@ import com.dlstudio.app.ui.theme.gradientColors
 /** Главная кнопка действия в цвете выбранного акцента. */
 @Composable
 fun GradientButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val source = remember { MutableInteractionSource() }
     Box(
-        modifier.fillMaxWidth().heightIn(min = 56.dp).clip(RoundedCornerShape(18.dp)).background(Brush.linearGradient(LocalAccent.current.gradientColors()))
-            .clickable(role = Role.Button, onClick = onClick).padding(horizontal = 16.dp, vertical = 12.dp),
+        modifier.fillMaxWidth().heightIn(min = 56.dp).pressScale(source).clip(RoundedCornerShape(18.dp)).background(Brush.linearGradient(LocalAccent.current.gradientColors()))
+            .clickable(source, null, role = Role.Button, onClick = onClick).padding(horizontal = 16.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center
     ) { Text(label, color = Color.White, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center) }
 }
@@ -54,11 +63,20 @@ fun GradientButton(label: String, onClick: () -> Unit, modifier: Modifier = Modi
 @Composable
 fun OutlineButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val color = MaterialTheme.colorScheme.primary
+    val source = remember { MutableInteractionSource() }
     Box(
-        modifier.fillMaxWidth().heightIn(min = 56.dp).clip(RoundedCornerShape(18.dp)).border(1.dp, color.copy(alpha = 0.6f), RoundedCornerShape(18.dp))
-            .clickable(role = Role.Button, onClick = onClick).padding(horizontal = 16.dp, vertical = 12.dp),
+        modifier.fillMaxWidth().heightIn(min = 56.dp).pressScale(source).clip(RoundedCornerShape(18.dp)).border(1.dp, color.copy(alpha = 0.6f), RoundedCornerShape(18.dp))
+            .clickable(source, null, role = Role.Button, onClick = onClick).padding(horizontal = 16.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center
     ) { Text(label, color = color, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center) }
+}
+
+/** Пока кнопка зажата, она плавно уменьшается до 96% и возвращается обратно. */
+@Composable
+private fun Modifier.pressScale(source: MutableInteractionSource): Modifier {
+    val pressed by source.collectIsPressedAsState()
+    val scale by animateFloatAsState(if (pressed) 0.96f else 1f, spring(stiffness = Spring.StiffnessMedium), label = "press")
+    return graphicsLayer { scaleX = scale; scaleY = scale }
 }
 
 /** Кнопка «Назад» со стрелкой возврата. */

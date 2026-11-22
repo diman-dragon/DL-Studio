@@ -8,6 +8,7 @@ import com.dlstudio.app.settings.ThemeMode
 interface Strings {
     val tabMap: String; val tabProgress: String; val tabSettings: String
 
+    val continueLabel: String
     val mapEmptyTitle: String; val mapEmptyHint: String; val openSettings: String; val noGroup: String
     fun groupProgress(done: Int, total: Int): String
     fun cardsCount(n: Int): String
