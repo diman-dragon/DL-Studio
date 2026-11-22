@@ -32,17 +32,14 @@ import kotlinx.coroutines.launch
 /** Состояние приложения: настройки, темы на устройстве, прогресс и загрузка каталога. Тяжёлое (файлы, сеть) — не на главном потоке. */
 class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val prefs = Prefs(app)
-    private val store = TopicStore(app, prefs)
+    private val store = TopicStore(app)
     private val speaker = Speaker(app)
     private val listener = Listener(app)
     private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, prefs.catalogUrl, ProgressJson.decode(prefs.progressJson), prefs.dailyGoal))
     val state: StateFlow<AppState> = mutable.asStateFlow()
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            store.seed()
-            reload()
-        }
+        viewModelScope.launch(Dispatchers.IO) { reload() }
     }
 
     private fun reload() {
@@ -79,7 +76,7 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) {
             var failed = false
             entries.forEach { entry ->
-                if (runCatching { store.install(Remote.download(url, entry)) }.getOrNull() == null) failed = true
+                if (runCatching { store.install(Remote.download(url, entry)) }.getOrNull().isNullOrEmpty()) failed = true
                 mutable.update { it.copy(busy = it.busy - entry.id) }
             }
             val topics = store.installed()
@@ -92,7 +89,7 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
             val bytes = runCatching { app.contentResolver.openInputStream(uri)?.use { it.readBytes() } }.getOrNull()
             val installed = bytes?.let(store::install)
             val topics = store.installed()
-            mutable.update { it.copy(topics = topics, notice = if (installed == null) Notice.FILE_FAILED else Notice.NONE) }
+            mutable.update { it.copy(topics = topics, notice = if (installed.isNullOrEmpty()) Notice.FILE_FAILED else Notice.NONE) }
         }
     }
 

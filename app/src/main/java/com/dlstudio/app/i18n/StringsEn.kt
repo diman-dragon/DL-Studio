@@ -54,7 +54,7 @@ object StringsEn : Strings {
     )
 
     override val continueLabel = "Continue"
-    override val mapEmptyTitle = "No topics yet"; override val mapEmptyHint = "Download topics in settings or install a topic file."
+    override val mapEmptyTitle = "No topics yet"; override val mapEmptyHint = "Download topics in settings or install a file: a topic json or a zip with topics."
     override val openSettings = "Open settings"; override val noGroup = "Topics"
     override fun groupProgress(done: Int, total: Int) = "$done of $total ${if (total == 1) "topic" else "topics"}"
     override fun cardsCount(n: Int) = "$n ${if (n == 1) "card" else "cards"}"
@@ -96,7 +96,7 @@ object StringsEn : Strings {
     override val refreshCatalog = "Refresh catalog"; override val fromFile = "From file"; override val downloadAll = "Download all"; override val download = "Download"
     override val availableTitle = "Available topics"; override val installedTitle = "Installed topics"; override val remove = "Remove"
     override val catalogLoading = "Loading the catalog…"; override val catalogFailed = "Couldn’t get the catalog. Check the address and your connection."
-    override val downloadFailed = "Some topics didn’t download. Try again."; override val fileFailed = "That file doesn’t look like a topic: it needs a json or a zip with a topic."
+    override val downloadFailed = "Some topics didn’t download. Try again."; override val fileFailed = "That file doesn’t look like a topic: it needs a topic json or a zip with topics."
     override val nothingNew = "All topics from the catalog are installed."
     override fun removeQuestion(title: String) = "Remove the topic “$title”? Your progress is kept."
     override val cancel = "Cancel"; override val save = "Save"

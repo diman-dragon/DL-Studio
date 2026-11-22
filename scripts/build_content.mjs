@@ -1,11 +1,11 @@
-// Собирает каталог тем: content/topics/*.json → content/course.json (размер и SHA-256 каждой темы).
-// Запуск: `node scripts/build_content.mjs`. Папку content/ кладут на https-хостинг.
+// Собирает каталог тем: <папка>/topics/*.json → <папка>/course.json (размер и SHA-256 каждой темы).
+// Запуск: `node scripts/build_content.mjs <папка>`. Папку кладут на https-хостинг, её адрес вводят в настройках приложения.
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'content');
+const root = process.argv[2];
+if (!root) throw new Error('usage: node scripts/build_content.mjs <папка с topics/>');
 const topics = readdirSync(join(root, 'topics')).filter(f => f.endsWith('.json')).sort().map(file => {
   const bytes = readFileSync(join(root, 'topics', file));
   const t = JSON.parse(bytes.toString('utf8'));

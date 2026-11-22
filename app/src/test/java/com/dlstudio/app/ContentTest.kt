@@ -2,10 +2,13 @@ package com.dlstudio.app
 
 import com.dlstudio.app.content.Remote
 import com.dlstudio.app.content.TopicJson
+import com.dlstudio.app.content.TopicPack
 import com.dlstudio.app.progress.Progress
 import com.dlstudio.app.progress.ProgressJson
 import com.dlstudio.app.progress.TopicProgress
-import java.io.File
+import java.io.ByteArrayOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -58,16 +61,21 @@ class ContentTest {
         assertEquals(TopicProgress(true, setOf(0, 2), setOf(1), false), p.topics["a-1"])
     }
 
-    /** Встроенные темы проекта должны читаться, а каталог — совпадать с ними по числу и контрольным суммам. */
-    @Test fun shippedTopicsAreValid() {
-        val files = File("../content/topics").listFiles { f -> f.extension == "json" }.orEmpty().sortedBy { it.name }
-        assertTrue(files.isNotEmpty())
-        val catalog = TopicJson.parseCatalog(File("../content/course.json").readText()).associateBy { it.id }
-        files.forEach { f ->
-            val t = TopicJson.parse(f.readText())
-            assertEquals(f.nameWithoutExtension, t.id)
-            assertEquals("course.json устарел: запустите scripts/build_content.mjs для ${t.id}", catalog[t.id]?.sha256, Remote.sha256(f.readBytes()))
-        }
-        assertEquals(files.size, catalog.size)
+    private fun zip(vararg entries: Pair<String, String>): ByteArray {
+        val out = ByteArrayOutputStream()
+        ZipOutputStream(out).use { z -> entries.forEach { (name, text) -> z.putNextEntry(ZipEntry(name)); z.write(text.toByteArray()); z.closeEntry() } }
+        return out.toByteArray()
+    }
+
+    @Test fun plainJsonIsOneTopicAndZipIsAPack() {
+        assertEquals(listOf(minimal), TopicPack.texts(minimal.toByteArray()))
+        val pack = zip("topics/a-1.json" to minimal, "topics/a-2.json" to minimal.replace("a-1", "a-2"), "readme.txt" to "не тема", "topics/" to "")
+        assertEquals(listOf("a-1", "a-2"), TopicPack.texts(pack).map { TopicJson.parse(it).id })
+    }
+
+    @Test fun packSkipsOversizedEntriesAndSurvivesGarbage() {
+        val big = "x".repeat(1_100_000)
+        assertEquals(listOf(minimal), TopicPack.texts(zip("big.json" to big, "ok.json" to minimal)))
+        assertTrue(TopicPack.texts("PK\u0003\u0004 это не архив".toByteArray()).isEmpty())
     }
 }

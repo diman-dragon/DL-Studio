@@ -53,8 +53,6 @@ android {
         buildConfig true
     }
     composeOptions { kotlinCompilerExtensionVersion '1.5.8' }   // под Kotlin 1.9.22
-    // Темы курса лежат в content/ (источник правды): попадают в assets как встроенные примеры
-    sourceSets { main { assets.srcDirs += ['../content'] } }
     packaging { resources { excludes += '/META-INF/{AL2.0,LGPL2.1}' } }
 }
 

@@ -34,11 +34,6 @@ class Prefs(context: Context) {
         get() = sp.getString("catalogUrl", "").orEmpty()
         set(value) = sp.putPref("catalogUrl", value.trim())
 
-    /** Встроенные темы уже скопированы при первом запуске (удалённые не возвращаются). */
-    var seeded: Boolean
-        get() = sp.getBoolean("seeded", false)
-        set(value) { sp.edit().putBoolean("seeded", value).apply() }
-
     var progressJson: String?
         get() = sp.getString("progress", null)
         set(value) = sp.putPref("progress", value)

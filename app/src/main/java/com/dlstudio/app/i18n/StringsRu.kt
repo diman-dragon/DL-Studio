@@ -54,7 +54,7 @@ object StringsRu : Strings {
     )
 
     override val continueLabel = "Продолжить"
-    override val mapEmptyTitle = "Пока нет тем"; override val mapEmptyHint = "Скачайте темы в настройках или поставьте файл темы."
+    override val mapEmptyTitle = "Пока нет тем"; override val mapEmptyHint = "Скачайте темы в настройках или поставьте файл: json темы или zip с темами."
     override val openSettings = "Открыть настройки"; override val noGroup = "Темы"
     override fun groupProgress(done: Int, total: Int) = "$done из $total ${ruPlural(total, "темы", "тем", "тем")}"
     override fun cardsCount(n: Int) = "$n ${ruPlural(n, "карточка", "карточки", "карточек")}"
@@ -96,7 +96,7 @@ object StringsRu : Strings {
     override val refreshCatalog = "Обновить каталог"; override val fromFile = "Из файла"; override val downloadAll = "Скачать все"; override val download = "Скачать"
     override val availableTitle = "Доступные темы"; override val installedTitle = "Установленные темы"; override val remove = "Удалить"
     override val catalogLoading = "Загружаем каталог…"; override val catalogFailed = "Не удалось получить каталог. Проверьте адрес и сеть."
-    override val downloadFailed = "Не все темы скачались. Попробуйте ещё раз."; override val fileFailed = "Файл не похож на тему: нужен json или zip с темой."
+    override val downloadFailed = "Не все темы скачались. Попробуйте ещё раз."; override val fileFailed = "Файл не похож на тему: нужен json темы или zip с темами."
     override val nothingNew = "Все темы из каталога уже установлены."
     override fun removeQuestion(title: String) = "Удалить тему «$title»? Прогресс сохранится."
     override val cancel = "Отмена"; override val save = "Сохранить"
