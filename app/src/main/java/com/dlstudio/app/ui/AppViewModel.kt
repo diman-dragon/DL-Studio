@@ -16,6 +16,10 @@ import com.dlstudio.app.progress.Xp
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.settings.ThemeMode
+import com.dlstudio.app.speech.Listener
+import com.dlstudio.app.speech.Phase
+import com.dlstudio.app.speech.Pronounce
+import com.dlstudio.app.speech.Pronunciation
 import com.dlstudio.app.speech.Speaker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +33,7 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val prefs = Prefs(app)
     private val store = TopicStore(app, prefs)
     private val speaker = Speaker(app)
+    private val listener = Listener(app)
     private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, prefs.catalogUrl, ProgressJson.decode(prefs.progressJson)))
     val state: StateFlow<AppState> = mutable.asStateFlow()
 
@@ -104,15 +109,34 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     fun finishTheory(topic: Topic) = reward(Xp.theory(mutable.value.progress, topic, Xp.dayNumber()))
     fun seeCard(topic: Topic, index: Int) = reward(Xp.card(mutable.value.progress, topic, index, Xp.dayNumber()))
     fun answer(topic: Topic, index: Int, correct: Boolean) = reward(Xp.answer(mutable.value.progress, topic, index, correct, Xp.dayNumber()))
-    /** Полный сброс прогресса (XP, серия, этапы тем). Установленные темы и настройки остаются. */
+    /** Сброс прогресса: этапы тем и серия обнуляются, XP (и уровень) сохраняются. Установленные темы и настройки остаются. */
     fun resetProgress() {
-        prefs.progressJson = null
-        mutable.update { it.copy(progress = Progress(), gain = null) }
+        val kept = Progress(xp = mutable.value.progress.xp)
+        prefs.progressJson = ProgressJson.encode(kept)
+        mutable.update { it.copy(progress = kept, gain = null) }
     }
 
     fun clearGain() = mutable.update { it.copy(gain = null) }
 
     fun speak(text: String, tag: String) = speaker.speak(text, tag)
 
-    override fun onCleared() { speaker.shutdown() }
+    /** Слушает, как пользователь произносит `text`, и оценивает похожесть (см. Pronunciation). */
+    fun listen(text: String, tag: String) {
+        speaker.stop()
+        mutable.update { it.copy(pronounce = Pronounce(text, Phase.LISTENING)) }
+        listener.start(
+            tag,
+            { heard -> mutable.update { it.copy(pronounce = Pronounce(text, Phase.DONE, heard.first(), Pronunciation.score(text, heard))) } },
+            { phase -> mutable.update { it.copy(pronounce = Pronounce(text, phase)) } }
+        )
+    }
+
+    fun stopListening() {
+        listener.stop()
+        if (mutable.value.pronounce.phase == Phase.LISTENING) mutable.update { it.copy(pronounce = Pronounce()) }
+    }
+
+    fun micDenied(text: String) = mutable.update { it.copy(pronounce = Pronounce(text, Phase.NO_PERMISSION)) }
+
+    override fun onCleared() { speaker.shutdown(); listener.stop() }
 }

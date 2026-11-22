@@ -50,8 +50,11 @@ import com.dlstudio.app.ui.theme.LocalAccent
 import com.dlstudio.app.ui.theme.gradientColors
 
 /** Высота одной строки тропы и графа; ширина подписи узла по умолчанию. */
-internal val ROW = 132.dp
+internal val ROW = 176.dp
 internal val LABEL = 148.dp
+
+/** Подпись узла занимает ровно две строки, чтобы линия всегда начиналась под ней. */
+private val LABEL_HEIGHT = 40.dp
 
 /**
  * Тропа группы: тема за темой по извилистой линии. Пройденный участок залит цветом акцента, дальше — пунктир.
@@ -77,8 +80,14 @@ fun Trail(topics: List<Topic>, progress: Map<String, TopicProgress>, onOpen: (St
     }
 }
 
-/** Линия между двумя узлами: пройденная — сплошная в цвете акцента, остальная — пунктир. */
-internal fun DrawScope.drawEdge(from: Offset, to: Offset, walked: Boolean, accent: Color, track: Color) {
+/** Где линия выходит из узла (ниже его подписи) и где входит в следующий (над кружком с запасом на свечение): расстояние от центра. */
+private val EDGE_OUT = 90.dp
+private val EDGE_IN = 56.dp
+
+/** Линия от узла к узлу, центры — `from` и `to`: начинается под подписью и кончается перед кружком, не заходя на них. Пройденная — сплошная, остальная — пунктир. */
+internal fun DrawScope.drawEdge(centerFrom: Offset, centerTo: Offset, walked: Boolean, accent: Color, track: Color) {
+    val from = Offset(centerFrom.x, centerFrom.y + EDGE_OUT.toPx())
+    val to = Offset(centerTo.x, centerTo.y - EDGE_IN.toPx())
     val mid = (from.y + to.y) / 2
     val path = Path().apply { moveTo(from.x, from.y); cubicTo(from.x, mid, to.x, mid, to.x, to.y) }
     val style = Stroke(
@@ -96,7 +105,7 @@ internal fun Stop(topic: Topic, number: Int, stages: Int, here: Boolean, dim: Bo
     Column(Modifier.width(width).offset(x - width / 2, y - 38.dp).alpha(if (dim) 0.72f else 1f), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.size(76.dp), Alignment.Center) { Node(number, stages, here) { onOpen(topic.id) } }
         Text(
-            topic.title, Modifier.padding(top = 6.dp), if (here) accent else colors.onBackground,
+            topic.title, Modifier.padding(top = 6.dp).height(LABEL_HEIGHT), if (here) accent else colors.onBackground,
             fontWeight = if (here) FontWeight.Bold else FontWeight.Normal, style = MaterialTheme.typography.labelLarge, textAlign = TextAlign.Center, maxLines = 2
         )
     }

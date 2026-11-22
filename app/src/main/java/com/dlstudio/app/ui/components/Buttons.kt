@@ -1,9 +1,14 @@
 package com.dlstudio.app.ui.components
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,9 +36,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
@@ -93,40 +98,29 @@ fun BackButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     }
 }
 
-/** Кнопка действия с иконкой в скруглённом контейнере. */
-@Composable
-fun ActionIconButton(
-    @DrawableRes icon: Int,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: Dp = 48.dp,
-    iconSize: Dp = 24.dp,
-    shape: Shape = RoundedCornerShape(13.dp),
-    containerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
-    iconTint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-    contentDescription: String? = null
-) {
-    Box(
-        modifier = modifier.size(size).clip(shape).background(containerColor).clickable(role = Role.Button, onClick = onClick)
-            .then(if (contentDescription != null) Modifier.semantics { this.contentDescription = contentDescription } else Modifier),
-        contentAlignment = Alignment.Center
-    ) { AppIcon(icon, iconTint, iconSize) }
-}
-
 /** Иконка (Material Design Icons) нужного размера и цвета. */
 @Composable
 fun AppIcon(@DrawableRes res: Int, tint: Color, size: Dp = 24.dp) {
     Icon(painterResource(res), contentDescription = null, modifier = Modifier.size(size), tint = tint)
 }
 
-/** Кнопка озвучки рядом с текстом на изучаемом языке. */
+/** Яркая круглая кнопка с иконкой: цветной градиент, свечение, при `pulse` мягко «дышит» (например, пока идёт запись). */
+@Composable
+fun GlowButton(@DrawableRes icon: Int, colors: List<Color>, onClick: () -> Unit, contentDescription: String, modifier: Modifier = Modifier, pulse: Boolean = false) {
+    val beat = if (pulse) rememberInfiniteTransition(label = "pulse").animateFloat(1f, 1.16f, infiniteRepeatable(tween(600), RepeatMode.Reverse), label = "beat") else null
+    Box(
+        modifier.size(54.dp).graphicsLayer { val k = beat?.value ?: 1f; scaleX = k; scaleY = k }
+            .shadow(14.dp, CircleShape, ambientColor = colors.last(), spotColor = colors.last()).clip(CircleShape)
+            .background(Brush.linearGradient(colors)).clickable(role = Role.Button, onClick = onClick)
+            .semantics { this.contentDescription = contentDescription },
+        contentAlignment = Alignment.Center
+    ) { AppIcon(icon, Color.White, 28.dp) }
+}
+
+/** Кнопка озвучки рядом с текстом на изучаемом языке: цвет акцента. */
 @Composable
 fun SmallSpeaker(text: String, onSpeak: Speak, modifier: Modifier = Modifier) {
-    val c = MaterialTheme.colorScheme
-    ActionIconButton(
-        R.drawable.ic_volume, { onSpeak(text) }, modifier, size = 44.dp, iconSize = 26.dp, shape = CircleShape,
-        containerColor = c.primaryContainer, iconTint = c.primary, contentDescription = LocalStrings.current.speak
-    )
+    GlowButton(R.drawable.ic_volume, LocalAccent.current.gradientColors(), { onSpeak(text) }, LocalStrings.current.speak, modifier)
 }
 
 /** Варианты ответа сеткой 2×N: выбранный верный — акцентом, выбранный неверный — красным, верный после ответа подсвечивается. */

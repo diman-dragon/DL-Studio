@@ -24,6 +24,7 @@ import com.dlstudio.app.R
 import com.dlstudio.app.content.Topic
 import com.dlstudio.app.progress.TopicProgress
 import com.dlstudio.app.progress.Xp
+import com.dlstudio.app.speech.Check
 import com.dlstudio.app.speech.Speak
 import com.dlstudio.app.ui.AppState
 import com.dlstudio.app.ui.AppViewModel
@@ -46,6 +47,7 @@ fun TopicScreen(topic: Topic, state: AppState, vm: AppViewModel, onBack: () -> U
     var picked by rememberSaveable(topic.id) { mutableStateOf(0) }
     val index = picked.coerceIn(0, stages.lastIndex)
     val speak: Speak? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> { text: String -> vm.speak(text, tag) } }
+    val check: Check? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> Check(state.pronounce, { vm.listen(it, tag) }, vm::stopListening, vm::micDenied) }
 
     Column(Modifier.fillMaxSize().padding(top = 12.dp)) {
         Row(Modifier.padding(horizontal = 16.dp), Arrangement.spacedBy(12.dp), Alignment.CenterVertically) {
@@ -66,7 +68,7 @@ fun TopicScreen(topic: Topic, state: AppState, vm: AppViewModel, onBack: () -> U
         val content = Modifier.weight(1f)
         when (stages[index]) {
             Stage.THEORY -> TheoryStage(topic.theory, { vm.finishTheory(topic); if (index < stages.lastIndex) picked = index + 1 }, content)
-            Stage.CARDS -> CardsStage(topic.cards, progress.seen, speak, { vm.seeCard(topic, it) }, content)
+            Stage.CARDS -> CardsStage(topic.cards, progress.seen, speak, check, { vm.seeCard(topic, it) }, content)
             Stage.QUIZ -> QuizStage(topic.quiz, Xp.quizDone(topic, progress), { i, ok -> vm.answer(topic, i, ok) }, content)
         }
     }

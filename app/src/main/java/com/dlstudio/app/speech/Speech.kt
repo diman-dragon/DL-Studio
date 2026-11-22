@@ -30,5 +30,8 @@ class Speaker(private val context: Context) {
         if (ready) run() else queued = run
     }
 
+    /** Прервать озвучку (перед записью микрофона, чтобы динамик не попал в запись). */
+    fun stop() { tts?.stop() }
+
     fun shutdown() { tts?.stop(); tts?.shutdown(); tts = null; ready = false }
 }

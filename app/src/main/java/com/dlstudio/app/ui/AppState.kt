@@ -6,6 +6,7 @@ import com.dlstudio.app.progress.Progress
 import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.settings.ThemeMode
+import com.dlstudio.app.speech.Pronounce
 
 /** Сообщение под разделом «Темы» после действия с файлом или загрузкой. */
 enum class Notice { NONE, DOWNLOAD_FAILED, FILE_FAILED }
@@ -26,5 +27,6 @@ data class AppState(
     val catalogFailed: Boolean = false,
     val busy: Set<String> = emptySet(),
     val notice: Notice = Notice.NONE,
-    val gain: Gain? = null
+    val gain: Gain? = null,
+    val pronounce: Pronounce = Pronounce()
 )

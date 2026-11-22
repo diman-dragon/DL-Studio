@@ -20,6 +20,11 @@ interface Strings {
     val stageTheory: String; val stageCards: String; val stagePractice: String
     val previous: String; val next: String; val finish: String; val speak: String
     val tapToFlip: String
+    val checkPronunciation: String; val pronListening: String; val pronNoSpeech: String; val pronNoPermission: String; val pronFailed: String
+    fun pronGreat(score: Int): String
+    fun pronGood(score: Int): String
+    fun pronRetry(score: Int): String
+    fun pronHeard(heard: String): String
     fun cardCounter(index: Int, total: Int, seen: Int): String
     val correct: String
     fun wrongAnswer(answer: String): String
