@@ -16,6 +16,17 @@ object StringsEn : Strings {
         Mood.KEEP_STREAK -> "Streak: ${streakDays(streak)}. One session today keeps it going."
         Mood.COMEBACK -> "Welcome back! Start with a single card — the rest will follow."
     }
+    override val goalTitle = "Daily goal"; override val goalDone = "Daily goal reached!"
+    override fun goalProgress(done: Int, goal: Int) = "$done of $goal XP"
+    override val sectionLearning = "Learning"; override val settingGoal = "Daily goal"; override fun goalValue(xp: Int) = "$xp XP a day"
+    override val weekTitle = "This week"; override fun weekTotal(xp: Int) = "$xp XP this week"
+    override val weekdays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    override val ranks = listOf("Newcomer", "Learner", "Practitioner", "Connoisseur", "Master", "Expert", "Mentor", "Guru", "Legend", "Champion")
+    override val badgesTitle = "Badges"; override fun badgesCount(have: Int, total: Int) = "$have of $total"
+    override val badgeNames = listOf("First steps", "First topic", "Three in a row", "Card collector", "Hundred points", "Sharp eye", "Week of fire", "Five topics", "Half a thousand", "A month without gaps")
+    override val badgeHints = listOf("Earn 10 XP", "Finish a whole topic", "Study 3 days in a row", "Flip 25 cards", "Earn 100 XP", "Answer 20 questions correctly", "Study 7 days in a row", "Finish 5 topics", "Earn 500 XP", "Study 30 days in a row")
+    override fun nextBadge(name: String, have: Int, target: Int) = "Next badge — “$name”: $have of $target"
+    override val statTopics = "Topics done"; override val statCards = "Cards"; override val statAnswers = "Correct answers"; override val quoteMore = "Tap to change"
     override val quoteTitle = "Thought of the day"
     override val quotes = listOf(
         "A small step every day beats a big push once a month.",

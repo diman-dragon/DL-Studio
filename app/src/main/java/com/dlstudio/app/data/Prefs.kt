@@ -24,6 +24,11 @@ class Prefs(context: Context) {
         get() = AccentColor(sp.getFloat("accentHue", AccentColor.DEFAULT.hue))
         set(value) { sp.edit().putFloat("accentHue", value.hue).apply() }
 
+    /** Цель дня в XP. */
+    var dailyGoal: Int
+        get() = sp.getInt("dailyGoal", DEFAULT_GOAL)
+        set(value) { sp.edit().putInt("dailyGoal", value).apply() }
+
     /** Адрес папки с course.json; пусто — каталог не задан. */
     var catalogUrl: String
         get() = sp.getString("catalogUrl", "").orEmpty()
@@ -38,6 +43,9 @@ class Prefs(context: Context) {
         get() = sp.getString("progress", null)
         set(value) = sp.putPref("progress", value)
 }
+
+/** Цель дня по умолчанию, XP. */
+const val DEFAULT_GOAL = 30
 
 /** Значение перечисления из настроек; нет или повреждено — default. */
 inline fun <reified T : Enum<T>> SharedPreferences.getEnum(key: String, default: T): T {

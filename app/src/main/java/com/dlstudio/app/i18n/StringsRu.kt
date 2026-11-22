@@ -16,6 +16,17 @@ object StringsRu : Strings {
         Mood.KEEP_STREAK -> "Серия: ${streakDays(streak)}. Одно занятие сегодня — и она продолжится."
         Mood.COMEBACK -> "С возвращением! Начните с одной карточки — остальное пойдёт само."
     }
+    override val goalTitle = "Цель дня"; override val goalDone = "Цель дня выполнена!"
+    override fun goalProgress(done: Int, goal: Int) = "$done из $goal XP"
+    override val sectionLearning = "Обучение"; override val settingGoal = "Цель дня"; override fun goalValue(xp: Int) = "$xp XP в день"
+    override val weekTitle = "Неделя"; override fun weekTotal(xp: Int) = "$xp XP за неделю"
+    override val weekdays = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс")
+    override val ranks = listOf("Новичок", "Ученик", "Практик", "Знаток", "Мастер", "Эксперт", "Наставник", "Гуру", "Легенда", "Чемпион")
+    override val badgesTitle = "Награды"; override fun badgesCount(have: Int, total: Int) = "$have из $total"
+    override val badgeNames = listOf("Первые шаги", "Первая тема", "Три дня подряд", "Коллекционер", "Сто очков", "Меткий глаз", "Неделя огня", "Пять тем", "Полтысячи", "Месяц без пропусков")
+    override val badgeHints = listOf("Наберите 10 XP", "Пройдите тему целиком", "Занимайтесь 3 дня подряд", "Переверните 25 карточек", "Наберите 100 XP", "Ответьте верно на 20 вопросов", "Занимайтесь 7 дней подряд", "Пройдите 5 тем", "Наберите 500 XP", "Занимайтесь 30 дней подряд")
+    override fun nextBadge(name: String, have: Int, target: Int) = "Следующая награда — «$name»: $have из $target"
+    override val statTopics = "Тем пройдено"; override val statCards = "Карточек"; override val statAnswers = "Верных ответов"; override val quoteMore = "Нажмите, чтобы сменить"
     override val quoteTitle = "Мысль дня"
     override val quotes = listOf(
         "Маленький шаг каждый день сильнее большого рывка раз в месяц.",

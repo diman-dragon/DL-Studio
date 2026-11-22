@@ -10,6 +10,13 @@ interface Strings {
 
     fun greeting(part: DayPart): String
     fun moodText(mood: Mood, streak: Int): String
+    val goalTitle: String; val goalDone: String; fun goalProgress(done: Int, goal: Int): String
+    val sectionLearning: String; val settingGoal: String; fun goalValue(xp: Int): String
+    val weekTitle: String; fun weekTotal(xp: Int): String; val weekdays: List<String>
+    val ranks: List<String>
+    val badgesTitle: String; fun badgesCount(have: Int, total: Int): String; val badgeNames: List<String>; val badgeHints: List<String>
+    fun nextBadge(name: String, have: Int, target: Int): String
+    val statTopics: String; val statCards: String; val statAnswers: String; val quoteMore: String
     val quoteTitle: String; val quotes: List<String>; val tipTitle: String; val tips: List<String>
 
     val continueLabel: String

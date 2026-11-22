@@ -25,7 +25,10 @@ import com.dlstudio.app.ui.components.SettingsSection
 import com.dlstudio.app.ui.components.ThemesSection
 import com.dlstudio.app.ui.theme.LocalStrings
 
-/** Настройки: внешний вид (тема, язык, цвет по радуге), темы курсов (каталог, файл, удаление), сброс прогресса и «О нас». */
+/** Варианты цели дня, XP. */
+private val GOALS = listOf(10, 20, 30, 50, 100)
+
+/** Настройки: внешний вид (тема, язык, цвет по радуге), цель дня, темы курсов (каталог, файл, удаление), сброс прогресса и «О нас». */
 @Composable
 fun SettingsScreen(state: AppState, vm: AppViewModel) {
     val s = LocalStrings.current
@@ -38,6 +41,9 @@ fun SettingsScreen(state: AppState, vm: AppViewModel) {
                 CycleTile(s.settingLanguage, AppLang.values().map { it.label to it }, state.lang, vm::setLang, Modifier.weight(1f))
             }
             AccentTile(s.settingAccent, state.accent, vm::setAccent)
+        }
+        SettingsSection(s.sectionLearning) {
+            CycleTile(s.settingGoal, GOALS.map { s.goalValue(it) to it }, state.dailyGoal, vm::setDailyGoal)
         }
         ThemesSection(state, vm) { picker.launch(arrayOf("*/*")) }
         ResetSection(vm::resetProgress)

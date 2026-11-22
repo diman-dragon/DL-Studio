@@ -85,6 +85,6 @@ fun AppScaffold(state: AppState, vm: AppViewModel) {
             }
         }
         GainToast(state.gain, vm::clearGain, Modifier.align(Alignment.TopCenter).padding(top = 12.dp))
-        state.gain?.takeIf { it.finished }?.let { Confetti(it.id) }
+        state.gain?.takeIf { it.finished || it.goal }?.let { Confetti(it.id) }
     }
 }

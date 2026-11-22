@@ -21,21 +21,25 @@ import com.dlstudio.app.ui.theme.LocalStrings
 import com.dlstudio.app.ui.theme.gradientColors
 import kotlinx.coroutines.delay
 
-/** Всплывашка «+N XP» (и «Тема пройдена!» с лёгкой вибрацией) на пару секунд после награды. */
+/** Всплывашка «+N XP» (и «Тема пройдена!» или «Цель дня выполнена!» с лёгкой вибрацией) на пару секунд после награды. */
 @Composable
 fun GainToast(gain: Gain?, onDone: () -> Unit, modifier: Modifier = Modifier) {
     val haptic = LocalHapticFeedback.current
     LaunchedEffect(gain?.id) {
         if (gain != null) {
-            if (gain.finished) haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-            delay(if (gain.finished) 2800 else 1800)
+            if (gain.finished || gain.goal) haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            delay(if (gain.finished || gain.goal) 2800 else 1800)
             onDone()
         }
     }
     if (gain == null) return
     val s = LocalStrings.current
     val shape = RoundedCornerShape(22.dp)
-    val text = if (gain.finished) "${s.topicDone}  +${gain.xp} XP" else "+${gain.xp} XP"
+    val text = when {
+        gain.finished -> "${s.topicDone}  +${gain.xp} XP"
+        gain.goal -> "${s.goalDone}  +${gain.xp} XP"
+        else -> "+${gain.xp} XP"
+    }
     Text(
         text, modifier.shadow(10.dp, shape).clip(shape).background(Brush.linearGradient(LocalAccent.current.gradientColors())).padding(horizontal = 20.dp, vertical = 10.dp),
         Color.White, style = MaterialTheme.typography.titleMedium
