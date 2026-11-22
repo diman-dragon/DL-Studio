@@ -54,7 +54,7 @@ fun CardsStage(cards: List<Card>, seen: Set<Int>, speak: Speak?, check: Check?, 
     val scope = rememberCoroutineScope()
     val flipped = remember { mutableStateMapOf<Int, Boolean>() }
     val at = pager.currentPage
-    LaunchedEffect(at) { check?.cancel() }
+    LaunchedEffect(at) { check?.cancel?.invoke() }
     Column(modifier.fillMaxSize().padding(16.dp), Arrangement.spacedBy(14.dp)) {
         Text(s.cardCounter(at + 1, cards.size, seen.size), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         ProgressBar(seen.size / cards.size.toFloat())
