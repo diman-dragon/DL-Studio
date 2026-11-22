@@ -32,6 +32,7 @@ fun ThemesSection(state: AppState, vm: AppViewModel, onPickFile: () -> Unit) {
     val s = LocalStrings.current
     var editing by remember { mutableStateOf(false) }
     var removing by remember { mutableStateOf<Topic?>(null) }
+    var removingAll by remember { mutableStateOf(false) }
     val installed = state.topics.map { it.id }.toSet()
     val available = state.catalog.filter { it.id !in installed }
 
@@ -59,12 +60,19 @@ fun ThemesSection(state: AppState, vm: AppViewModel, onPickFile: () -> Unit) {
         }
         if (state.topics.isNotEmpty()) {
             Text(s.installedTitle, Modifier.padding(start = 6.dp, top = 4.dp), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+            ActionTile(s.removeAll, { removingAll = true })
             state.topics.forEach { topic ->
                 TopicRow(topic.title, listOf(topic.course, topic.group).filter { it.isNotBlank() }.joinToString(" · "), s.remove, false) { removing = topic }
             }
         }
     }
     if (editing) CatalogDialog(state.catalogUrl, { editing = false }) { vm.setCatalogUrl(it); editing = false }
+    if (removingAll) {
+        DlModal.Shell(onDismiss = { removingAll = false }) {
+            Text(s.removeAllQuestion(state.topics.size), style = MaterialTheme.typography.bodyLarge)
+            DlModal.Actions(s.cancel, s.removeAll, { removingAll = false }, { vm.removeAll(); removingAll = false }, danger = true)
+        }
+    }
     removing?.let { topic ->
         DlModal.Shell(onDismiss = { removing = null }) {
             Text(s.removeQuestion(topic.title), style = MaterialTheme.typography.bodyLarge)

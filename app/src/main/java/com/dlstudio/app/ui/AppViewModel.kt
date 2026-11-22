@@ -100,6 +100,13 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun removeAll() {
+        viewModelScope.launch(Dispatchers.IO) {
+            store.removeAll()
+            reload()
+        }
+    }
+
     private fun reward(r: Reward) {
         if (r.gained == 0) return
         prefs.progressJson = ProgressJson.encode(r.progress)

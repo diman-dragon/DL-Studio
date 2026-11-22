@@ -94,11 +94,12 @@ object StringsEn : Strings {
     override val sectionTopics = "Topics"; override val catalogAddress = "Catalog address"; override val catalogNotSet = "Not set"
     override val catalogHint = "An https folder that contains course.json. Topics download one by one, each checked against its checksum."
     override val refreshCatalog = "Refresh catalog"; override val fromFile = "From file"; override val downloadAll = "Download all"; override val download = "Download"
-    override val availableTitle = "Available topics"; override val installedTitle = "Installed topics"; override val remove = "Remove"
+    override val availableTitle = "Available topics"; override val installedTitle = "Installed topics"; override val remove = "Remove"; override val removeAll = "Remove all topics"
     override val catalogLoading = "Loading the catalog…"; override val catalogFailed = "Couldn’t get the catalog. Check the address and your connection."
     override val downloadFailed = "Some topics didn’t download. Try again."; override val fileFailed = "That file doesn’t look like a topic: it needs a topic json or a zip with topics."
     override val nothingNew = "All topics from the catalog are installed."
     override fun removeQuestion(title: String) = "Remove the topic “$title”? Your progress is kept."
+    override fun removeAllQuestion(count: Int) = "Remove all $count topics? Your progress is kept and you can install them again."
     override val cancel = "Cancel"; override val save = "Save"
 
     override val aboutTitle = "DL Studio"; override val aboutText = "Courses by topic: theory, flashcards and practice. Works offline."

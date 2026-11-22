@@ -20,4 +20,6 @@ class TopicStore(private val context: Context) {
     }
 
     fun remove(id: String) { File(dir, "$id.json").delete() }
+
+    fun removeAll() { dir.listFiles { f -> f.extension == "json" }?.forEach { it.delete() } }
 }

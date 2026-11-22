@@ -51,9 +51,10 @@ interface Strings {
 
     val sectionTopics: String; val catalogAddress: String; val catalogNotSet: String; val catalogHint: String
     val refreshCatalog: String; val fromFile: String; val downloadAll: String; val download: String
-    val availableTitle: String; val installedTitle: String; val remove: String
+    val availableTitle: String; val installedTitle: String; val remove: String; val removeAll: String
     val catalogLoading: String; val catalogFailed: String; val downloadFailed: String; val fileFailed: String; val nothingNew: String
     fun removeQuestion(title: String): String
+    fun removeAllQuestion(count: Int): String
     val cancel: String; val save: String
 
     val aboutTitle: String; val aboutText: String; val aboutCopyright: String
