@@ -1,32 +1,32 @@
 package com.dlstudio.app.settings
 
-/** Акцентный цвет приложения: светлый оттенок, основной и глубокий цвет градиента. */
-enum class AccentColor(val soft: Long, val main: Long, val deep: Long) {
-    VIOLET(0xFFB69CFF, 0xFF8A66FF, 0xFF5B3FD6),
-    BLUE(0xFF8DB4FF, 0xFF4C8DFF, 0xFF2457D6),
-    GREEN(0xFF7BE495, 0xFF3DC768, 0xFF1B8A45),
-    AMBER(0xFFFFC857, 0xFFFFA11A, 0xFFB35400),
-    RED(0xFFFF9A9A, 0xFFFF5252, 0xFFC62828),
-    LAVENDER(0xFFE0C7FF, 0xFFB58BFF, 0xFF7C4DCC),
-    SKY(0xFFB9EAFF, 0xFF55C7F2, 0xFF1687B5),
-    MINT(0xFFB9F2D0, 0xFF63D69A, 0xFF218A5A),
-    PEACH(0xFFFFD1A8, 0xFFFFA15C, 0xFFD45E1D),
-    CRIMSON(0xFFFFB0BC, 0xFFE34B63, 0xFFA51F3A),
-    PLUM(0xFFE0B7FF, 0xFF9D5CDB, 0xFF642698),
-    TURQUOISE(0xFF8CEBE0, 0xFF20C9B5, 0xFF087B71),
-    LIME(0xFFD7F58F, 0xFF9BD331, 0xFF56800D),
-    ORANGE(0xFFFFC080, 0xFFFF853D, 0xFFC94D13),
-    MAGENTA(0xFFFFB5F1, 0xFFE85BD4, 0xFFA62396)
-}
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 
-/** Три набора по пять цветов. При смене набора сохраняется позиция выбранного цвета. */
-enum class AccentPalette(val colors: List<AccentColor>) {
-    CLASSIC(listOf(AccentColor.VIOLET, AccentColor.BLUE, AccentColor.GREEN, AccentColor.AMBER, AccentColor.RED)),
-    SOFT(listOf(AccentColor.LAVENDER, AccentColor.SKY, AccentColor.MINT, AccentColor.PEACH, AccentColor.CRIMSON)),
-    BRIGHT(listOf(AccentColor.PLUM, AccentColor.TURQUOISE, AccentColor.LIME, AccentColor.ORANGE, AccentColor.MAGENTA));
+/**
+ * Акцентный цвет приложения — любой оттенок радуги (`hue` 0..360). Из него считаются три цвета:
+ * светлый (на чёрном фоне), основной и глубокий (концы градиента, акцент на светлой теме).
+ * Основной и глубокий затемняются, пока белый текст на них не станет читаться (жёлтый и салатовый иначе были бы бледными).
+ */
+data class AccentColor(val hue: Float) {
+    val soft: Long get() = argb(0.38f, 1f, 1f)
+    val main: Long get() = argb(0.72f, 0.95f, MAIN_LUMINANCE)
+    val deep: Long get() = argb(0.9f, 0.66f, DEEP_LUMINANCE)
 
-    fun slot(accent: AccentColor): Int = colors.indexOf(accent).coerceAtLeast(0)
-    companion object { fun forAccent(accent: AccentColor): AccentPalette = values().firstOrNull { accent in it.colors } ?: CLASSIC }
+    private fun argb(saturation: Float, value: Float, maxLuminance: Float): Long {
+        var v = value
+        var color = Color.hsv(hue.coerceIn(0f, 360f), saturation, v)
+        while (color.luminance() > maxLuminance && v > 0.2f) { v -= 0.02f; color = Color.hsv(hue.coerceIn(0f, 360f), saturation, v) }
+        return color.toArgb().toLong() and 0xFFFFFFFFL
+    }
+
+    companion object {
+        val DEFAULT = AccentColor(258f)
+        /** Предельная яркость (0..1): контраст белого текста с основным цветом ≥ 3:1, с глубоким ≥ 4.5:1. */
+        const val MAIN_LUMINANCE = 0.30f
+        const val DEEP_LUMINANCE = 0.18f
+    }
 }
 
 /** Язык интерфейса; `label` — название языка на нём самом. */

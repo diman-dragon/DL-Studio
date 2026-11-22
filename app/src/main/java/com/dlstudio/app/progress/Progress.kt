@@ -5,8 +5,8 @@ import java.util.TimeZone
 import org.json.JSONArray
 import org.json.JSONObject
 
-/** Что сделано в теме: прочитана ли теория, какие карточки отмечены «Знаю», какие вопросы практики решены верно, выдан ли бонус за тему. */
-data class TopicProgress(val theory: Boolean = false, val known: Set<Int> = emptySet(), val quizOk: Set<Int> = emptySet(), val bonus: Boolean = false)
+/** Что сделано в теме: прочитана ли теория, какие карточки пользователь перевернул (увидел ответ), какие вопросы практики решены верно, выдан ли бонус за тему. */
+data class TopicProgress(val theory: Boolean = false, val seen: Set<Int> = emptySet(), val quizOk: Set<Int> = emptySet(), val bonus: Boolean = false)
 
 /** Очки опыта, серия дней и прогресс по темам (по `id` темы). */
 data class Progress(val xp: Int = 0, val streak: Int = 0, val lastDay: Long = 0, val topics: Map<String, TopicProgress> = emptyMap())
@@ -35,7 +35,7 @@ object Xp {
     fun currentStreak(p: Progress, today: Long) = if (p.lastDay >= today - 1) p.streak else 0
 
     fun theoryDone(t: Topic, p: TopicProgress) = t.theory.isEmpty() || p.theory
-    fun cardsDone(t: Topic, p: TopicProgress) = t.cards.isEmpty() || p.known.size >= t.cards.size
+    fun cardsDone(t: Topic, p: TopicProgress) = t.cards.isEmpty() || p.seen.size >= t.cards.size
     fun quizDone(t: Topic, p: TopicProgress) = t.quiz.isEmpty() || p.quizOk.size >= passMark(t.quiz.size)
     fun complete(t: Topic, p: TopicProgress) = theoryDone(t, p) && cardsDone(t, p) && quizDone(t, p)
 
@@ -43,7 +43,7 @@ object Xp {
     fun stagesDone(t: Topic, p: TopicProgress) = listOf(theoryDone(t, p), cardsDone(t, p), quizDone(t, p)).count { it }
 
     fun theory(p: Progress, t: Topic, today: Long) = award(p, t, today, THEORY) { it.copy(theory = true) }
-    fun card(p: Progress, t: Topic, index: Int, today: Long) = award(p, t, today, CARD) { it.copy(known = it.known + index) }
+    fun card(p: Progress, t: Topic, index: Int, today: Long) = award(p, t, today, CARD) { it.copy(seen = it.seen + index) }
     fun answer(p: Progress, t: Topic, index: Int, correct: Boolean, today: Long) =
         award(p, t, today, ANSWER) { if (correct) it.copy(quizOk = it.quizOk + index) else it }
 
@@ -77,7 +77,7 @@ object ProgressJson {
         .put("xp", p.xp).put("streak", p.streak).put("day", p.lastDay)
         .put("topics", JSONObject().also { all ->
             p.topics.forEach { (id, t) ->
-                all.put(id, JSONObject().put("t", t.theory).put("k", JSONArray(t.known.sorted())).put("q", JSONArray(t.quizOk.sorted())).put("b", t.bonus))
+                all.put(id, JSONObject().put("t", t.theory).put("k", JSONArray(t.seen.sorted())).put("q", JSONArray(t.quizOk.sorted())).put("b", t.bonus))
             }
         }).toString()
 

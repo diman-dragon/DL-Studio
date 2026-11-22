@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -33,31 +32,26 @@ import androidx.compose.ui.unit.dp
 import com.dlstudio.app.content.Card
 import com.dlstudio.app.speech.Speak
 import com.dlstudio.app.ui.components.GradientButton
-import com.dlstudio.app.ui.components.OutlineButton
 import com.dlstudio.app.ui.components.ProgressBar
 import com.dlstudio.app.ui.components.SmallSpeaker
 import com.dlstudio.app.ui.theme.LocalStrings
 
 /**
- * Карточки по порядку: тап переворачивает, «Знаю» отмечает карточку и даёт XP (один раз), «Ещё раз» просто идёт дальше.
- * Колода идёт по кругу, пока не отмечены все карточки; никакого расписания повторений нет.
+ * Карточки по порядку: тап переворачивает; увидел ответ — карточка засчитана и даёт XP (один раз). Никаких «знаю / не знаю»:
+ * учитывается только то, что пользователь сделал. Колода идёт по кругу, пока не просмотрены все карточки; расписания повторений нет.
  */
 @Composable
-fun CardsStage(cards: List<Card>, known: Set<Int>, speak: Speak?, onKnow: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun CardsStage(cards: List<Card>, seen: Set<Int>, speak: Speak?, onSeen: (Int) -> Unit, modifier: Modifier = Modifier) {
     val s = LocalStrings.current
     var index by rememberSaveable { mutableStateOf(0) }
     var flipped by rememberSaveable(index) { mutableStateOf(false) }
     val at = index.coerceIn(0, cards.lastIndex)
-    val next = { index = (at + 1) % cards.size }
     Column(modifier.fillMaxSize().padding(16.dp), Arrangement.spacedBy(14.dp)) {
-        Text(s.cardCounter(at + 1, cards.size, known.size), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        ProgressBar(known.size / cards.size.toFloat())
-        FlipCard(cards[at], flipped, speak, Modifier.weight(1f)) { flipped = !flipped }
+        Text(s.cardCounter(at + 1, cards.size, seen.size), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        ProgressBar(seen.size / cards.size.toFloat())
+        FlipCard(cards[at], flipped, speak, Modifier.weight(1f)) { flipped = !flipped; if (flipped) onSeen(at) }
         if (flipped) {
-            Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(12.dp)) {
-                OutlineButton(s.again, next, Modifier.weight(1f))
-                GradientButton(s.know, { onKnow(at); next() }, Modifier.weight(1f))
-            }
+            GradientButton(s.next, { index = (at + 1) % cards.size })
         } else {
             Text(s.tapToFlip, Modifier.fillMaxWidth().padding(vertical = 18.dp), MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyMedium)
         }

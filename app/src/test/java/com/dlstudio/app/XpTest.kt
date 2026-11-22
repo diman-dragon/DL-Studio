@@ -55,7 +55,7 @@ class XpTest {
     }
 
     @Test fun stagesAreCounted() {
-        val p = TopicProgress(theory = true, known = setOf(0, 1))
+        val p = TopicProgress(theory = true, seen = setOf(0, 1))
         assertEquals(2, Xp.stagesDone(topic, p))
         assertFalse(Xp.complete(topic, p))
     }

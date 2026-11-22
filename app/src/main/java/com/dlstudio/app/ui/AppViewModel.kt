@@ -9,6 +9,7 @@ import com.dlstudio.app.content.Remote
 import com.dlstudio.app.content.Topic
 import com.dlstudio.app.content.TopicStore
 import com.dlstudio.app.data.Prefs
+import com.dlstudio.app.progress.Progress
 import com.dlstudio.app.progress.ProgressJson
 import com.dlstudio.app.progress.Reward
 import com.dlstudio.app.progress.Xp
@@ -101,8 +102,14 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun finishTheory(topic: Topic) = reward(Xp.theory(mutable.value.progress, topic, Xp.dayNumber()))
-    fun knowCard(topic: Topic, index: Int) = reward(Xp.card(mutable.value.progress, topic, index, Xp.dayNumber()))
+    fun seeCard(topic: Topic, index: Int) = reward(Xp.card(mutable.value.progress, topic, index, Xp.dayNumber()))
     fun answer(topic: Topic, index: Int, correct: Boolean) = reward(Xp.answer(mutable.value.progress, topic, index, correct, Xp.dayNumber()))
+    /** Полный сброс прогресса (XP, серия, этапы тем). Установленные темы и настройки остаются. */
+    fun resetProgress() {
+        prefs.progressJson = null
+        mutable.update { it.copy(progress = Progress(), gain = null) }
+    }
+
     fun clearGain() = mutable.update { it.copy(gain = null) }
 
     fun speak(text: String, tag: String) = speaker.speak(text, tag)

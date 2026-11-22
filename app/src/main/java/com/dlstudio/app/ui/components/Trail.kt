@@ -93,7 +93,7 @@ internal fun DrawScope.drawEdge(from: Offset, to: Offset, walked: Boolean, accen
 internal fun Stop(topic: Topic, number: Int, stages: Int, here: Boolean, dim: Boolean, x: Dp, y: Dp, width: Dp, onOpen: (String) -> Unit) {
     val colors = MaterialTheme.colorScheme
     val accent = Color(LocalAccent.current.main)
-    Column(Modifier.width(width).offset(x - width / 2, y - 38.dp).alpha(if (dim) 0.5f else 1f), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(Modifier.width(width).offset(x - width / 2, y - 38.dp).alpha(if (dim) 0.72f else 1f), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.size(76.dp), Alignment.Center) { Node(number, stages, here) { onOpen(topic.id) } }
         Text(
             topic.title, Modifier.padding(top = 6.dp), if (here) accent else colors.onBackground,

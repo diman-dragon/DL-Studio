@@ -88,9 +88,10 @@ private fun TabItem(tab: TabSpec, selected: Boolean, onClick: () -> Unit, modifi
 /** Описание вкладки: подпись и иконка в выбранном (залитая) и обычном (контурная) виде. */
 class TabSpec(val label: (Strings) -> String, @DrawableRes val fill: Int, @DrawableRes val outline: Int)
 
-/** Три вкладки по порядку свайпа: Карта → Прогресс → Настройки (иконки Material Design Icons). */
+/** Четыре вкладки по порядку свайпа: Старт → Карта → Прогресс → Настройки (иконки Material). */
 object Tabs {
     val all = listOf(
+        TabSpec(Strings::tabStart, R.drawable.ic_tab_home_fill, R.drawable.ic_tab_home_outline),
         TabSpec(Strings::tabMap, R.drawable.ic_tab_library_fill, R.drawable.ic_tab_library_outline),
         TabSpec(Strings::tabProgress, R.drawable.ic_tab_stats_fill, R.drawable.ic_tab_stats_outline),
         TabSpec(Strings::tabSettings, R.drawable.ic_tab_settings_fill, R.drawable.ic_tab_settings_outline)

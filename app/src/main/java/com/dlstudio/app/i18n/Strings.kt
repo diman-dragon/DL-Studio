@@ -1,12 +1,16 @@
 package com.dlstudio.app.i18n
 
-import com.dlstudio.app.settings.AccentColor
-import com.dlstudio.app.settings.AccentPalette
+import com.dlstudio.app.progress.DayPart
+import com.dlstudio.app.progress.Mood
 import com.dlstudio.app.settings.ThemeMode
 
 /** Все тексты интерфейса. Новый язык = новая реализация; забытая строка не соберётся. */
 interface Strings {
-    val tabMap: String; val tabProgress: String; val tabSettings: String
+    val tabStart: String; val tabMap: String; val tabProgress: String; val tabSettings: String
+
+    fun greeting(part: DayPart): String
+    fun moodText(mood: Mood, streak: Int): String
+    val quoteTitle: String; val quotes: List<String>; val tipTitle: String; val tips: List<String>
 
     val continueLabel: String
     val mapEmptyTitle: String; val mapEmptyHint: String; val openSettings: String; val noGroup: String
@@ -15,8 +19,8 @@ interface Strings {
 
     val stageTheory: String; val stageCards: String; val stagePractice: String
     val previous: String; val next: String; val finish: String; val speak: String
-    val tapToFlip: String; val know: String; val again: String
-    fun cardCounter(index: Int, total: Int, known: Int): String
+    val tapToFlip: String
+    fun cardCounter(index: Int, total: Int, seen: Int): String
     val correct: String
     fun wrongAnswer(answer: String): String
     fun quizResult(ok: Int, total: Int): String
@@ -30,8 +34,8 @@ interface Strings {
 
     val sectionLook: String; val settingTheme: String; val settingLanguage: String; val settingAccent: String
     fun themeName(mode: ThemeMode): String
-    fun accentName(accent: AccentColor): String
-    fun accentPaletteName(palette: AccentPalette): String
+
+    val sectionData: String; val resetProgress: String; val resetProgressHint: String; val resetQuestion: String; val reset: String
 
     val sectionTopics: String; val catalogAddress: String; val catalogNotSet: String; val catalogHint: String
     val refreshCatalog: String; val fromFile: String; val downloadAll: String; val download: String

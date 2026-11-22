@@ -66,7 +66,7 @@ fun TopicScreen(topic: Topic, state: AppState, vm: AppViewModel, onBack: () -> U
         val content = Modifier.weight(1f)
         when (stages[index]) {
             Stage.THEORY -> TheoryStage(topic.theory, { vm.finishTheory(topic); if (index < stages.lastIndex) picked = index + 1 }, content)
-            Stage.CARDS -> CardsStage(topic.cards, progress.known, speak, { vm.knowCard(topic, it) }, content)
+            Stage.CARDS -> CardsStage(topic.cards, progress.seen, speak, { vm.seeCard(topic, it) }, content)
             Stage.QUIZ -> QuizStage(topic.quiz, Xp.quizDone(topic, progress), { i, ok -> vm.answer(topic, i, ok) }, content)
         }
     }

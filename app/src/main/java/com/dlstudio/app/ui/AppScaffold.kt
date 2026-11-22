@@ -33,12 +33,13 @@ import com.dlstudio.app.ui.components.Tabs
 import com.dlstudio.app.ui.screens.MapScreen
 import com.dlstudio.app.ui.screens.ProgressScreen
 import com.dlstudio.app.ui.screens.SettingsScreen
+import com.dlstudio.app.ui.screens.StartScreen
 import com.dlstudio.app.ui.theme.LocalAccent
 import com.dlstudio.app.ui.topic.TopicScreen
 import kotlinx.coroutines.launch
 
 /**
- * Каркас: три вкладки со свайпом; открытая тема плавно занимает весь экран. «Назад» закрывает тему, затем листает вкладки.
+ * Каркас: четыре вкладки со свайпом (самая левая — стартовый экран, карта правее); открытая тема плавно занимает весь экран. «Назад» закрывает тему, затем листает вкладки.
  * Сверху лежит мягкое свечение акцентного цвета, а когда пройдена тема, поверх всего запускается салют.
  */
 @OptIn(ExperimentalFoundationApi::class)
@@ -74,8 +75,9 @@ fun AppScaffold(state: AppState, vm: AppViewModel) {
                 ) { padding ->
                     HorizontalPager(pager, Modifier.fillMaxSize().padding(padding)) { page ->
                         when (page) {
-                            0 -> MapScreen(state, { openId = it }, { toSettings() })
-                            1 -> ProgressScreen(state)
+                            0 -> StartScreen(state, { openId = it }, { toSettings() })
+                            1 -> MapScreen(state, { openId = it }, { toSettings() })
+                            2 -> ProgressScreen(state)
                             else -> SettingsScreen(state, vm)
                         }
                     }

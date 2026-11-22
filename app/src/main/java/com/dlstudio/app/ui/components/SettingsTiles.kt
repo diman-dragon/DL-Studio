@@ -5,12 +5,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -19,21 +24,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.selected
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.BuildConfig
 import com.dlstudio.app.R
 import com.dlstudio.app.settings.AccentColor
-import com.dlstudio.app.settings.AccentPalette
 import com.dlstudio.app.ui.theme.LocalStrings
 
 /** Раздел настроек: небольшой акцентный заголовок и плитки под ним. Все разделы выглядят одинаково. */
@@ -59,7 +63,7 @@ fun SettingCard(
     val colors = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(24.dp)
     val tap = if (onClick == null) Modifier else Modifier.clip(shape).clickable(role = Role.Button, onClick = onClick)
-    Surface(modifier.then(tap), shape, colors.surfaceVariant, border = BorderStroke(1.dp, colors.outlineVariant)) {
+    Surface(modifier.then(tap), shape, colors.surfaceVariant, colors.onSurface, border = BorderStroke(1.dp, colors.outlineVariant)) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 14.dp), Arrangement.spacedBy(gap), content = content)
     }
 }
@@ -106,49 +110,36 @@ fun SettingRow(content: @Composable RowScope.() -> Unit) {
     Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(12.dp), content = content)
 }
 
-/** Плитка «Акцентный цвет»: палитры, ряд образцов и название выбранного цвета. */
+/** Плитка «Акцентный цвет»: радужная линейка — тап или перетаскивание выбирает любой оттенок. */
 @Composable
-fun AccentTile(title: String, selected: AccentColor, name: (AccentColor) -> String, onSelect: (AccentColor) -> Unit) {
-    SettingCard(gap = 12.dp) {
+fun AccentTile(title: String, selected: AccentColor, onSelect: (AccentColor) -> Unit) {
+    SettingCard(gap = 14.dp) {
         Text(title, style = MaterialTheme.typography.titleMedium)
-        AccentWheel(selected, onSelect)
-        Text(name(selected), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+        RainbowBar(selected, onSelect)
     }
 }
 
+/** Линейка всех оттенков; ползунок стоит на выбранном и залит этим цветом. */
 @Composable
-private fun AccentWheel(selected: AccentColor, onSelect: (AccentColor) -> Unit) {
-    val strings = LocalStrings.current
-    val colors = MaterialTheme.colorScheme
-    val current = AccentPalette.forAccent(selected)
-    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
-            AccentPalette.values().forEach { palette ->
-                val active = palette == current
-                Surface(
-                    Modifier.weight(1f).clickable(role = Role.RadioButton) { onSelect(palette.colors[current.slot(selected)]) }, RoundedCornerShape(12.dp),
-                    if (active) colors.primaryContainer else colors.background, border = BorderStroke(1.dp, if (active) colors.primary else colors.outline)
-                ) {
-                    Box(Modifier.padding(vertical = 8.dp), Alignment.Center) {
-                        Text(strings.accentPaletteName(palette), style = MaterialTheme.typography.labelMedium, color = if (active) colors.primary else colors.onSurfaceVariant)
-                    }
-                }
-            }
-        }
-        Row(Modifier.fillMaxWidth(), Arrangement.SpaceEvenly, Alignment.Top) {
-            current.colors.forEach { accent ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(
-                        Modifier.size(48.dp).clip(CircleShape).background(Brush.linearGradient(listOf(Color(accent.main), Color(accent.deep))))
-                            .then(if (accent == selected) Modifier.border(3.dp, colors.onSurface, CircleShape) else Modifier)
-                            .clickable(role = Role.RadioButton) { onSelect(accent) }.semantics { this.selected = accent == selected }
-                    )
-                    if (accent == selected) Text(strings.accentName(accent), style = MaterialTheme.typography.labelSmall, color = colors.primary)
-                }
-            }
-        }
+private fun RainbowBar(selected: AccentColor, onSelect: (AccentColor) -> Unit) {
+    val rainbow = remember { Brush.horizontalGradient((0..12).map { Color.hsv(it * 30f, 0.75f, 1f) }) }
+    val thumb = 40.dp
+    BoxWithConstraints(Modifier.fillMaxWidth().height(thumb)) {
+        val track = maxWidth - thumb
+        Box(
+            Modifier.fillMaxSize().padding(horizontal = thumb / 2, vertical = 8.dp).clip(RoundedCornerShape(12.dp)).background(rainbow)
+                .pointerInput(Unit) { detectTapGestures { onSelect(AccentColor(hueAt(it.x, size.width.toFloat()))) } }
+                .pointerInput(Unit) { detectHorizontalDragGestures { change, _ -> change.consume(); onSelect(AccentColor(hueAt(change.position.x, size.width.toFloat()))) } }
+        )
+        Box(
+            Modifier.offset(x = track * (selected.hue / 360f)).size(thumb).background(Color(selected.main), CircleShape)
+                .border(3.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
+        )
     }
 }
+
+/** Оттенок под пальцем: край линейки — красный, середина — голубой. */
+private fun hueAt(x: Float, width: Float): Float = (x / width).coerceIn(0f, 1f) * 360f
 
 /** Постоянная карточка о приложении и компании в настройках. */
 @Composable

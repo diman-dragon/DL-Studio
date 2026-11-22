@@ -1,6 +1,7 @@
 package com.dlstudio.app.ui.theme
 
 import android.app.Activity
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -21,8 +22,11 @@ fun DlTheme(dark: Boolean, accent: AccentColor, content: @Composable () -> Unit)
     val typography = remember { dlTypography() }
     CompositionLocalProvider(LocalDensity provides density, LocalAccent provides accent) {
         MaterialTheme(colorScheme = accentScheme(dark, accent), typography = typography) {
-            SystemBars(dark)
-            content()
+            // Без явного цвета текст берёт LocalContentColor, а вне Surface он чёрный — на чёрном фоне темы его не видно.
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onBackground) {
+                SystemBars(dark)
+                content()
+            }
         }
     }
 }

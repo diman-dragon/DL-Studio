@@ -1,11 +1,46 @@
 package com.dlstudio.app.i18n
 
-import com.dlstudio.app.settings.AccentColor
-import com.dlstudio.app.settings.AccentPalette
+import com.dlstudio.app.progress.DayPart
+import com.dlstudio.app.progress.Mood
 import com.dlstudio.app.settings.ThemeMode
 
 object StringsRu : Strings {
-    override val tabMap = "Карта"; override val tabProgress = "Прогресс"; override val tabSettings = "Настройки"
+    override val tabStart = "Старт"; override val tabMap = "Карта"; override val tabProgress = "Прогресс"; override val tabSettings = "Настройки"
+
+    override fun greeting(part: DayPart) = when (part) {
+        DayPart.MORNING -> "Доброе утро!"; DayPart.DAY -> "Добрый день!"; DayPart.EVENING -> "Добрый вечер!"; DayPart.NIGHT -> "Не спится? Давайте учиться"
+    }
+    override fun moodText(mood: Mood, streak: Int) = when (mood) {
+        Mood.FIRST_STEP -> "Первый шаг самый важный. Откройте любую тему — хватит и пяти минут."
+        Mood.DONE_TODAY -> "Сегодня вы уже занимались. Серия: ${streakDays(streak)}. Так держать!"
+        Mood.KEEP_STREAK -> "Серия: ${streakDays(streak)}. Одно занятие сегодня — и она продолжится."
+        Mood.COMEBACK -> "С возвращением! Начните с одной карточки — остальное пойдёт само."
+    }
+    override val quoteTitle = "Мысль дня"
+    override val quotes = listOf(
+        "Маленький шаг каждый день сильнее большого рывка раз в месяц.",
+        "Не обязательно знать всё. Достаточно сегодня узнать чуть больше, чем вчера.",
+        "Ошибка — это не провал, а подсказка, куда смотреть дальше.",
+        "Дорогу осилит идущий.",
+        "Тот, кто начал, уже впереди тех, кто думает о начале.",
+        "Привычка работает лучше мотивации: сделайте занятие частью дня.",
+        "Сложное становится простым после десятого повтора.",
+        "Не сравнивайте себя с другими — сравнивайте с собой вчерашним.",
+        "Терпение и труд всё перетрут.",
+        "Хороший день начинается с одной выученной вещи.",
+        "Прогресс не всегда заметен, но он всегда накапливается.",
+        "Главное — не скорость, а то, что вы не останавливаетесь."
+    )
+    override val tipTitle = "Совет дня"
+    override val tips = listOf(
+        "10 минут каждый день работают лучше, чем 2 часа раз в неделю.",
+        "Перед ответом попробуйте вспомнить его сами — так запоминается крепче.",
+        "Произносите слова вслух: озвучка карточек поможет с произношением.",
+        "Повторите вчерашнюю тему перед тем, как начать новую.",
+        "Придумайте свой пример к каждой карточке — со своим примером слово не забудется.",
+        "Занимайтесь в одно и то же время: привычка закрепляется быстрее.",
+        "Устали — сделайте перерыв. Мозг запоминает и во время отдыха."
+    )
 
     override val continueLabel = "Продолжить"
     override val mapEmptyTitle = "Пока нет тем"; override val mapEmptyHint = "Скачайте темы в настройках или поставьте файл темы."
@@ -15,8 +50,8 @@ object StringsRu : Strings {
 
     override val stageTheory = "Теория"; override val stageCards = "Карточки"; override val stagePractice = "Практика"
     override val previous = "Назад"; override val next = "Дальше"; override val finish = "Готово"; override val speak = "Озвучить"
-    override val tapToFlip = "Нажмите на карточку, чтобы перевернуть"; override val know = "Знаю"; override val again = "Ещё раз"
-    override fun cardCounter(index: Int, total: Int, known: Int) = "$index из $total · знаю $known"
+    override val tapToFlip = "Нажмите на карточку, чтобы перевернуть"
+    override fun cardCounter(index: Int, total: Int, seen: Int) = "$index из $total · просмотрено $seen"
     override val correct = "Верно!"
     override fun wrongAnswer(answer: String) = "Правильно: $answer"
     override fun quizResult(ok: Int, total: Int) = "Верно $ok из $total"
@@ -27,13 +62,15 @@ object StringsRu : Strings {
     override fun streakDays(n: Int) = "$n ${ruPlural(n, "день", "дня", "дней")} подряд"
     override fun topicsDone(done: Int, total: Int) = "Пройдено тем: $done из $total"
     override val xpRulesTitle = "Как получить XP"
-    override val xpRules = "Теория +10 · карточка «Знаю» +2 · верный ответ +5 · тема целиком +50. За повтор уже пройденного XP не даётся."
+    override val xpRules = "Теория +10 · просмотренная карточка +2 · верный ответ +5 · тема целиком +50. За повтор уже пройденного XP не даётся."
     override val sealsTitle = "Печати уровней"
 
     override val sectionLook = "Внешний вид"; override val settingTheme = "Тема"; override val settingLanguage = "Язык приложения"; override val settingAccent = "Акцентный цвет"
     override fun themeName(mode: ThemeMode) = if (mode == ThemeMode.DARK) "Тёмная (AMOLED)" else "Светлая"
-    override fun accentName(accent: AccentColor) = listOf("Фиолетовый", "Синий", "Зелёный", "Янтарный", "Красный", "Лавандовый", "Небесный", "Мятный", "Персиковый", "Малиновый", "Сливовый", "Бирюзовый", "Лаймовый", "Оранжевый", "Маджента")[accent.ordinal]
-    override fun accentPaletteName(palette: AccentPalette) = listOf("Классика", "Мягкие", "Яркие")[palette.ordinal]
+
+    override val sectionData = "Данные"; override val resetProgress = "Сбросить прогресс"
+    override val resetProgressHint = "Обнулит XP, серию дней и пройденные этапы. Темы останутся."
+    override val resetQuestion = "Сбросить весь прогресс? XP, серия и пройденные этапы удалятся, вернуть их будет нельзя."; override val reset = "Сбросить"
 
     override val sectionTopics = "Темы"; override val catalogAddress = "Адрес каталога"; override val catalogNotSet = "Не задан"
     override val catalogHint = "Адрес https-папки, где лежит course.json. Темы скачиваются по одной, каждая проверяется по контрольной сумме."

@@ -22,7 +22,14 @@ jobs:
       - name: Структура (атомарность, версия)
         run: node scripts/check.mjs
       - name: Тесты, lint и сборка
-        run: chmod +x gradlew && ./gradlew testDebugUnitTest lint assembleRelease
+        run: |
+          chmod +x gradlew
+          for attempt in 1 2 3; do
+            ./gradlew testDebugUnitTest lint assembleRelease && exit 0
+            echo "Попытка $attempt не удалась; ждём и повторяем (репозитории иногда отвечают 429)"
+            sleep $((attempt * 45))
+          done
+          exit 1
       - name: Версия
         id: ver
         run: echo "v=$(cat version.txt)" >> "$GITHUB_OUTPUT"

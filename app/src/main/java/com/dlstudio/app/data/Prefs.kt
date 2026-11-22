@@ -21,8 +21,8 @@ class Prefs(context: Context) {
         set(value) = sp.putPref("lang", value.name)
 
     var accent: AccentColor
-        get() = sp.getEnum("accent", AccentColor.VIOLET)
-        set(value) = sp.putPref("accent", value.name)
+        get() = AccentColor(sp.getFloat("accentHue", AccentColor.DEFAULT.hue))
+        set(value) { sp.edit().putFloat("accentHue", value.hue).apply() }
 
     /** Адрес папки с course.json; пусто — каталог не задан. */
     var catalogUrl: String
