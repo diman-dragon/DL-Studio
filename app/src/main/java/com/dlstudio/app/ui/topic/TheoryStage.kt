@@ -16,7 +16,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.content.TheoryPage
-import com.dlstudio.app.speech.Speak
+import com.dlstudio.app.speech.SpeakAs
 import com.dlstudio.app.ui.components.GradientButton
 import com.dlstudio.app.ui.components.OutlineButton
 import com.dlstudio.app.ui.theme.LocalStrings
@@ -25,11 +25,11 @@ import java.io.File
 
 /**
  * Теория: страницы-карточки со свайпом и точками-индикатором; на последней странице кнопка «Готово» отмечает этап пройденным.
- * Если у темы есть язык озвучки (`speak`), у фраз и плиток-букв появляется озвучка; `mediaDir` — папка картинок, звука и видео темы.
+ * Если у темы есть язык озвучки (`speak`), у фраз и плиток-букв появляется озвучка (реплики диалога — разными голосами); `mediaDir` — папка картинок, звука и видео темы.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TheoryStage(pages: List<TheoryPage>, speak: Speak?, mediaDir: File?, onFinish: () -> Unit, modifier: Modifier = Modifier) {
+fun TheoryStage(pages: List<TheoryPage>, speak: SpeakAs?, mediaDir: File?, onFinish: () -> Unit, modifier: Modifier = Modifier) {
     val s = LocalStrings.current
     val pager = rememberPagerState { pages.size }
     val scope = rememberCoroutineScope()

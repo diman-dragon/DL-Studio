@@ -39,6 +39,7 @@ import com.dlstudio.app.content.TheoryPage
 import com.dlstudio.app.content.Tile
 import com.dlstudio.app.content.TileKind
 import com.dlstudio.app.speech.Speak
+import com.dlstudio.app.speech.SpeakAs
 import com.dlstudio.app.ui.components.Markup
 import com.dlstudio.app.ui.components.SmallSpeaker
 import com.dlstudio.app.ui.theme.LocalAccent
@@ -53,7 +54,7 @@ private const val TILE_ALPHA = 0.2f
 
 /** Карточка теории: яркая шапка со значком и заголовком, под ней блоки страницы (текст, выноски, фразы с озвучкой, таблицы, плитки-буквы). */
 @Composable
-fun TheoryCard(page: TheoryPage, speak: Speak?, mediaDir: File?, modifier: Modifier = Modifier) {
+fun TheoryCard(page: TheoryPage, speak: SpeakAs?, mediaDir: File?, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(28.dp)
     val blocks = remember(page) { TheoryBlocks.parse(page.paragraphs) }
@@ -82,7 +83,7 @@ private fun CardHeader(page: TheoryPage) {
 }
 
 @Composable
-private fun BlockView(block: Block, speak: Speak?, mediaDir: File?) {
+private fun BlockView(block: Block, speak: SpeakAs?, mediaDir: File?) {
     val colors = MaterialTheme.colorScheme
     when (block) {
         is Block.Text -> Text(Markup.annotate(block.text), style = MaterialTheme.typography.bodyLarge)
@@ -98,7 +99,7 @@ private fun BlockView(block: Block, speak: Speak?, mediaDir: File?) {
         is Block.Callout -> CalloutBox(block.kind, block.text)
         is Block.Say -> SayRow(block, speak)
         is Block.Table -> TableView(block.rows)
-        is Block.Tiles -> TileGrid(block.tiles, speak)
+        is Block.Tiles -> TileGrid(block.tiles, speak?.let { f -> { text: String -> f(text, 0) } })
         is Block.Media -> MediaView(block, mediaDir)
     }
 }
@@ -124,7 +125,7 @@ private fun CalloutBox(kind: CalloutKind, text: String) {
 
 /** Фраза на изучаемом языке с кнопкой озвучки и переводом под ней. */
 @Composable
-private fun SayRow(say: Block.Say, speak: Speak?) {
+private fun SayRow(say: Block.Say, speak: SpeakAs?) {
     val colors = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(18.dp)
     Row(
@@ -135,7 +136,7 @@ private fun SayRow(say: Block.Say, speak: Speak?) {
             Text(say.text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             if (say.note.isNotBlank()) Text(say.note, style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
         }
-        if (speak != null) SmallSpeaker(say.say.ifBlank { say.text }, speak, size = 42.dp)
+        if (speak != null) SmallSpeaker(say.say.ifBlank { say.text }, { text -> speak(text, say.voice) }, size = 42.dp)
     }
 }
 

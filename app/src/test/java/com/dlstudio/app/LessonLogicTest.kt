@@ -42,6 +42,22 @@ class LessonLogicTest {
         assertEquals("hello", (b[5] as Block.Say).say)
     }
 
+    private fun voices(vararg lines: String) = TheoryBlocks.parse(lines.toList()).map { (it as Block.Say).voice }
+
+    @Test fun twoOrThreeNeighbourPhrasesGetDifferentVoices() {
+        assertEquals(listOf(0), voices("~ Hi"))
+        assertEquals(listOf(0, 1), voices("~ Hi", "~ Hello"))
+        assertEquals(listOf(0, 1, 2), voices("~ a", "~ b", "~ c"))
+        assertEquals(listOf(0, 0, 0, 0), voices("~ a", "~ b", "~ c", "~ d"))
+    }
+
+    @Test fun dialogueLinesKeepTheirExplicitVoice() {
+        assertEquals(listOf(0, 1, 0, 1), voices("~ Hi", "~2 Hello", "~1 How are you?", "~2 Fine"))
+        assertEquals(listOf(0, 1), voices("~1 text | перевод | say", "~2 Hello"))
+        assertEquals("Hello", ((TheoryBlocks.parse(listOf("~3 Hello | Привет"))[0]) as Block.Say).text)
+        assertEquals(2, ((TheoryBlocks.parse(listOf("~3 Hello | Привет"))[0]) as Block.Say).voice)
+    }
+
     private fun kind(b: Block) = when (b) {
         is Block.Text -> "text"; is Block.Bullets -> "list"; is Block.Table -> "table"; is Block.Tiles -> "tiles"
         is Block.Callout -> "tip"; is Block.Say -> "say"; is Block.Sub -> "sub"; is Block.Media -> "media"

@@ -15,7 +15,7 @@ sealed interface Block {
     data class Sub(val text: String) : Block
     data class Bullets(val items: List<String>) : Block
     data class Callout(val kind: CalloutKind, val text: String) : Block
-    data class Say(val text: String, val note: String, val say: String) : Block
+    data class Say(val text: String, val note: String, val say: String, val voice: Int = 0) : Block
     data class Table(val rows: List<List<String>>) : Block
     data class Tiles(val tiles: List<Tile>) : Block
     data class Media(val kind: MediaKind, val src: String, val caption: String) : Block
@@ -27,11 +27,15 @@ sealed interface Block {
  * - `- ` — пункт списка (подряд идущие собираются в один список);
  * - `!tip `, `!note `, `!warn `, `!fun ` — цветная выноска;
  * - `~ English | перевод | что озвучить` — фраза с кнопкой озвучки и переводом под ней; третье поле необязательно (если пусто, озвучивается сама фраза);
+ *   `~2 `, `~3 ` — то же, но другим голосом (реплики диалога: `~ ` или `~1 ` — первый голос). Две-три фразы подряд без номера сами получают разные голоса;
  * - `| a | b | c` — строка таблицы (подряд идущие — одна таблица, первая строка — шапка);
  * - `@image путь | подпись`, `@audio …`, `@video …` — картинка, звук или видео (путь относительно папки медиа темы или адрес https);
  * - `::v A a | эй | /eɪ/ | ay` — плитка (v — гласная, c — согласная, b — обе); последнее поле (что озвучить) необязательно; подряд идущие — сетка.
  */
 object TheoryBlocks {
+    private const val UNSET = -1
+    private const val MAX_VOICES = 3
+
     fun parse(paragraphs: List<String>): List<Block> {
         val out = ArrayList<Block>()
         for (raw in paragraphs) {
@@ -41,12 +45,36 @@ object TheoryBlocks {
             when {
                 p.startsWith("## ") -> out.add(Block.Sub(p.drop(3).trim()))
                 p.startsWith("- ") -> merge(out, last, Block.Bullets(listOf(p.drop(2).trim())))
-                p.startsWith("~ ") -> out.add(say(p.drop(2)))
+                p.startsWith("~") && voiceMark(p) != null -> out.add(say(p.drop(2), voiceMark(p) ?: 0))
                 p.startsWith("|") -> merge(out, last, Block.Table(listOf(cells(p))))
                 p.startsWith("@") -> out.add(media(p) ?: Block.Text(p))
                 p.startsWith("::") -> tile(p)?.let { merge(out, last, Block.Tiles(listOf(it))) } ?: out.add(Block.Text(p))
                 else -> out.add(callout(p) ?: Block.Text(p))
             }
+        }
+        return voices(out)
+    }
+
+    /** Номер голоса из отметки: `~ ` — не задан (UNSET), `~1 `…`~3 ` — 0…2; не отметка фразы — null. */
+    private fun voiceMark(p: String): Int? = when {
+        p.startsWith("~ ") -> UNSET
+        p.length > 2 && p[1] in '1'..'3' && p[2] == ' ' -> p[1] - '1'
+        else -> null
+    }
+
+    /** Две-три фразы подряд без явного голоса звучат разными голосами; длинные ряды (слова списком) — одним. */
+    private fun voices(blocks: List<Block>): List<Block> {
+        val out = ArrayList<Block>(blocks)
+        var i = 0
+        while (i < out.size) {
+            if (out[i] !is Block.Say) { i++; continue }
+            var j = i
+            while (j < out.size && out[j] is Block.Say) j++
+            for (k in i until j) {
+                val b = out[k] as Block.Say
+                if (b.voice == UNSET) out[k] = b.copy(voice = if (j - i in 2..MAX_VOICES) k - i else 0)
+            }
+            i = j
         }
         return out
     }
@@ -65,9 +93,9 @@ object TheoryBlocks {
     private fun callout(p: String): Block.Callout? =
         CalloutKind.values().firstOrNull { p.startsWith(it.mark) }?.let { Block.Callout(it, p.drop(it.mark.length).trim()) }
 
-    private fun say(body: String): Block.Say {
+    private fun say(body: String, voice: Int): Block.Say {
         val parts = body.split(" | ", limit = 3).map { it.trim() }
-        return Block.Say(parts[0], parts.getOrElse(1) { "" }, parts.getOrElse(2) { "" })
+        return Block.Say(parts[0], parts.getOrElse(1) { "" }, parts.getOrElse(2) { "" }, voice)
     }
 
     private fun media(p: String): Block.Media? {
