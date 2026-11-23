@@ -82,13 +82,17 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) {
             var failed = false
             entries.forEach { entry ->
-                if (runCatching { store.install(Remote.download(url, entry)) }.getOrNull().isNullOrEmpty()) failed = true
+                val ok = runCatching { store.install(Remote.download(url, entry)).isNotEmpty() }.getOrDefault(false)
+                if (!ok || runCatching { Remote.downloadMedia(url, entry, store.mediaDir(entry.id)) }.isFailure) failed = true
                 mutable.update { it.copy(busy = it.busy - entry.id) }
             }
             val topics = store.installed()
             mutable.update { it.copy(topics = topics, busy = emptySet(), notice = if (failed) Notice.DOWNLOAD_FAILED else Notice.NONE) }
         }
     }
+
+    /** Папка медиа темы: туда кладутся аудио, видео и картинки урока. */
+    fun mediaDir(id: String) = store.mediaDir(id)
 
     fun installFile(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -102,6 +106,14 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     fun remove(topic: Topic) {
         viewModelScope.launch(Dispatchers.IO) {
             store.remove(topic.id)
+            reload()
+        }
+    }
+
+    /** Удаляет несколько тем (курс или урок целиком); прогресс сохраняется. */
+    fun removeMany(topics: List<Topic>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            topics.forEach { store.remove(it.id) }
             reload()
         }
     }
@@ -166,8 +178,8 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
         updateSpeech { it.copy(rate = rate) }
     }
 
-    fun installVoices() { SpeechPacks.openVoiceDownload(app) }
-    fun openSpeechSettings() { SpeechPacks.openSpeechSettings(app) }
+    /** Открывает экран загрузки голосов самого движка синтеза речи (не общие настройки системы). */
+    fun downloadVoice() { SpeechPacks.openVoiceDownload(app, speaker.engine()) }
 
     /** Скачивание пакета распознавания речи: на Android 13+ запускается сразу и через несколько секунд состояние проверяется ещё раз, на старых открываются настройки голосового ввода. */
     fun downloadPack(tag: String) {

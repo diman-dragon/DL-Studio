@@ -21,14 +21,15 @@ import com.dlstudio.app.ui.components.GradientButton
 import com.dlstudio.app.ui.components.OutlineButton
 import com.dlstudio.app.ui.theme.LocalStrings
 import kotlinx.coroutines.launch
+import java.io.File
 
 /**
  * Теория: страницы-карточки со свайпом и точками-индикатором; на последней странице кнопка «Готово» отмечает этап пройденным.
- * Если у темы есть язык озвучки (`speak`), у фраз и плиток-букв появляется озвучка.
+ * Если у темы есть язык озвучки (`speak`), у фраз и плиток-букв появляется озвучка; `mediaDir` — папка картинок, звука и видео темы.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TheoryStage(pages: List<TheoryPage>, speak: Speak?, onFinish: () -> Unit, modifier: Modifier = Modifier) {
+fun TheoryStage(pages: List<TheoryPage>, speak: Speak?, mediaDir: File?, onFinish: () -> Unit, modifier: Modifier = Modifier) {
     val s = LocalStrings.current
     val pager = rememberPagerState { pages.size }
     val scope = rememberCoroutineScope()
@@ -37,7 +38,7 @@ fun TheoryStage(pages: List<TheoryPage>, speak: Speak?, onFinish: () -> Unit, mo
         PageDots(pages.size, pager.currentPage, Modifier.fillMaxWidth().padding(vertical = 10.dp))
         HorizontalPager(pager, Modifier.weight(1f), pageSpacing = 8.dp) { index ->
             Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp)) {
-                TheoryCard(pages[index], speak)
+                TheoryCard(pages[index], speak, mediaDir)
             }
         }
         Row(Modifier.padding(16.dp), Arrangement.spacedBy(12.dp)) {

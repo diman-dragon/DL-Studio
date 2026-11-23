@@ -59,12 +59,13 @@ interface Strings {
     val catalogLoading: String; val catalogFailed: String; val downloadFailed: String; val fileFailed: String; val nothingNew: String
     fun removeQuestion(title: String): String
     fun removeAllQuestion(count: Int): String
+    fun removeManyQuestion(count: Int): String
+    val noCourse: String; val mediaMissing: String
     val cancel: String; val save: String
 
     val sectionVoice: String; val voiceIntro: String; val voiceRate: String; val rateSlow: String; val rateNormal: String; val rateFast: String
     val voiceAuto: String; val voiceAutoHint: String; val voiceHigh: String; val voiceNetwork: String; val voiceNotInstalled: String
-    val voicesLoading: String; val voicesEmpty: String; val voicesGet: String; val voicesSettings: String; val voicesRefresh: String; val voicesLess: String
-    fun voicesAll(count: Int): String
+    val voicesLoading: String; val voicesMore: String; val voiceLanguage: String; val voiceLabel: String; val packOn: String; val packOff: String
     val recogTitle: String; val recogHint: String
     val packInstalled: String; val packAvailable: String; val packDownloading: String; val packUnsupported: String; val packUnknown: String
 

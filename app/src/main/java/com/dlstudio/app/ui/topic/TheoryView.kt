@@ -44,6 +44,7 @@ import com.dlstudio.app.ui.components.SmallSpeaker
 import com.dlstudio.app.ui.theme.LocalAccent
 import com.dlstudio.app.ui.theme.LocalStrings
 import com.dlstudio.app.ui.theme.gradientColors
+import java.io.File
 
 private val VOWEL_COLOR = Color(0xFFFF7A59)
 private val CONSONANT_COLOR = Color(0xFF4C8DFF)
@@ -52,7 +53,7 @@ private const val TILE_ALPHA = 0.2f
 
 /** Карточка теории: яркая шапка со значком и заголовком, под ней блоки страницы (текст, выноски, фразы с озвучкой, таблицы, плитки-буквы). */
 @Composable
-fun TheoryCard(page: TheoryPage, speak: Speak?, modifier: Modifier = Modifier) {
+fun TheoryCard(page: TheoryPage, speak: Speak?, mediaDir: File?, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(28.dp)
     val blocks = remember(page) { TheoryBlocks.parse(page.paragraphs) }
@@ -61,7 +62,7 @@ fun TheoryCard(page: TheoryPage, speak: Speak?, modifier: Modifier = Modifier) {
             .background(colors.surfaceVariant).border(1.dp, colors.primary.copy(alpha = 0.35f), shape)
     ) {
         if (page.heading.isNotBlank() || page.icon.isNotBlank()) CardHeader(page)
-        Column(Modifier.fillMaxWidth().padding(18.dp), Arrangement.spacedBy(14.dp)) { blocks.forEach { BlockView(it, speak) } }
+        Column(Modifier.fillMaxWidth().padding(18.dp), Arrangement.spacedBy(14.dp)) { blocks.forEach { BlockView(it, speak, mediaDir) } }
     }
 }
 
@@ -81,7 +82,7 @@ private fun CardHeader(page: TheoryPage) {
 }
 
 @Composable
-private fun BlockView(block: Block, speak: Speak?) {
+private fun BlockView(block: Block, speak: Speak?, mediaDir: File?) {
     val colors = MaterialTheme.colorScheme
     when (block) {
         is Block.Text -> Text(Markup.annotate(block.text), style = MaterialTheme.typography.bodyLarge)
@@ -98,6 +99,7 @@ private fun BlockView(block: Block, speak: Speak?) {
         is Block.Say -> SayRow(block, speak)
         is Block.Table -> TableView(block.rows)
         is Block.Tiles -> TileGrid(block.tiles, speak)
+        is Block.Media -> MediaView(block, mediaDir)
     }
 }
 

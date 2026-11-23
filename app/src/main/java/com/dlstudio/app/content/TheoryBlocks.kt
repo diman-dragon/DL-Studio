@@ -18,6 +18,7 @@ sealed interface Block {
     data class Say(val text: String, val note: String, val say: String) : Block
     data class Table(val rows: List<List<String>>) : Block
     data class Tiles(val tiles: List<Tile>) : Block
+    data class Media(val kind: MediaKind, val src: String, val caption: String) : Block
 }
 
 /**
@@ -27,6 +28,7 @@ sealed interface Block {
  * - `!tip `, `!note `, `!warn `, `!fun ` — цветная выноска;
  * - `~ English | перевод | что озвучить` — фраза с кнопкой озвучки и переводом под ней; третье поле необязательно (если пусто, озвучивается сама фраза);
  * - `| a | b | c` — строка таблицы (подряд идущие — одна таблица, первая строка — шапка);
+ * - `@image путь | подпись`, `@audio …`, `@video …` — картинка, звук или видео (путь относительно папки медиа темы или адрес https);
  * - `::v A a | эй | /eɪ/ | ay` — плитка (v — гласная, c — согласная, b — обе); последнее поле (что озвучить) необязательно; подряд идущие — сетка.
  */
 object TheoryBlocks {
@@ -41,6 +43,7 @@ object TheoryBlocks {
                 p.startsWith("- ") -> merge(out, last, Block.Bullets(listOf(p.drop(2).trim())))
                 p.startsWith("~ ") -> out.add(say(p.drop(2)))
                 p.startsWith("|") -> merge(out, last, Block.Table(listOf(cells(p))))
+                p.startsWith("@") -> out.add(media(p) ?: Block.Text(p))
                 p.startsWith("::") -> tile(p)?.let { merge(out, last, Block.Tiles(listOf(it))) } ?: out.add(Block.Text(p))
                 else -> out.add(callout(p) ?: Block.Text(p))
             }
@@ -65,6 +68,12 @@ object TheoryBlocks {
     private fun say(body: String): Block.Say {
         val parts = body.split(" | ", limit = 3).map { it.trim() }
         return Block.Say(parts[0], parts.getOrElse(1) { "" }, parts.getOrElse(2) { "" })
+    }
+
+    private fun media(p: String): Block.Media? {
+        val kind = MediaKind.values().firstOrNull { p.startsWith(it.mark) } ?: return null
+        val parts = p.drop(kind.mark.length).split(" | ", limit = 2).map { it.trim() }
+        return parts[0].takeIf { it.isNotEmpty() }?.let { Block.Media(kind, it, parts.getOrElse(1) { "" }) }
     }
 
     private fun cells(row: String): List<String> = row.trim().trim('|').split('|').map { it.trim() }

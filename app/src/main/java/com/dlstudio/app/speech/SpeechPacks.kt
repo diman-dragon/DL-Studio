@@ -26,11 +26,15 @@ object SpeechPacks {
         runCatching { context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }.isSuccess
     }
 
-    /** Открывает загрузку голосовых данных движка синтеза речи; если движок такого экрана не имеет — настройки синтеза речи. */
-    fun openVoiceDownload(context: Context): Boolean = open(context, Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA), Intent(TTS_SETTINGS), Intent(Settings.ACTION_SETTINGS))
-
-    /** Открывает настройки синтеза речи (движок, голоса, скорость). */
-    fun openSpeechSettings(context: Context): Boolean = open(context, Intent(TTS_SETTINGS), Intent(Settings.ACTION_SETTINGS))
+    /**
+     * Открывает экран загрузки голосов именно движка `engine` (у Google это список голосов с кнопками «скачать»), без захода в общие настройки системы.
+     * Если движок не назван или у него нет такого экрана — любой экран загрузки голосовых данных, затем настройки синтеза речи.
+     */
+    fun openVoiceDownload(context: Context, engine: String?): Boolean {
+        val install = Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
+        val targeted = engine?.let { Intent(install).setPackage(it) }
+        return open(context, *listOfNotNull(targeted, install, Intent(TTS_SETTINGS), Intent(Settings.ACTION_SETTINGS)).toTypedArray())
+    }
 
     /** Открывает настройки голосового ввода, где на старых Android скачиваются офлайн-пакеты распознавания. */
     fun openRecognitionSettings(context: Context): Boolean = open(context, Intent(Settings.ACTION_VOICE_INPUT_SETTINGS), Intent(Settings.ACTION_SETTINGS))

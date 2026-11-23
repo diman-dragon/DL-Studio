@@ -43,7 +43,7 @@ data class Topic(
 )
 
 /** Строка каталога: что скачать (`path` относительно папки каталога) и как проверить. */
-data class CatalogEntry(val id: String, val course: String, val group: String, val n: Int, val title: String, val path: String, val size: Long, val sha256: String, val cards: Int)
+data class CatalogEntry(val id: String, val course: String, val group: String, val n: Int, val title: String, val path: String, val size: Long, val sha256: String, val cards: Int, val media: List<MediaFile> = emptyList())
 
 private fun JSONArray?.objects(): List<JSONObject> = if (this == null) emptyList() else List(length()) { getJSONObject(it) }
 private fun JSONArray?.strings(): List<String> = if (this == null) emptyList() else List(length()) { getString(it) }
@@ -88,6 +88,11 @@ object TopicJson {
         return item.takeIf { ok }
     }
 
+    private fun mediaFiles(o: JSONObject): List<MediaFile> = o.optJSONArray("media").objects().mapNotNull {
+        val path = it.optString("path")
+        if (Media.safePath(path)) MediaFile(path, it.optLong("size"), it.optString("sha256")) else null
+    }
+
     private fun JSONArray?.pairs(): List<Pair<String, String>> =
         if (this == null) emptyList() else List(length()) { optJSONArray(it) }.mapNotNull { p -> if (p != null && p.length() >= 2) p.getString(0) to p.getString(1) else null }
 
@@ -95,6 +100,6 @@ object TopicJson {
         val id = it.optString("id")
         val path = it.optString("pack")
         if (!safeId.matches(id) || !safePath.matches(path) || ".." in path) null
-        else CatalogEntry(id, it.optString("course"), it.optString("group"), it.optInt("n"), it.optString("title", id), path, it.optLong("size"), it.optString("sha256"), it.optInt("cards"))
+        else CatalogEntry(id, it.optString("course"), it.optString("group"), it.optInt("n"), it.optString("title", id), path, it.optLong("size"), it.optString("sha256"), it.optInt("cards"), mediaFiles(it))
     }
 }

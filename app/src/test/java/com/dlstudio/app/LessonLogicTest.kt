@@ -2,6 +2,8 @@ package com.dlstudio.app
 
 import com.dlstudio.app.content.Answers
 import com.dlstudio.app.content.Block
+import com.dlstudio.app.content.Media
+import com.dlstudio.app.content.MediaKind
 import com.dlstudio.app.content.QuizItem
 import com.dlstudio.app.content.QuizKind
 import com.dlstudio.app.content.TheoryBlocks
@@ -42,7 +44,7 @@ class LessonLogicTest {
 
     private fun kind(b: Block) = when (b) {
         is Block.Text -> "text"; is Block.Bullets -> "list"; is Block.Table -> "table"; is Block.Tiles -> "tiles"
-        is Block.Callout -> "tip"; is Block.Say -> "say"; is Block.Sub -> "sub"
+        is Block.Callout -> "tip"; is Block.Say -> "say"; is Block.Sub -> "sub"; is Block.Media -> "media"
     }
 
     @Test fun voiceNamesAreHumanAndUnique() {
@@ -50,5 +52,16 @@ class LessonLogicTest {
         val names = VoiceNames.choices(raw, "en", true).map { it.title }
         assertEquals(15, names.toSet().size)
         assertTrue(names.all { it.first().isLetter() })
+    }
+
+    @Test fun mediaBlocksAndSafePaths() {
+        val b = TheoryBlocks.parse(listOf("@audio hello.mp3 | Диалог", "@video https://x.org/a.mp4", "@image"))
+        assertEquals(MediaKind.AUDIO, (b[0] as Block.Media).kind)
+        assertEquals("Диалог", (b[0] as Block.Media).caption)
+        assertEquals("https://x.org/a.mp4", (b[1] as Block.Media).src)
+        assertTrue(b[2] is Block.Text)
+        assertTrue(Media.safePath("img/map.png"))
+        assertEquals(false, Media.safePath("../secret.png"))
+        assertEquals(false, Media.safePath("run.exe"))
     }
 }

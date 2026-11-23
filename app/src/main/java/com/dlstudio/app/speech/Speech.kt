@@ -62,6 +62,9 @@ class Speaker(private val context: Context) {
         onReady(list)
     }
 
+    /** Пакет движка синтеза речи по умолчанию (например com.google.android.tts); null, если движок ещё не запущен. */
+    fun engine(): String? = runCatching { tts?.defaultEngine }.getOrNull()
+
     /** Прервать озвучку (перед записью микрофона, чтобы динамик не попал в запись). */
     fun stop() { tts?.stop() }
 
