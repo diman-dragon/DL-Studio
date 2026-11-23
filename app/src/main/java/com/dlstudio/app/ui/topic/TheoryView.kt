@@ -102,7 +102,7 @@ private fun BlockView(block: Block, speak: SpeakAs?, mediaDir: File?) {
         is Block.Callout -> CalloutBox(block.kind, block.text)
         is Block.Say -> SayRow(block, speak)
         is Block.Table -> TableView(block.rows)
-        is Block.Tiles -> TileGrid(block.tiles, speak?.let { f -> { text: String -> f(text, 0) } })
+        is Block.Tiles -> TileGrid(block.tiles, speak?.let { f -> { text: String -> f(text, com.dlstudio.app.speech.Role()) } })
         is Block.Media -> MediaView(block, mediaDir)
     }
 }
