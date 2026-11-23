@@ -18,14 +18,14 @@ class Speaker(private val context: Context) {
     var chosen: Map<String, String> = emptyMap()
     var rate: Float = 1f
 
-    private fun engine(): TextToSpeech = tts ?: TextToSpeech(context.applicationContext) { code ->
+    private fun ensureEngine(): TextToSpeech = tts ?: TextToSpeech(context.applicationContext) { code ->
         ready = code == TextToSpeech.SUCCESS
         if (ready) queued.forEach { it() }
         queued.clear()
     }.also { tts = it }
 
     private fun whenReady(job: () -> Unit) {
-        engine()
+        ensureEngine()
         if (ready) job() else queued.add(job)
     }
 
