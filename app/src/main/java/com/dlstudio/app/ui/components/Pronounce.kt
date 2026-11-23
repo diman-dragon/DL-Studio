@@ -67,6 +67,7 @@ private fun PronounceResult(p: Pronounce) {
         Phase.LISTENING -> s.pronListening to colors.primary
         Phase.NO_SPEECH -> s.pronNoSpeech to colors.onSurfaceVariant
         Phase.NO_PERMISSION -> s.pronNoPermission to colors.error
+        Phase.NO_PACK -> s.pronNoPack to colors.error
         Phase.FAILED -> s.pronFailed to colors.error
         Phase.DONE -> when (Pronunciation.grade(p.score)) {
             Grade.GREAT -> s.pronGreat(p.score) to Color(0xFF34D399)

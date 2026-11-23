@@ -1,0 +1,412 @@
+{
+ "id": "en-l1-intro",
+ "course": "Английский",
+ "group": "Урок 1",
+ "n": 3,
+ "title": "Знакомство и города",
+ "tag": "en-US",
+ "theory": [
+  {
+   "i": "👋",
+   "h": "Знакомство",
+   "p": [
+    "Беатриса и Сергей знакомятся. Нажимайте на динамик и повторяйте за диктором.",
+    "~ My name is Beatrice. | Меня зовут (моё имя) Беатриса.",
+    "~ Bea… I’m sorry, spell your name, please. | Беа… Извините, скажите ваше имя по буквам, пожалуйста.",
+    "~ B – E – A – T – R – I – C – E | Беатриса диктует: би: и: эй ти: а: ай си: и: | bee, ee, ay, tea, ar, eye, see, ee",
+    "~ And what is your name? | А как вас зовут?",
+    "~ My name is Sergei. | Меня зовут Сергей.",
+    "~ Sir… G…? | Сэр… Г…?",
+    "~ Never mind. Just call me Grey. | Не важно. Зовите меня просто Грей (Серый).",
+    "!tip Если вас зовут **Сергей**, выучите вторую часть диалога — пригодится! Остальным — просто повеселиться."
+   ]
+  },
+  {
+   "i": "🔠",
+   "h": "Главное слово — spell",
+   "p": [
+    "Из всего диалога запомнить стоит прежде всего слово **spell** (спэл):",
+    "- писать или произносить (слово) **по буквам**;",
+    "- **заклинание**; заколдовывать (для любителей компьютерных игр).",
+    "~ Spell your name, please. | Скажите ваше имя по буквам, пожалуйста.",
+    "!note Уточнять написание в английском особенно актуально: слова пишутся и читаются совсем по-разному."
+   ]
+  },
+  {
+   "i": "🏙️",
+   "h": "Города по названиям букв",
+   "p": [
+    "Транскрипция в косых чертах — это названия букв. Прочитайте их подряд, и получится слово. Все города — из вашего упражнения:",
+    "| Названия букв | Город |",
+    "| /el/ /əʊ/ /en/ /di:/ /əʊ/ /en/ | L O N D O N |",
+    "| /es/ /waɪ/ /di:/ /en/ /i:/ /waɪ/ | S Y D N E Y |",
+    "| /bi:/ /aɪ/ /ɑ:/ /em/ /aɪ/ /en/ /ʤi:/ /eɪʧ/ /eɪ/ /em/ | B I R M I N G H A M |",
+    "| /em/ /eɪ/ /en/ /si:/ /eiʧ/ /i:/ /es/ /ti:/ /i:/ /ɑ:/ | M A N C H E S T E R |",
+    "| /el/ /i:/ /aɪ/ /si:/ /i:/ /es/ /ti:/ /i:/ /ɑ:/ | L E I C E S T E R |",
+    "~ London | Лондон",
+    "~ Sydney | Сидней",
+    "~ Birmingham | Бирмингем",
+    "~ Manchester | Манчестер",
+    "~ Leicester | Лестер (Лэ́стэ)",
+    "!fun **Leicester** ≈ (Лэ́стэ): в нём 9 букв, а звуков всего 5. Некоторые буквы «немые» — так исторически сложилось.",
+    "!tip Помните поговорку: «Пишется **Liverpool** (Ливерпуль), а читается **Manchester** (Манчестер)»."
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "front": "My name is…",
+   "back": "Меня зовут… (моё имя…)",
+   "ipa": "/maɪ neɪm ɪz/",
+   "example": "My name is Beatrice."
+  },
+  {
+   "front": "What is your name?",
+   "back": "Как вас зовут?",
+   "ipa": "/wɒt ɪz jɔː neɪm/",
+   "example": ""
+  },
+  {
+   "front": "And what is your name?",
+   "back": "А как вас зовут?",
+   "ipa": "/ænd wɒt ɪz jɔː neɪm/",
+   "example": ""
+  },
+  {
+   "front": "I’m sorry.",
+   "back": "Извините.",
+   "ipa": "/aɪm ˈsɒri/",
+   "example": ""
+  },
+  {
+   "front": "Spell your name, please.",
+   "back": "Скажите ваше имя по буквам, пожалуйста.",
+   "ipa": "/spel jɔː neɪm pliːz/",
+   "example": ""
+  },
+  {
+   "front": "Never mind.",
+   "back": "Не важно. Неважно.",
+   "ipa": "/ˈnevə maɪnd/",
+   "example": ""
+  },
+  {
+   "front": "Just call me Grey.",
+   "back": "Зовите меня просто Грей.",
+   "ipa": "/dʒʌst kɔːl miː ɡreɪ/",
+   "example": ""
+  },
+  {
+   "front": "My name is Sergei.",
+   "back": "Меня зовут Сергей.",
+   "ipa": "/maɪ neɪm ɪz ˈsɜːɡeɪ/",
+   "example": ""
+  },
+  {
+   "front": "Beatrice",
+   "back": "Беатриса (Беа…)",
+   "ipa": "/ˈbiːətrɪs/",
+   "example": ""
+  },
+  {
+   "front": "Sergei",
+   "back": "Сергей",
+   "ipa": "/ˈsɜːɡeɪ/",
+   "example": ""
+  },
+  {
+   "front": "Grey",
+   "back": "Грей, серый",
+   "ipa": "/ɡreɪ/",
+   "example": ""
+  },
+  {
+   "front": "Sir",
+   "back": "сэр",
+   "ipa": "/sɜː/",
+   "example": ""
+  },
+  {
+   "front": "name",
+   "back": "имя; название",
+   "ipa": "/neɪm/",
+   "example": ""
+  },
+  {
+   "front": "my",
+   "back": "мой, моя, моё",
+   "ipa": "/maɪ/",
+   "example": ""
+  },
+  {
+   "front": "your",
+   "back": "ваш, твой",
+   "ipa": "/jɔː/",
+   "example": ""
+  },
+  {
+   "front": "call",
+   "back": "звать, называть",
+   "ipa": "/kɔːl/",
+   "example": ""
+  },
+  {
+   "front": "just",
+   "back": "просто, всего лишь",
+   "ipa": "/dʒʌst/",
+   "example": ""
+  },
+  {
+   "front": "sorry",
+   "back": "извините; виноват",
+   "ipa": "/ˈsɒri/",
+   "example": ""
+  },
+  {
+   "front": "please",
+   "back": "пожалуйста",
+   "ipa": "/pliːz/",
+   "example": ""
+  },
+  {
+   "front": "never mind",
+   "back": "не важно, забудьте",
+   "ipa": "/ˈnevə maɪnd/",
+   "example": ""
+  },
+  {
+   "front": "and",
+   "back": "и, а",
+   "ipa": "/ænd/",
+   "example": ""
+  },
+  {
+   "front": "what",
+   "back": "что; какой",
+   "ipa": "/wɒt/",
+   "example": ""
+  },
+  {
+   "front": "is",
+   "back": "есть, является",
+   "ipa": "/ɪz/",
+   "example": ""
+  },
+  {
+   "front": "London",
+   "back": "Лондон",
+   "ipa": "/ˈlʌndən/",
+   "example": ""
+  },
+  {
+   "front": "Sydney",
+   "back": "Сидней",
+   "ipa": "/ˈsɪdni/",
+   "example": ""
+  },
+  {
+   "front": "Birmingham",
+   "back": "Бирмингем",
+   "ipa": "/ˈbɜːmɪŋəm/",
+   "example": ""
+  },
+  {
+   "front": "Manchester",
+   "back": "Манчестер",
+   "ipa": "/ˈmæntʃɪstə/",
+   "example": ""
+  },
+  {
+   "front": "Leicester",
+   "back": "Лестер (Лэ́стэ)",
+   "ipa": "/ˈlestə/",
+   "example": ""
+  },
+  {
+   "front": "Liverpool",
+   "back": "Ливерпуль",
+   "ipa": "/ˈlɪvəpuːl/",
+   "example": ""
+  }
+ ],
+ "quiz": [
+  {
+   "t": "choice",
+   "q": "Как по-английски «Меня зовут…»?",
+   "a": "My name is…",
+   "options": [
+    "What is your name?",
+    "I’m sorry.",
+    "My name is…",
+    "Never mind."
+   ]
+  },
+  {
+   "t": "choice",
+   "q": "Что значит **Never mind**?",
+   "a": "Не важно",
+   "options": [
+    "Извините",
+    "Не важно",
+    "По буквам",
+    "Как вас зовут?"
+   ]
+  },
+  {
+   "t": "choice",
+   "q": "Как попросить назвать имя по буквам?",
+   "a": "Spell your name, please.",
+   "options": [
+    "Spell your name, please.",
+    "Just call me Grey.",
+    "I’m sorry.",
+    "Never mind."
+   ]
+  },
+  {
+   "t": "choice",
+   "q": "Что значит слово **spell**?",
+   "a": "писать или произносить по буквам",
+   "options": [
+    "звать",
+    "извиняться",
+    "открывать",
+    "писать или произносить по буквам"
+   ]
+  },
+  {
+   "t": "listen",
+   "q": "Какую фразу вы услышали?",
+   "say": "What is your name?",
+   "a": "What is your name?",
+   "options": [
+    "My name is Sergei.",
+    "I’m sorry.",
+    "Never mind.",
+    "What is your name?"
+   ]
+  },
+  {
+   "t": "listen",
+   "q": "Какую фразу вы услышали?",
+   "say": "Never mind",
+   "a": "Never mind.",
+   "options": [
+    "I’m sorry.",
+    "Just call me Grey.",
+    "Never mind.",
+    "Spell your name, please."
+   ]
+  },
+  {
+   "t": "bank",
+   "q": "Соберите фразу: «Как вас зовут?»",
+   "a": "What is your name",
+   "options": [
+    "my",
+    "sorry"
+   ],
+   "hint": "Вопрос"
+  },
+  {
+   "t": "bank",
+   "q": "Соберите фразу: «Меня зовут Сергей»",
+   "a": "My name is Sergei",
+   "options": [
+    "your",
+    "call"
+   ]
+  },
+  {
+   "t": "bank",
+   "q": "Соберите фразу: «Зовите меня просто Грей»",
+   "a": "Just call me Grey",
+   "options": [
+    "name",
+    "is"
+   ]
+  },
+  {
+   "t": "fill",
+   "q": "Впишите по-английски: «Извините»",
+   "a": "I’m sorry",
+   "alt": [
+    "sorry",
+    "I am sorry",
+    "Im sorry"
+   ]
+  },
+  {
+   "t": "fill",
+   "q": "Расшифруйте по названиям букв: /el/ /əʊ/ /en/ /di:/ /əʊ/ /en/",
+   "a": "London",
+   "alt": [],
+   "hint": "Столица Великобритании"
+  },
+  {
+   "t": "fill",
+   "q": "Расшифруйте: /es/ /waɪ/ /di:/ /en/ /i:/ /waɪ/",
+   "a": "Sydney",
+   "alt": [],
+   "hint": "Город в Австралии"
+  },
+  {
+   "t": "fill",
+   "q": "Расшифруйте: /em/ /eɪ/ /en/ /si:/ /eiʧ/ /i:/ /es/ /ti:/ /i:/ /ɑ:/",
+   "a": "Manchester",
+   "alt": []
+  },
+  {
+   "t": "match",
+   "q": "Соедините слова с переводом",
+   "pairs": [
+    [
+     "Sir",
+     "сэр"
+    ],
+    [
+     "sorry",
+     "извините"
+    ],
+    [
+     "please",
+     "пожалуйста"
+    ],
+    [
+     "call",
+     "звать"
+    ]
+   ]
+  },
+  {
+   "t": "choice",
+   "q": "Сколько звуков в названии **Leicester**?",
+   "a": "5",
+   "options": [
+    "5",
+    "9",
+    "7",
+    "3"
+   ]
+  },
+  {
+   "t": "speak",
+   "q": "Представьтесь по-английски",
+   "a": "My name is Sergei",
+   "say": "My name is Sergei"
+  },
+  {
+   "t": "speak",
+   "q": "Произнесите фразу",
+   "a": "Never mind",
+   "say": "Never mind"
+  },
+  {
+   "t": "speak",
+   "q": "Произнесите название города",
+   "a": "Leicester",
+   "say": "Leicester",
+   "hint": "Лэ́стэ: «немые» буквы не читаем"
+  }
+ ]
+}

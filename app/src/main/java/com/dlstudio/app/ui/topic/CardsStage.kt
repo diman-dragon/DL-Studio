@@ -95,7 +95,7 @@ private fun FlipCard(card: Card, flipped: Boolean, speak: Speak?, check: Check?,
 private fun Front(card: Card, speak: Speak?, check: Check?) {
     Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(16.dp), Alignment.CenterHorizontally) {
         Text(card.front, style = MaterialTheme.typography.headlineLarge, textAlign = TextAlign.Center)
-        if (speak != null) PronounceRow(card.front, speak, check)
+        if (speak != null) PronounceRow(card.say.ifBlank { card.front }, speak, check.takeIf { card.mic })
     }
 }
 

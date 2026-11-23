@@ -18,11 +18,15 @@ import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.settings.ThemeMode
 import com.dlstudio.app.speech.Listener
+import com.dlstudio.app.speech.PackState
+import com.dlstudio.app.speech.SpeechPacks
+import com.dlstudio.app.speech.VoiceChoice
 import com.dlstudio.app.speech.Phase
 import com.dlstudio.app.speech.Pronounce
 import com.dlstudio.app.speech.Pronunciation
 import com.dlstudio.app.speech.Speaker
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,10 +39,12 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val store = TopicStore(app)
     private val speaker = Speaker(app)
     private val listener = Listener(app)
-    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, prefs.catalogUrl, ProgressJson.decode(prefs.progressJson), prefs.dailyGoal))
+    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, prefs.catalogUrl, ProgressJson.decode(prefs.progressJson), prefs.dailyGoal, speech = SpeechUi(chosen = prefs.voices, rate = prefs.speechRate)))
     val state: StateFlow<AppState> = mutable.asStateFlow()
 
     init {
+        speaker.chosen = prefs.voices
+        speaker.rate = prefs.speechRate
         viewModelScope.launch(Dispatchers.IO) { reload() }
     }
 
@@ -132,6 +138,45 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun speak(text: String, tag: String) = speaker.speak(text, tag)
 
+    private fun updateSpeech(change: (SpeechUi) -> SpeechUi) = mutable.update { it.copy(speech = change(it.speech)) }
+
+    /** Читает голоса встроенного движка и узнаёт, скачаны ли пакеты распознавания для языков `tags`. Вызывать при открытии настроек. */
+    fun loadVoices(tags: List<String>) {
+        speaker.voices { raw -> updateSpeech { it.copy(voices = raw, loaded = true) } }
+        checkPacks(tags)
+    }
+
+    private fun checkPacks(tags: List<String>) = tags.forEach { tag ->
+        SpeechPacks.check(app, tag) { found -> updateSpeech { it.copy(packs = it.packs + (tag to found)) } }
+    }
+
+    /** Выбор голоса для языка (`name` — служебное имя; null — голос по умолчанию). */
+    fun chooseVoice(lang: String, name: String?) {
+        val chosen = if (name == null) mutable.value.speech.chosen - lang else mutable.value.speech.chosen + (lang to name)
+        prefs.voices = chosen
+        speaker.chosen = chosen
+        updateSpeech { it.copy(chosen = chosen) }
+    }
+
+    fun previewVoice(voice: VoiceChoice, sample: String) = speaker.preview(sample, voice.name, voice.tag)
+
+    fun setSpeechRate(rate: Float) {
+        prefs.speechRate = rate
+        speaker.rate = rate
+        updateSpeech { it.copy(rate = rate) }
+    }
+
+    fun installVoices() { SpeechPacks.openVoiceDownload(app) }
+    fun openSpeechSettings() { SpeechPacks.openSpeechSettings(app) }
+
+    /** Скачивание пакета распознавания речи: на Android 13+ запускается сразу и через несколько секунд состояние проверяется ещё раз, на старых открываются настройки голосового ввода. */
+    fun downloadPack(tag: String) {
+        SpeechPacks.download(app, tag)
+        if (!SpeechPacks.canManage(app)) return
+        updateSpeech { it.copy(packs = it.packs + (tag to PackState.DOWNLOADING)) }
+        viewModelScope.launch { delay(PACK_RECHECK_MS); checkPacks(listOf(tag)) }
+    }
+
     /** Слушает, как пользователь произносит `text`, и оценивает похожесть (см. Pronunciation). */
     fun listen(text: String, tag: String) {
         speaker.stop()
@@ -149,6 +194,8 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun micDenied(text: String) = mutable.update { it.copy(pronounce = Pronounce(text, Phase.NO_PERMISSION)) }
+
+    private companion object { const val PACK_RECHECK_MS = 5000L }
 
     override fun onCleared() { speaker.shutdown(); listener.stop() }
 }

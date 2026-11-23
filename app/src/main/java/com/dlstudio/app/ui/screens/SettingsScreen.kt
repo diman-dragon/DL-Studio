@@ -23,12 +23,13 @@ import com.dlstudio.app.ui.components.ScreenHeader
 import com.dlstudio.app.ui.components.SettingRow
 import com.dlstudio.app.ui.components.SettingsSection
 import com.dlstudio.app.ui.components.ThemesSection
+import com.dlstudio.app.ui.components.VoiceSection
 import com.dlstudio.app.ui.theme.LocalStrings
 
 /** Варианты цели дня, XP. */
 private val GOALS = listOf(10, 20, 30, 50, 100)
 
-/** Настройки: внешний вид (тема, язык, цвет по радуге), цель дня, темы курсов (каталог, файл, удаление), сброс прогресса и «О нас». */
+/** Настройки: внешний вид (тема, язык, цвет по радуге), цель дня, озвучка и распознавание речи (голоса, пакеты), темы курсов (каталог, файл, удаление), сброс прогресса и «О нас». */
 @Composable
 fun SettingsScreen(state: AppState, vm: AppViewModel) {
     val s = LocalStrings.current
@@ -45,6 +46,7 @@ fun SettingsScreen(state: AppState, vm: AppViewModel) {
         SettingsSection(s.sectionLearning) {
             CycleTile(s.settingGoal, GOALS.map { s.goalValue(it) to it }, state.dailyGoal, vm::setDailyGoal)
         }
+        VoiceSection(state, vm)
         ThemesSection(state, vm) { picker.launch(arrayOf("*/*")) }
         ResetSection(vm::resetProgress)
         AboutCard()

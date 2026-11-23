@@ -106,21 +106,24 @@ fun AppIcon(@DrawableRes res: Int, tint: Color, size: Dp = 24.dp) {
 
 /** Яркая круглая кнопка с иконкой: цветной градиент, свечение, при `pulse` мягко «дышит» (например, пока идёт запись). */
 @Composable
-fun GlowButton(@DrawableRes icon: Int, colors: List<Color>, onClick: () -> Unit, contentDescription: String, modifier: Modifier = Modifier, pulse: Boolean = false) {
+fun GlowButton(
+    @DrawableRes icon: Int, colors: List<Color>, onClick: () -> Unit, contentDescription: String, modifier: Modifier = Modifier,
+    pulse: Boolean = false, size: Dp = 54.dp
+) {
     val beat = if (pulse) rememberInfiniteTransition(label = "pulse").animateFloat(1f, 1.16f, infiniteRepeatable(tween(600), RepeatMode.Reverse), label = "beat") else null
     Box(
-        modifier.size(54.dp).graphicsLayer { val k = beat?.value ?: 1f; scaleX = k; scaleY = k }
+        modifier.size(size).graphicsLayer { val k = beat?.value ?: 1f; scaleX = k; scaleY = k }
             .shadow(14.dp, CircleShape, ambientColor = colors.last(), spotColor = colors.last()).clip(CircleShape)
             .background(Brush.linearGradient(colors)).clickable(role = Role.Button, onClick = onClick)
             .semantics { this.contentDescription = contentDescription },
         contentAlignment = Alignment.Center
-    ) { AppIcon(icon, Color.White, 28.dp) }
+    ) { AppIcon(icon, Color.White, size * 0.52f) }
 }
 
 /** Кнопка озвучки рядом с текстом на изучаемом языке: цвет акцента. */
 @Composable
-fun SmallSpeaker(text: String, onSpeak: Speak, modifier: Modifier = Modifier) {
-    GlowButton(R.drawable.ic_volume, LocalAccent.current.gradientColors(), { onSpeak(text) }, LocalStrings.current.speak, modifier)
+fun SmallSpeaker(text: String, onSpeak: Speak, modifier: Modifier = Modifier, size: Dp = 54.dp) {
+    GlowButton(R.drawable.ic_volume, LocalAccent.current.gradientColors(), { onSpeak(text) }, LocalStrings.current.speak, modifier, size = size)
 }
 
 /** Варианты ответа сеткой 2×N: выбранный верный — акцентом, выбранный неверный — красным, верный после ответа подсвечивается. */

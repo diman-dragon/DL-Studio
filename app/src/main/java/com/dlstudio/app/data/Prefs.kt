@@ -6,6 +6,7 @@ import com.dlstudio.app.settings.AccentColor
 import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.settings.ThemeMode
 import java.util.Locale
+import org.json.JSONObject
 
 /** Настройки и прогресс (SharedPreferences). Прогресс хранится одной JSON-строкой: см. progress/Progress.kt. */
 class Prefs(context: Context) {
@@ -33,6 +34,16 @@ class Prefs(context: Context) {
     var catalogUrl: String
         get() = sp.getString("catalogUrl", "").orEmpty()
         set(value) = sp.putPref("catalogUrl", value.trim())
+
+    /** Выбранные голоса озвучки: язык («en») → служебное имя голоса встроенного движка Android. Нет записи — голос по умолчанию. */
+    var voices: Map<String, String>
+        get() = runCatching { JSONObject(sp.getString("voices", "{}").orEmpty()).let { o -> o.keys().asSequence().associateWith { o.getString(it) } } }.getOrDefault(emptyMap())
+        set(value) = sp.putPref("voices", JSONObject(value).toString())
+
+    /** Скорость озвучки: 1 — обычная, меньше — медленнее. */
+    var speechRate: Float
+        get() = sp.getFloat("speechRate", 1f)
+        set(value) { sp.edit().putFloat("speechRate", value).apply() }
 
     var progressJson: String?
         get() = sp.getString("progress", null)

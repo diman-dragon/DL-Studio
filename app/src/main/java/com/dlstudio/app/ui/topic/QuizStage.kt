@@ -11,48 +11,76 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.content.QuizItem
-import com.dlstudio.app.ui.components.ChoiceOptions
+import com.dlstudio.app.content.QuizKind
+import com.dlstudio.app.i18n.Strings
+import com.dlstudio.app.speech.Check
+import com.dlstudio.app.speech.Speak
 import com.dlstudio.app.ui.components.GradientButton
 import com.dlstudio.app.ui.components.ProgressBar
-import com.dlstudio.app.ui.components.SettingCard
 import com.dlstudio.app.ui.theme.LocalStrings
 
 /**
- * Практика: вопросы по порядку с готовыми вариантами. Верный ответ даёт XP (один раз за вопрос), неверный просто показывает правильный.
- * В конце — результат и «Пройти снова». Этап считается пройденным, когда верно решено 60% вопросов (`done` приходит снаружи).
+ * Практика: вопросы по порядку, виды — выбор из четырёх, «на слух», произнести вслух, мешок слов, вписать, соединить пары.
+ * Верный ответ даёт XP (один раз за вопрос), неверный показывает правильный. Вопросы, которым нужны озвучка и микрофон,
+ * показываются только в темах с языком озвучки. В конце — результат и «Пройти снова». Этап считается пройденным, когда верно решено 60% вопросов (`done` приходит снаружи).
  */
 @Composable
-fun QuizStage(items: List<QuizItem>, done: Boolean, onAnswer: (Int, Boolean) -> Unit, modifier: Modifier = Modifier) {
+fun QuizStage(items: List<QuizItem>, done: Boolean, speak: Speak?, check: Check?, onAnswer: (Int, Boolean) -> Unit, modifier: Modifier = Modifier) {
     val s = LocalStrings.current
-    var index by rememberSaveable { mutableStateOf(0) }
-    var picked by rememberSaveable(index) { mutableStateOf<String?>(null) }
+    val order = remember(items, speak != null) { items.indices.filter { speak != null || !items[it].kind.needsVoice } }
+    var pos by rememberSaveable { mutableStateOf(0) }
     var correct by rememberSaveable { mutableStateOf(0) }
+    var result by remember(pos) { mutableStateOf<Boolean?>(null) }
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), Arrangement.spacedBy(16.dp)) {
-        if (index >= items.size) {
-            Text(s.quizResult(correct, items.size), Modifier.fillMaxWidth().padding(top = 24.dp), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
+        if (pos >= order.size) {
+            Text(s.quizResult(correct, order.size), Modifier.fillMaxWidth().padding(top = 24.dp), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
             if (done) Text(s.stageDone, Modifier.fillMaxWidth(), MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
-            GradientButton(s.retry, { index = 0; correct = 0 })
+            GradientButton(s.retry, { pos = 0; correct = 0 })
         } else {
+            val index = order[pos]
             val item = items[index]
-            ProgressBar(index / items.size.toFloat())
-            SettingCard { Text(item.question, style = MaterialTheme.typography.headlineSmall) }
-            ChoiceOptions(item.options, item.answer, picked, { choice ->
-                picked = choice
-                val ok = choice == item.answer
-                if (ok) correct += 1
-                onAnswer(index, ok)
-            })
-            if (picked != null) {
-                Text(if (picked == item.answer) s.correct else s.wrongAnswer(item.answer), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-                GradientButton(if (index == items.lastIndex) s.seeResult else s.next, { index += 1 })
+            ProgressBar(pos / order.size.toFloat())
+            key(pos) {
+                Question(item, speak, check) { ok ->
+                    if (result == null) {
+                        result = ok
+                        if (ok) correct += 1
+                        onAnswer(index, ok)
+                    }
+                }
+            }
+            result?.let { ok ->
+                Text(verdict(s, item, ok), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                GradientButton(if (pos == order.lastIndex) s.seeResult else s.next, { pos += 1 })
             }
         }
     }
+}
+
+@Composable
+private fun Question(item: QuizItem, speak: Speak?, check: Check?, onDone: (Boolean) -> Unit) {
+    when (item.kind) {
+        QuizKind.CHOICE, QuizKind.LISTEN -> ChoiceQuestion(item, speak, onDone)
+        QuizKind.SPEAK -> if (speak != null) SpeakQuestion(item, speak, check, onDone)
+        QuizKind.BANK -> BankQuestion(item, onDone)
+        QuizKind.FILL -> FillQuestion(item, speak, onDone)
+        QuizKind.MATCH -> MatchQuestion(item, onDone)
+    }
+}
+
+/** Строка под вопросом после ответа: «Верно!» или то, как было правильно. */
+private fun verdict(s: Strings, item: QuizItem, ok: Boolean): String = when {
+    ok -> s.correct
+    item.kind == QuizKind.SPEAK -> s.speakSkipped
+    item.kind == QuizKind.MATCH -> s.matchWrong
+    else -> s.wrongAnswer(item.answer)
 }

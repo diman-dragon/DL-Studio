@@ -2,8 +2,8 @@ package com.dlstudio.app.speech
 
 import kotlin.math.roundToInt
 
-/** Этап проверки произношения: ждём, слушаем, получили оценку или не вышло. */
-enum class Phase { IDLE, LISTENING, DONE, NO_SPEECH, NO_PERMISSION, FAILED }
+/** Этап проверки произношения: ждём, слушаем, получили оценку или не вышло (NO_PACK — для языка нет пакета распознавания речи). */
+enum class Phase { IDLE, LISTENING, DONE, NO_SPEECH, NO_PERMISSION, NO_PACK, FAILED }
 
 /** Оценка: насколько сказанное похоже на нужную фразу. */
 enum class Grade { GREAT, GOOD, RETRY }

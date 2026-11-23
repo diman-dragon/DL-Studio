@@ -7,7 +7,14 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 
-/** Слушает микрофон системным распознаванием речи на языке темы. Работать с ним нужно с главного потока. */
+/** Коды ошибок распознавателя Android 12+ (SpeechRecognizer.ERROR_LANGUAGE_*): язык не поддерживается / пакет языка не скачан. */
+private const val ERROR_LANGUAGE_NOT_SUPPORTED = 12
+private const val ERROR_LANGUAGE_UNAVAILABLE = 13
+
+/**
+ * Слушает микрофон встроенным распознаванием речи Android на языке темы; если на устройстве скачан языковой пакет, работает без сети.
+ * Работать с ним нужно с главного потока.
+ */
 class Listener(private val context: Context) {
     private var recognizer: SpeechRecognizer? = null
 
@@ -25,6 +32,7 @@ class Listener(private val context: Context) {
                 when (error) {
                     SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> Phase.NO_SPEECH
                     SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> Phase.NO_PERMISSION
+                    ERROR_LANGUAGE_NOT_SUPPORTED, ERROR_LANGUAGE_UNAVAILABLE -> Phase.NO_PACK
                     else -> Phase.FAILED
                 }
             )
@@ -40,6 +48,7 @@ class Listener(private val context: Context) {
             .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             .putExtra(RecognizerIntent.EXTRA_LANGUAGE, tag)
             .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5)
+            .putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
         recognizer = engine
         engine.startListening(intent)
     }
