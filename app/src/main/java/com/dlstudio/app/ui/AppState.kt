@@ -1,6 +1,5 @@
 package com.dlstudio.app.ui
 
-import com.dlstudio.app.content.CatalogEntry
 import com.dlstudio.app.content.Topic
 import com.dlstudio.app.progress.Progress
 import com.dlstudio.app.settings.AccentColor
@@ -10,8 +9,8 @@ import com.dlstudio.app.speech.PackState
 import com.dlstudio.app.speech.Pronounce
 import com.dlstudio.app.speech.RawVoice
 
-/** Сообщение под разделом «Темы» после действия с файлом или загрузкой. */
-enum class Notice { NONE, DOWNLOAD_FAILED, FILE_FAILED }
+/** Сообщение под разделом «Темы» после установки файла. */
+enum class Notice { NONE, FILE_FAILED }
 
 /** Последняя награда: сколько XP, закончилась ли тема, выполнена ли цель дня, и номер (меняется при каждой награде, чтобы всплывашка показывалась снова). */
 data class Gain(val xp: Int, val finished: Boolean, val id: Int, val goal: Boolean = false)
@@ -25,21 +24,17 @@ data class SpeechUi(
     val rate: Float = 1f, val packs: Map<String, PackState> = emptyMap()
 )
 
-/** Всё, что рисует интерфейс. */
+/** Всё, что рисует интерфейс. `offer` — после установки тем предложить скачать недостающие языковые пакеты. */
 data class AppState(
     val theme: ThemeMode,
     val lang: AppLang,
     val accent: AccentColor,
-    val catalogUrl: String,
     val progress: Progress,
     val dailyGoal: Int,
     val lastTopic: String = "",
     val topics: List<Topic> = emptyList(),
-    val catalog: List<CatalogEntry> = emptyList(),
-    val catalogLoading: Boolean = false,
-    val catalogFailed: Boolean = false,
-    val busy: Set<String> = emptySet(),
     val notice: Notice = Notice.NONE,
+    val offer: Boolean = false,
     val gain: Gain? = null,
     val pronounce: Pronounce = Pronounce(),
     val speech: SpeechUi = SpeechUi()

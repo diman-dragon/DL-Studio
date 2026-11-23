@@ -69,15 +69,6 @@ fun SettingCard(
     }
 }
 
-/** Плитка: название сверху, значение под ним (после «/» разрешён перенос); тап — действие. */
-@Composable
-fun SettingTile(title: String, value: String, onClick: () -> Unit) {
-    SettingCard(onClick = onClick, gap = 3.dp) {
-        Text(title, style = MaterialTheme.typography.titleMedium)
-        Text(value.replace("/", "/\u200b"), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, maxLines = 2)
-    }
-}
-
 /** Плитка-кнопка с одной подписью по центру: короткое действие рядом с другими в `SettingRow`. */
 @Composable
 fun ActionTile(label: String, onClick: () -> Unit, modifier: Modifier = Modifier.fillMaxWidth()) {

@@ -26,6 +26,7 @@ import com.dlstudio.app.progress.TopicProgress
 import com.dlstudio.app.progress.Xp
 import com.dlstudio.app.speech.Check
 import com.dlstudio.app.speech.Speak
+import com.dlstudio.app.speech.Role as VoiceRole
 import com.dlstudio.app.speech.SpeakAs
 import com.dlstudio.app.ui.AppState
 import com.dlstudio.app.ui.AppViewModel
@@ -48,7 +49,7 @@ fun TopicScreen(topic: Topic, state: AppState, vm: AppViewModel, onBack: () -> U
     var picked by rememberSaveable(topic.id) { mutableStateOf(0) }
     val index = picked.coerceIn(0, stages.lastIndex)
     val speak: Speak? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> { text: String -> vm.speak(text, tag) } }
-    val speakAs: SpeakAs? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> { text: String, voice: Int -> vm.speak(text, tag, voice) } }
+    val speakAs: SpeakAs? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> { text: String, role: VoiceRole -> vm.speak(text, tag, role) } }
     val check: Check? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> Check(state.pronounce, { vm.listen(it, tag) }, vm::stopListening, vm::micDenied) }
 
     Column(Modifier.fillMaxSize().padding(top = 12.dp)) {

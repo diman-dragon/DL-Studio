@@ -23,7 +23,7 @@ object TopicPack {
 
     /**
      * Медиа из zip-пакета: записи `media/<id темы>/<путь>` с разрешённым расширением и безопасным путём. Каждая отдаётся в `onFile(id, путь, байты)`.
-     * Запись крупнее 25 МБ пропускается (большое медиа лучше раздавать по каталогу).
+     * Запись крупнее 25 МБ пропускается (большое медиа лучше давать ссылкой https).
      */
     fun media(bytes: ByteArray, onFile: (String, String, ByteArray) -> Unit) {
         if (bytes.size > MAX_FILE || bytes.size < 4 || bytes[0] != 'P'.code.toByte() || bytes[1] != 'K'.code.toByte()) return

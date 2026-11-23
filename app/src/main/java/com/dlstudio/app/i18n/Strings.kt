@@ -60,10 +60,8 @@ interface Strings {
 
     val sectionData: String; val resetProgress: String; val resetProgressHint: String; val resetQuestion: String; val reset: String
 
-    val sectionTopics: String; val catalogAddress: String; val catalogNotSet: String; val catalogHint: String
-    val refreshCatalog: String; val fromFile: String; val downloadAll: String; val download: String
-    val availableTitle: String; val installedTitle: String; val remove: String; val removeAll: String
-    val catalogLoading: String; val catalogFailed: String; val downloadFailed: String; val fileFailed: String; val nothingNew: String
+    val sectionTopics: String; val fromFile: String; val download: String
+    val installedTitle: String; val remove: String; val removeAll: String; val fileFailed: String
     fun removeQuestion(title: String): String
     fun removeAllQuestion(count: Int): String
     fun removeManyQuestion(count: Int): String
@@ -74,6 +72,11 @@ interface Strings {
     val voiceAuto: String; val voiceAutoHint: String; val voiceHigh: String; val voiceNetwork: String; val voiceNotInstalled: String
     val voicesLoading: String; val voicesMore: String; val voiceLanguage: String; val voiceLabel: String; val packOn: String; val packOff: String
     val recogTitle: String; val recogHint: String
+    val voiceFemaleLabel: String; val voiceMaleLabel: String; val genderAutoHint: String; val voiceGenderHint: String
+    val genderFemale: String; val genderMale: String; val genderUnknown: String
+    val statusVoice: String; val statusRecog: String; val statusFemale: String; val statusMale: String; val statusNoLangs: String
+    val downloadNeeded: String; val allReady: String; val offerTitle: String; val later: String
+    fun offerText(languages: String): String
     val packInstalled: String; val packAvailable: String; val packDownloading: String; val packUnsupported: String; val packUnknown: String
 
     val aboutTitle: String; val aboutText: String; val aboutCopyright: String

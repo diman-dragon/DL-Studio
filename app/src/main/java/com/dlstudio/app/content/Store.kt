@@ -5,7 +5,7 @@ import java.io.File
 
 /**
  * Установленные темы: по файлу `<id>.json` в папке приложения. Встроенных тем нет: их ставят из файла
- * (json одной темы или zip-пакет с темами) или скачивают по каталогу.
+ * (json одной темы или zip-пакет с темами).
  */
 class TopicStore(private val context: Context) {
     private val dir: File get() = File(context.filesDir, "topics").also { it.mkdirs() }

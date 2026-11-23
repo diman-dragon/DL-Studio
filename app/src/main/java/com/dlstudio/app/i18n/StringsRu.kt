@@ -122,13 +122,9 @@ object StringsRu : Strings {
     override val resetProgressHint = "Обнулит серию дней и пройденные этапы. XP, уровень и темы останутся."
     override val resetQuestion = "Сбросить прогресс? Пройденные этапы и серия удалятся, вернуть их будет нельзя. XP и уровень сохранятся."; override val reset = "Сбросить"
 
-    override val sectionTopics = "Темы"; override val catalogAddress = "Адрес каталога"; override val catalogNotSet = "Не задан"
-    override val catalogHint = "Адрес https-папки, где лежит course.json. Темы скачиваются по одной, каждая проверяется по контрольной сумме."
-    override val refreshCatalog = "Обновить каталог"; override val fromFile = "Из файла"; override val downloadAll = "Скачать все"; override val download = "Скачать"
-    override val availableTitle = "Доступные темы"; override val installedTitle = "Установленные темы"; override val remove = "Удалить"; override val removeAll = "Удалить все темы"
-    override val catalogLoading = "Загружаем каталог…"; override val catalogFailed = "Не удалось получить каталог. Проверьте адрес и сеть."
-    override val downloadFailed = "Не все темы скачались. Попробуйте ещё раз."; override val fileFailed = "Файл не похож на тему: нужен json темы или zip с темами."
-    override val nothingNew = "Все темы из каталога уже установлены."
+    override val sectionTopics = "Темы"; override val fromFile = "Добавить из файла"; override val download = "Скачать"
+    override val installedTitle = "Установленные темы"; override val remove = "Удалить"; override val removeAll = "Удалить все темы"
+    override val fileFailed = "Файл не похож на тему: нужен json темы или zip с темами."
     override fun removeQuestion(title: String) = "Удалить тему «$title»? Прогресс сохранится."
     override fun removeAllQuestion(count: Int) = "Удалить все темы ($count)? Прогресс сохранится, темы можно поставить снова."
     override fun removeManyQuestion(count: Int) = "Удалить темы ($count)? Прогресс сохранится."
@@ -136,8 +132,8 @@ object StringsRu : Strings {
     override val noCourse = "Без курса"
     override val cancel = "Отмена"; override val save = "Сохранить"
 
-    override val sectionVoice = "Озвучка и распознавание"
-    override val voiceIntro = "Озвучка и проверка произношения работают на встроенных средствах Android. Здесь можно выбрать голос, скорость речи и скачать нужные пакеты."
+    override val sectionVoice = "Языки и озвучка"
+    override val voiceIntro = "Языки берутся из установленных тем. Озвучка и проверка произношения работают на встроенных средствах Android: здесь можно скачать нужные голоса и пакеты, выбрать голоса и скорость речи."
     override val voiceRate = "Скорость речи"; override val rateSlow = "Медленно"; override val rateNormal = "Обычно"; override val rateFast = "Быстро"
     override val voiceAuto = "Авто"; override val voiceAutoHint = "Голос, который система выбрала сама"
     override val voiceHigh = "высокое качество"; override val voiceNetwork = "нужен интернет"; override val voiceNotInstalled = "не скачан"
@@ -151,4 +147,14 @@ object StringsRu : Strings {
 
     override val aboutTitle = "DL Studio"; override val aboutText = "Курсы по темам: теория, карточки и практика. Работает без интернета."
     override val aboutCopyright = "© 2026 DataLaw DesignLab. Все права защищены."
+
+    override val voiceFemaleLabel = "Женский голос (диалоги)"; override val voiceMaleLabel = "Мужской голос (диалоги)"
+    override val genderAutoHint = "Подберётся автоматически по полу"
+    override val voiceGenderHint = "Женские реплики диалогов звучат женскими голосами, мужские — мужскими. Пол Android не сообщает, он определяется по названию голоса; если не определился, выберите голос сами — он станет женским или мужским."
+    override val genderFemale = "женский"; override val genderMale = "мужской"; override val genderUnknown = "пол не определён"
+    override val statusVoice = "Голос"; override val statusRecog = "Распознавание"; override val statusFemale = "Женский голос"; override val statusMale = "Мужской голос"
+    override val statusNoLangs = "Установите тему, и здесь появятся её языки, голоса и пакеты."
+    override val downloadNeeded = "Скачать недостающее"; override val allReady = "Всё нужное установлено"
+    override val offerTitle = "Нужны языковые пакеты"; override val later = "Позже"
+    override fun offerText(languages: String) = "Для установленных тем не хватает голосов или пакетов распознавания: $languages. Скачать недостающее?"
 }

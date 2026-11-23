@@ -30,11 +30,6 @@ class Prefs(context: Context) {
         get() = sp.getInt("dailyGoal", DEFAULT_GOAL)
         set(value) { sp.edit().putInt("dailyGoal", value).apply() }
 
-    /** Адрес папки с course.json; пусто — каталог не задан. */
-    var catalogUrl: String
-        get() = sp.getString("catalogUrl", "").orEmpty()
-        set(value) = sp.putPref("catalogUrl", value.trim())
-
     /** Выбранные голоса озвучки: язык («en») → служебное имя голоса встроенного движка Android. Нет записи — голос по умолчанию. */
     var voices: Map<String, String>
         get() = runCatching { JSONObject(sp.getString("voices", "{}").orEmpty()).let { o -> o.keys().asSequence().associateWith { o.getString(it) } } }.getOrDefault(emptyMap())

@@ -1,6 +1,5 @@
 package com.dlstudio.app
 
-import com.dlstudio.app.content.Remote
 import com.dlstudio.app.content.TopicJson
 import com.dlstudio.app.content.TopicPack
 import com.dlstudio.app.progress.Progress
@@ -34,15 +33,6 @@ class ContentTest {
     @Test fun quizWithoutRightOptionIsDropped() {
         val t = TopicJson.parse("""{"id":"x","title":"T","quiz":[{"q":"1","a":"yes","options":["no","maybe"]},{"q":"2","a":"yes","options":["yes","no"]}]}""")
         assertEquals(listOf("2"), t.quiz.map { it.question })
-    }
-
-    @Test fun catalogSkipsUnsafePaths() {
-        val text = """{"topics":[{"id":"ok","pack":"topics/ok.json","sha256":"00"},{"id":"bad","pack":"../secret.json","sha256":"00"},{"id":"bad2","pack":"https://evil/x.json","sha256":"00"}]}"""
-        assertEquals(listOf("ok"), TopicJson.parseCatalog(text).map { it.id })
-    }
-
-    @Test fun sha256MatchesKnownValue() {
-        assertEquals("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", Remote.sha256("abc".toByteArray()))
     }
 
     @Test fun progressSurvivesRoundTripAndGarbage() {

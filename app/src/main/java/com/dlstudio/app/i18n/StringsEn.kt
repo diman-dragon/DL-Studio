@@ -122,13 +122,9 @@ object StringsEn : Strings {
     override val resetProgressHint = "Clears your streak and completed stages. XP, level and topics stay."
     override val resetQuestion = "Reset progress? Completed stages and your streak will be deleted and can’t be restored. XP and level are kept."; override val reset = "Reset"
 
-    override val sectionTopics = "Topics"; override val catalogAddress = "Catalog address"; override val catalogNotSet = "Not set"
-    override val catalogHint = "An https folder that contains course.json. Topics download one by one, each checked against its checksum."
-    override val refreshCatalog = "Refresh catalog"; override val fromFile = "From file"; override val downloadAll = "Download all"; override val download = "Download"
-    override val availableTitle = "Available topics"; override val installedTitle = "Installed topics"; override val remove = "Remove"; override val removeAll = "Remove all topics"
-    override val catalogLoading = "Loading the catalog…"; override val catalogFailed = "Couldn’t get the catalog. Check the address and your connection."
-    override val downloadFailed = "Some topics didn’t download. Try again."; override val fileFailed = "That file doesn’t look like a topic: it needs a topic json or a zip with topics."
-    override val nothingNew = "All topics from the catalog are installed."
+    override val sectionTopics = "Topics"; override val fromFile = "Add from file"; override val download = "Download"
+    override val installedTitle = "Installed topics"; override val remove = "Remove"; override val removeAll = "Remove all topics"
+    override val fileFailed = "That file doesn’t look like a topic: it needs a topic json or a zip with topics."
     override fun removeQuestion(title: String) = "Remove the topic “$title”? Your progress is kept."
     override fun removeAllQuestion(count: Int) = "Remove all $count topics? Your progress is kept and you can install them again."
     override fun removeManyQuestion(count: Int) = "Remove $count topics? Progress is kept."
@@ -136,8 +132,8 @@ object StringsEn : Strings {
     override val noCourse = "No course"
     override val cancel = "Cancel"; override val save = "Save"
 
-    override val sectionVoice = "Voice & recognition"
-    override val voiceIntro = "Speech and pronunciation checks use Android’s built-in services. Pick a voice, set the speed and download the packs you need."
+    override val sectionVoice = "Languages & voices"
+    override val voiceIntro = "Languages come from the installed topics. Speech and pronunciation checks use Android’s built-in services: download the voices and packs you need, pick voices and speech speed here."
     override val voiceRate = "Speech speed"; override val rateSlow = "Slow"; override val rateNormal = "Normal"; override val rateFast = "Fast"
     override val voiceAuto = "Auto"; override val voiceAutoHint = "The voice the system picked itself"
     override val voiceHigh = "high quality"; override val voiceNetwork = "needs internet"; override val voiceNotInstalled = "not downloaded"
@@ -151,4 +147,14 @@ object StringsEn : Strings {
 
     override val aboutTitle = "DL Studio"; override val aboutText = "Courses by topic: theory, flashcards and practice. Works offline."
     override val aboutCopyright = "© 2026 DataLaw DesignLab. All rights reserved."
+
+    override val voiceFemaleLabel = "Female voice (dialogues)"; override val voiceMaleLabel = "Male voice (dialogues)"
+    override val genderAutoHint = "Picked automatically by gender"
+    override val voiceGenderHint = "Female lines in dialogues use female voices, male lines use male voices. Android doesn’t report a voice’s gender, so it is read from the voice name; if it can’t be told, pick a voice yourself and it becomes the female or male one."
+    override val genderFemale = "female"; override val genderMale = "male"; override val genderUnknown = "gender unknown"
+    override val statusVoice = "Voice"; override val statusRecog = "Recognition"; override val statusFemale = "Female voice"; override val statusMale = "Male voice"
+    override val statusNoLangs = "Install a topic and its languages, voices and packs will appear here."
+    override val downloadNeeded = "Download what’s missing"; override val allReady = "Everything needed is installed"
+    override val offerTitle = "Language packs needed"; override val later = "Later"
+    override fun offerText(languages: String) = "The installed topics need more voices or recognition packs: $languages. Download what’s missing?"
 }

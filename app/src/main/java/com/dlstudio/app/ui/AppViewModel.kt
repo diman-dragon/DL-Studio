@@ -4,8 +4,6 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.dlstudio.app.content.CatalogEntry
-import com.dlstudio.app.content.Remote
 import com.dlstudio.app.content.Topic
 import com.dlstudio.app.content.TopicStore
 import com.dlstudio.app.data.Prefs
@@ -24,6 +22,8 @@ import com.dlstudio.app.speech.VoiceChoice
 import com.dlstudio.app.speech.Phase
 import com.dlstudio.app.speech.Pronounce
 import com.dlstudio.app.speech.Pronunciation
+import com.dlstudio.app.speech.Role
+import com.dlstudio.app.speech.LangNeed
 import com.dlstudio.app.speech.Speaker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -32,14 +32,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-/** Состояние приложения: настройки, темы на устройстве, прогресс и загрузка каталога. Тяжёлое (файлы, сеть) — не на главном потоке. */
+/** Состояние приложения: настройки, темы на устройстве, прогресс, озвучка. Тяжёлое (файлы) — не на главном потоке. */
 class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val prefs = Prefs(app)
     private val store = TopicStore(app)
     private val speaker = Speaker(app)
     private val listener = Listener(app)
-    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, prefs.catalogUrl, ProgressJson.decode(prefs.progressJson), prefs.dailyGoal, lastTopic = prefs.lastTopic, speech = SpeechUi(chosen = prefs.voices, rate = prefs.speechRate)))
+    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, ProgressJson.decode(prefs.progressJson), prefs.dailyGoal, lastTopic = prefs.lastTopic, speech = SpeechUi(chosen = prefs.voices, rate = prefs.speechRate)))
     val state: StateFlow<AppState> = mutable.asStateFlow()
 
     init {
@@ -59,49 +60,23 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun setDailyGoal(goal: Int) { prefs.dailyGoal = goal; mutable.update { it.copy(dailyGoal = goal) } }
 
-    fun setCatalogUrl(url: String) {
-        prefs.catalogUrl = url
-        mutable.update { it.copy(catalogUrl = prefs.catalogUrl, catalog = emptyList(), catalogFailed = false) }
-    }
-
-    fun refreshCatalog() {
-        val url = mutable.value.catalogUrl
-        if (url.isBlank() || mutable.value.catalogLoading) return
-        mutable.update { it.copy(catalogLoading = true, catalogFailed = false) }
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = runCatching { Remote.catalog(url) }
-            mutable.update { it.copy(catalogLoading = false, catalog = result.getOrDefault(it.catalog), catalogFailed = result.isFailure) }
-        }
-    }
-
-    /** Скачивает выбранные темы по одной; ошибка одной не мешает остальным. */
-    fun download(entries: List<CatalogEntry>) {
-        val url = mutable.value.catalogUrl
-        if (entries.isEmpty() || mutable.value.busy.isNotEmpty()) return
-        mutable.update { it.copy(busy = entries.map(CatalogEntry::id).toSet(), notice = Notice.NONE) }
-        viewModelScope.launch(Dispatchers.IO) {
-            var failed = false
-            entries.forEach { entry ->
-                val ok = runCatching { store.install(Remote.download(url, entry)).isNotEmpty() }.getOrDefault(false)
-                if (!ok || runCatching { Remote.downloadMedia(url, entry, store.mediaDir(entry.id)) }.isFailure) failed = true
-                mutable.update { it.copy(busy = it.busy - entry.id) }
-            }
-            val topics = store.installed()
-            mutable.update { it.copy(topics = topics, busy = emptySet(), notice = if (failed) Notice.DOWNLOAD_FAILED else Notice.NONE) }
-        }
-    }
-
     /** Папка медиа темы: туда кладутся аудио, видео и картинки урока. */
     fun mediaDir(id: String) = store.mediaDir(id)
 
+    /** Ставит темы из файла (json или zip). После успеха предлагает скачать языковые пакеты, которых темам не хватает. */
     fun installFile(uri: Uri) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val bytes = runCatching { app.contentResolver.openInputStream(uri)?.use { it.readBytes() } }.getOrNull()
-            val installed = bytes?.let(store::install)
-            val topics = store.installed()
-            mutable.update { it.copy(topics = topics, notice = if (installed.isNullOrEmpty()) Notice.FILE_FAILED else Notice.NONE) }
+        viewModelScope.launch {
+            val (topics, ok) = withContext(Dispatchers.IO) {
+                val bytes = runCatching { app.contentResolver.openInputStream(uri)?.use { it.readBytes() } }.getOrNull()
+                val installed = bytes?.let(store::install)
+                store.installed() to !installed.isNullOrEmpty()
+            }
+            mutable.update { it.copy(topics = topics, notice = if (ok) Notice.NONE else Notice.FILE_FAILED, offer = ok) }
+            if (ok) loadVoices(topics.map { it.tag }.filter { it.isNotBlank() }.distinct())
         }
     }
+
+    fun clearOffer() = mutable.update { it.copy(offer = false) }
 
     fun remove(topic: Topic) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -155,7 +130,7 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun clearGain() = mutable.update { it.copy(gain = null) }
 
-    fun speak(text: String, tag: String, voice: Int = 0) = speaker.speak(text, tag, voice)
+    fun speak(text: String, tag: String, role: Role = Role()) = speaker.speak(text, tag, role)
 
     private fun updateSpeech(change: (SpeechUi) -> SpeechUi) = mutable.update { it.copy(speech = change(it.speech)) }
 
@@ -169,9 +144,9 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
         SpeechPacks.check(app, tag) { found -> updateSpeech { it.copy(packs = it.packs + (tag to found)) } }
     }
 
-    /** Выбор голоса для языка (`name` — служебное имя; null — голос по умолчанию). */
-    fun chooseVoice(lang: String, name: String?) {
-        val chosen = if (name == null) mutable.value.speech.chosen - lang else mutable.value.speech.chosen + (lang to name)
+    /** Выбор голоса: `key` — язык («en», основной голос) или язык с полом («en:f», «en:m», голоса диалогов); `name` — служебное имя, null — автоматически. */
+    fun chooseVoice(key: String, name: String?) {
+        val chosen = if (name == null) mutable.value.speech.chosen - key else mutable.value.speech.chosen + (key to name)
         prefs.voices = chosen
         speaker.chosen = chosen
         updateSpeech { it.copy(chosen = chosen) }
@@ -187,6 +162,20 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
 
     /** Открывает экран загрузки голосов самого движка синтеза речи (не общие настройки системы). */
     fun downloadVoice() { SpeechPacks.openVoiceDownload(app, speaker.engine()) }
+
+    /**
+     * Скачивает всё недостающее сразу: пакеты распознавания (Android 13+ — без экранов, иначе открываются настройки голосового ввода) и голоса —
+     * тихо скачать голос Android не позволяет, поэтому открывается экран загрузки голосов самого движка. На старых Android за раз открывается один экран.
+     */
+    fun downloadNeeded(needs: List<LangNeed>) {
+        val packs = needs.flatMap { it.packs }
+        val voices = needs.any { it.voices }
+        when {
+            SpeechPacks.canManage(app) -> { packs.forEach(::downloadPack); if (voices) downloadVoice() }
+            packs.isNotEmpty() -> downloadPack(packs.first())
+            voices -> downloadVoice()
+        }
+    }
 
     /** Скачивание пакета распознавания речи: на Android 13+ запускается сразу и через несколько секунд состояние проверяется ещё раз, на старых открываются настройки голосового ввода. */
     fun downloadPack(tag: String) {

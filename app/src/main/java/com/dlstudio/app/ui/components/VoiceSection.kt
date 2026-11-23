@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.dlstudio.app.settings.AppLang
+import com.dlstudio.app.speech.Gender
 import com.dlstudio.app.speech.PackState
 import com.dlstudio.app.speech.VoiceChoice
 import com.dlstudio.app.speech.VoiceNames
@@ -32,63 +33,72 @@ private val RATES = listOf(0.7f, 1f, 1.15f)
 private const val KEY_AUTO = "\u0000auto"
 private const val KEY_MORE = "\u0000more"
 
-/** Язык озвучки, если ни у одной установленной темы его нет: английский. */
-private const val DEFAULT_TAG = "en-US"
-
 /**
- * Раздел «Озвучка и распознавание речи». Язык выбирается в выпадающем списке; для него — список голосов встроенного синтезатора с человеческими
- * именами и список пакетов распознавания речи. Пункты не скачанных голосов и пакетов помечены «Скачать» и скачиваются по нажатию, без захода в общие настройки системы.
- * Ничего своего: всё делают системные движки. Список голосов обновляется при возвращении в приложение (например, после загрузки голоса).
+ * Раздел «Языки и озвучка». Языки берутся из установленных тем: для каждого видно, чего не хватает (голос, женский или мужской голос для диалогов,
+ * пакет распознавания), и есть кнопка «Скачать недостающее». Для выбранного языка — выпадающие списки: основной голос, женский и мужской голос диалогов,
+ * пакеты распознавания. Не скачанные голоса и пакеты скачиваются по нажатию. Ничего своего: всё делают системные движки.
+ * Список голосов обновляется при возвращении в приложение (например, после загрузки голоса).
  */
 @Composable
 fun VoiceSection(state: AppState, vm: AppViewModel) {
     val s = LocalStrings.current
     val shown = Locale.forLanguageTag(if (state.lang == AppLang.RU) "ru" else "en")
-    val tags = remember(state.topics) { state.topics.map { it.tag }.filter { it.isNotBlank() }.distinct().ifEmpty { listOf(DEFAULT_TAG) } }
+    val tags = remember(state.topics) { state.topics.map { it.tag }.filter { it.isNotBlank() }.distinct() }
     val langs = remember(tags) { tags.map { VoiceNames.language(it) }.distinct() }
     var picked by rememberSaveable { mutableStateOf("") }
-    val lang = picked.takeIf { it in langs } ?: langs.first()
     val owner = LocalLifecycleOwner.current
     DisposableEffect(owner, tags) {
-        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME) vm.loadVoices(tags) }
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME && tags.isNotEmpty()) vm.loadVoices(tags) }
         owner.lifecycle.addObserver(observer)
         onDispose { owner.lifecycle.removeObserver(observer) }
     }
     SettingsSection(s.sectionVoice) {
         Text(s.voiceIntro, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (langs.isEmpty()) {
+            Text(s.statusNoLangs, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodyMedium)
+            return@SettingsSection
+        }
+        val lang = picked.takeIf { it in langs } ?: langs.first()
+        LangStatus(state, vm, shown)
         CycleTile(s.voiceRate, listOf(s.rateSlow to RATES[0], s.rateNormal to RATES[1], s.rateFast to RATES[2]), state.speech.rate, vm::setSpeechRate)
-        PickerTile(s.voiceLanguage, languageName(lang, shown), langs.map { PickItem(it, languageName(it, shown), selected = it == lang) }, { picked = it })
-        VoicePicker(lang, shown, state, vm)
+        if (langs.size > 1) PickerTile(s.voiceLanguage, languageName(lang, shown), langs.map { PickItem(it, languageName(it, shown), selected = it == lang) }, { picked = it })
+        VoicePicker(s.voiceLabel, s.voiceAutoHint, lang, lang, { true }, shown, state, vm)
+        VoicePicker(s.voiceFemaleLabel, s.genderAutoHint, lang, "$lang:f", { it.gender != Gender.M }, shown, state, vm)
+        VoicePicker(s.voiceMaleLabel, s.genderAutoHint, lang, "$lang:m", { it.gender != Gender.F }, shown, state, vm)
+        Text(s.voiceGenderHint, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         PackPicker(tags.filter { VoiceNames.language(it) == lang }, shown, state, vm)
     }
 }
 
-private fun languageName(lang: String, shown: Locale) = Locale.forLanguageTag(lang).getDisplayLanguage(shown).replaceFirstChar { it.uppercase() }
+fun languageName(lang: String, shown: Locale) = Locale.forLanguageTag(lang).getDisplayLanguage(shown).replaceFirstChar { it.uppercase() }
 
-/** Голос выбранного языка: «Авто» и голоса с именами; не скачанный голос скачивается через экран загрузки голосов самого движка. */
+/**
+ * Список голосов: «Авто» и голоса с именами по полу; `key` — «en» (основной) или «en:f» / «en:m» (голос женских и мужских реплик диалогов),
+ * `show` отбирает голоса для списка (в женском нет заведомо мужских). Не скачанный голос скачивается через экран загрузки голосов самого движка.
+ */
 @Composable
-private fun VoicePicker(lang: String, shown: Locale, state: AppState, vm: AppViewModel) {
+private fun VoicePicker(title: String, autoHint: String, lang: String, key: String, show: (VoiceChoice) -> Boolean, shown: Locale, state: AppState, vm: AppViewModel) {
     val s = LocalStrings.current
     val speech = state.speech
-    val voices = remember(speech.voices, lang, shown) { VoiceNames.choices(speech.voices, lang, shown.language == "ru") }
-    val current = speech.chosen[lang]
+    val voices = remember(speech.voices, speech.chosen, lang, shown) { VoiceNames.choices(speech.voices, lang, shown.language == "ru", speech.chosen).filter(show) }
+    val current = speech.chosen[key]
     val value = when {
         !speech.loaded -> s.voicesLoading
         else -> voices.firstOrNull { it.name == current }?.title ?: s.voiceAuto
     }
     val items = buildList {
-        add(PickItem(KEY_AUTO, s.voiceAuto, s.voiceAutoHint, selected = current == null))
+        add(PickItem(KEY_AUTO, s.voiceAuto, autoHint, selected = current == null))
         voices.forEach { v ->
             val preview = v.takeIf { it.installed }?.let { voice -> { text: String -> vm.previewVoice(voice, text) } }
             add(PickItem(v.name, v.title, details(v), v.name == current, if (v.installed) "" else s.download, preview, sample(v)))
         }
         add(PickItem(KEY_MORE, s.voicesMore))
     }
-    PickerTile(s.voiceLabel, value, items, { key ->
-        when (key) {
-            KEY_AUTO -> vm.chooseVoice(lang, null)
+    PickerTile(title, value, items, { picked ->
+        when (picked) {
+            KEY_AUTO -> vm.chooseVoice(key, null)
             KEY_MORE -> vm.downloadVoice()
-            else -> voices.firstOrNull { it.name == key }?.let { if (it.installed) vm.chooseVoice(lang, it.name) else vm.downloadVoice() }
+            else -> voices.firstOrNull { it.name == picked }?.let { if (it.installed) vm.chooseVoice(key, it.name) else vm.downloadVoice() }
         }
     })
 }
@@ -96,7 +106,8 @@ private fun VoicePicker(lang: String, shown: Locale, state: AppState, vm: AppVie
 @Composable
 private fun details(v: VoiceChoice): String {
     val s = LocalStrings.current
-    return listOfNotNull(v.region.ifBlank { null }, s.voiceHigh.takeIf { v.high }, s.voiceNetwork.takeIf { v.network }, s.voiceNotInstalled.takeIf { !v.installed }).joinToString(" · ")
+    val gender = when (v.gender) { Gender.F -> s.genderFemale; Gender.M -> s.genderMale; else -> s.genderUnknown }
+    return listOfNotNull(gender, v.region.ifBlank { null }, s.voiceHigh.takeIf { v.high }, s.voiceNetwork.takeIf { v.network }, s.voiceNotInstalled.takeIf { !v.installed }).joinToString(" · ")
 }
 
 /** Пробная фраза голоса на его языке. */

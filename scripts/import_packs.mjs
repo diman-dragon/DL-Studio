@@ -1,5 +1,5 @@
 // Переводит большие плоские наборы (курс → урок → карточки name/back/…) в темы приложения: content/topics/<id>.json.
-// Запуск: `node scripts/import_packs.mjs <папка с наборами> <папка для тем>`; затем при желании `node scripts/build_content.mjs <папка для тем>` (каталог).
+// Запуск: `node scripts/import_packs.mjs <папка с наборами> <папка для тем>`.
 // Урок набора режется на темы по ~28 карточек; у темы есть карточки и практика (из тех же карточек), а у первой темы группы ещё и теория.
 import { readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';

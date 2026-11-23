@@ -7,12 +7,12 @@ import java.util.Locale
 /** Озвучить текст языком темы (BCP 47, например en-US). */
 typealias Speak = (String) -> Unit
 
-/** Озвучка с номером голоса: 0 — основной (выбранный в настройках), 1 и 2 — другие голоса того же языка (реплики диалога). */
-typealias SpeakAs = (String, Int) -> Unit
+/** Озвучка в роли: пол и номер голоса героя диалога (см. Role); основной голос — роль по умолчанию. */
+typealias SpeakAs = (String, Role) -> Unit
 
 /**
  * Один встроенный движок синтеза речи Android на приложение: создаётся при первой озвучке, а не при каждом входе на экран.
- * `chosen` — выбранные голоса (язык → служебное имя голоса), `rate` — скорость речи; пусто — голос по умолчанию.
+ * `chosen` — выбранные голоса: язык («en») — основной, «en:f» и «en:m» — женский и мужской голос диалогов; `rate` — скорость речи; пусто — голос по умолчанию.
  */
 class Speaker(private val context: Context) {
     private var tts: TextToSpeech? = null
@@ -33,13 +33,17 @@ class Speaker(private val context: Context) {
         if (ready) job() else queued.add(job)
     }
 
-    /** `slot` — голос: 0 основной, 1 и 2 — другие голоса языка (предпочтительно другого пола), чтобы реплики диалога различались. */
-    fun speak(text: String, tag: String, slot: Int = 0) = whenReady {
+    /** Озвучивает голосом роли: у героя с полом — голос этого пола (см. VoiceCast), у остальных — основной или другие голоса языка. */
+    fun speak(text: String, tag: String, role: Role = Role()) = whenReady {
         val e = tts ?: return@whenReady
         val locale = Locale.forLanguageTag(tag)
         prepare(e, locale)
-        val base = chosen[VoiceNames.language(tag)] ?: defaults[locale.language]
-        applyVoice(e, if (slot <= 0) base else otherVoice(e, locale, base, slot), locale)
+        val lang = VoiceNames.language(tag)
+        val base = chosen[lang] ?: defaults[locale.language]
+        val explicit = listOfNotNull(chosen["$lang:f"]?.let { Gender.F to it }, chosen["$lang:m"]?.let { Gender.M to it }).toMap()
+        val cast = VoiceCast.pick(installed(e, locale), role, base, explicit)
+        applyVoice(e, cast.voice, locale)
+        e.setPitch(cast.pitch)
         e.setSpeechRate(rate)
         e.speak(text, TextToSpeech.QUEUE_FLUSH, null, "dl")
     }
@@ -50,26 +54,17 @@ class Speaker(private val context: Context) {
         if (!defaults.containsKey(locale.language)) defaults[locale.language] = runCatching { e.voice?.name }.getOrNull()
     }
 
-    /** Установленный голос языка, не совпадающий с основным: сначала другого пола, без сети, того же региона, лучшего качества. */
-    private fun otherVoice(e: TextToSpeech, locale: Locale, base: String?, slot: Int): String? {
-        val mine = runCatching { e.voices }.getOrNull().orEmpty().filter {
-            it.locale.language == locale.language && it.name != base && TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features.orEmpty()
-        }
-        val g = gender(base.orEmpty())
-        val ranked = mine.sortedWith(
-            compareBy({ g != 0 && gender(it.name) == g }, { it.isNetworkConnectionRequired }, { it.locale.country != locale.country }, { -it.quality }, { it.name })
-        )
-        return if (ranked.isEmpty()) null else ranked[(slot - 1) % ranked.size].name
-    }
-
-    /** Пол по служебному имени голоса: 1 женский, 2 мужской, 0 неизвестен. */
-    private fun gender(name: String): Int = name.lowercase().let { if ("female" in it) 1 else if ("male" in it) 2 else 0 }
+    /** Установленные голоса языка как кандидаты на роль. */
+    private fun installed(e: TextToSpeech, locale: Locale): List<Cand> = runCatching { e.voices }.getOrNull().orEmpty()
+        .filter { it.locale.language == locale.language && TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features.orEmpty() }
+        .map { Cand(it.name, Gender.of(it.name, it.features.orEmpty()), it.isNetworkConnectionRequired, it.locale.country == locale.country, it.quality) }
 
     /** Пробное воспроизведение конкретного голоса из списка настроек (выбор при этом не меняется). */
     fun preview(text: String, voice: String, tag: String) = whenReady {
         val e = tts ?: return@whenReady
         prepare(e, Locale.forLanguageTag(tag))
         applyVoice(e, voice, Locale.forLanguageTag(tag))
+        e.setPitch(1f)
         e.setSpeechRate(rate)
         e.speak(text, TextToSpeech.QUEUE_FLUSH, null, "dl")
     }
@@ -84,7 +79,7 @@ class Speaker(private val context: Context) {
     /** Все голоса движка (в том числе ещё не скачанные); список придёт, когда движок будет готов. */
     fun voices(onReady: (List<RawVoice>) -> Unit) = whenReady {
         val list = runCatching { tts?.voices }.getOrNull().orEmpty().map {
-            RawVoice(it.name, it.locale.toLanguageTag(), it.quality, it.isNetworkConnectionRequired, TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features.orEmpty())
+            RawVoice(it.name, it.locale.toLanguageTag(), it.quality, it.isNetworkConnectionRequired, TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features.orEmpty(), Gender.of(it.name, it.features.orEmpty()))
         }
         onReady(list)
     }
