@@ -1,5 +1,10 @@
 package com.dlstudio.app.ui.components
 
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,7 +13,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,26 +31,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.progress.Achievements
 import com.dlstudio.app.progress.Badge
+import com.dlstudio.app.progress.Motivation
 import com.dlstudio.app.progress.Totals
 import com.dlstudio.app.progress.Xp
 import com.dlstudio.app.progress.rankIndex
-import com.dlstudio.app.ui.theme.LocalAccent
 import com.dlstudio.app.ui.theme.LocalStrings
-import com.dlstudio.app.ui.theme.gradientColors
 
-private val GOLD = listOf(Color(0xFFFFD166), Color(0xFFFF9A3D))
+internal val GOLD = listOf(Color(0xFFFFD166), Color(0xFFFF9A3D))
 
 /** Заголовок карточки: мелкие акцентные капсы слева и необязательная подпись справа. */
 @Composable
-private fun CardTitle(title: String, note: String? = null) {
+internal fun CardTitle(title: String, note: String? = null) {
     val colors = MaterialTheme.colorScheme
     Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
         Text(title.uppercase(), style = MaterialTheme.typography.labelMedium, color = colors.primary)
@@ -54,51 +56,24 @@ private fun CardTitle(title: String, note: String? = null) {
     }
 }
 
-/** Цель дня: кольцо с процентом, сколько XP набрано сегодня и серия дней. Выполнена — праздничный вид. */
+/** Цель дня: кольцо с процентом, сколько XP набрано сегодня, подбадривающая фраза по тому, как близко цель, и серия дней. Выполнена — пляшущий салют в кольце. */
 @Composable
 fun GoalCard(todayXp: Int, goal: Int, streak: Int) {
     val s = LocalStrings.current
     val done = todayXp >= goal
+    val percent = rememberCountUp(todayXp * 100 / goal)
+    val party by rememberInfiniteTransition(label = "party").animateFloat(0.9f, 1.18f, infiniteRepeatable(tween(600), RepeatMode.Reverse), label = "party")
     SettingCard(gap = 10.dp) {
         Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(18.dp), Alignment.CenterVertically) {
             Ring(todayXp / goal.toFloat(), 104.dp, 11.dp) {
-                Text(if (done) "🎉" else "${todayXp * 100 / goal}%", style = MaterialTheme.typography.titleLarge)
+                if (done) Text("🎉", Modifier.graphicsLayer { scaleX = party; scaleY = party }, style = MaterialTheme.typography.headlineMedium)
+                else Text("$percent%", style = MaterialTheme.typography.titleLarge)
             }
             Column(Modifier.weight(1f), Arrangement.spacedBy(4.dp)) {
                 Text(s.goalTitle.uppercase(), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                 Text(if (done) s.goalDone else s.goalProgress(todayXp, goal), style = MaterialTheme.typography.titleMedium)
-                if (streak > 0) Text("🔥 ${s.streakDays(streak)}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        }
-    }
-}
-
-/** Неделя столбиками: XP по дням с понедельника. Столбик цвета акцента, а в день, когда цель выполнена, — золотой. Сегодня подписан акцентом. */
-@Composable
-fun WeekCard(xps: List<Int>, goal: Int, today: Int) {
-    val s = LocalStrings.current
-    val colors = MaterialTheme.colorScheme
-    val accent = LocalAccent.current.gradientColors()
-    val scale = maxOf(goal, xps.max()).toFloat()
-    SettingCard(gap = 12.dp) {
-        CardTitle(s.weekTitle, s.weekTotal(xps.sum()))
-        Row(Modifier.fillMaxWidth().height(104.dp), Arrangement.SpaceEvenly) {
-            xps.forEachIndexed { day, xp ->
-                val fill = when {
-                    xp >= goal -> GOLD
-                    xp > 0 -> accent
-                    else -> listOf(colors.outline, colors.outline)
-                }
-                Column(Modifier.fillMaxHeight().width(30.dp), Arrangement.spacedBy(6.dp), Alignment.CenterHorizontally) {
-                    Box(Modifier.weight(1f).fillMaxWidth(), Alignment.BottomCenter) {
-                        Box(Modifier.fillMaxWidth().fillMaxHeight(maxOf(0.08f, xp / scale)).clip(RoundedCornerShape(8.dp)).background(Brush.verticalGradient(fill)))
-                    }
-                    Text(
-                        s.weekdays[day], style = MaterialTheme.typography.labelMedium, maxLines = 1,
-                        color = if (day == today) colors.primary else colors.onSurfaceVariant,
-                        fontWeight = if (day == today) FontWeight.Bold else null
-                    )
-                }
+                Text(s.goalNudge(Motivation.goalPhase(todayXp, goal), goal - todayXp), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (streak > 0) Text("🔥 ${s.streakDays(streak)}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
             }
         }
     }
@@ -115,7 +90,7 @@ fun RankCard(xp: Int) {
                 Text(s.ranks[rankIndex(level, s.ranks.size)], style = MaterialTheme.typography.titleLarge)
                 Text(s.levelTitle(level), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            Text("$xp XP", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+            Text("${rememberCountUp(xp)} XP", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
         }
         ProgressBar(Xp.intoLevel(xp) / Xp.LEVEL.toFloat())
         Text(s.xpToNext(Xp.LEVEL - Xp.intoLevel(xp)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -176,18 +151,18 @@ private fun BadgeTile(badge: Badge, totals: Totals, onClick: () -> Unit) {
 fun StatsRow(totals: Totals) {
     val s = LocalStrings.current
     Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(10.dp)) {
-        StatTile("${totals.topics}", s.statTopics, Modifier.weight(1f))
-        StatTile("${totals.cards}", s.statCards, Modifier.weight(1f))
-        StatTile("${totals.answers}", s.statAnswers, Modifier.weight(1f))
+        StatTile(totals.topics, s.statTopics, Modifier.weight(1f))
+        StatTile(totals.cards, s.statCards, Modifier.weight(1f))
+        StatTile(totals.answers, s.statAnswers, Modifier.weight(1f))
     }
 }
 
 @Composable
-private fun StatTile(value: String, label: String, modifier: Modifier) {
+private fun StatTile(value: Int, label: String, modifier: Modifier) {
     val colors = MaterialTheme.colorScheme
     Surface(modifier, RoundedCornerShape(20.dp), colors.surfaceVariant, colors.onSurface, border = androidx.compose.foundation.BorderStroke(1.dp, colors.outlineVariant)) {
         Column(Modifier.padding(horizontal = 8.dp, vertical = 12.dp), Arrangement.spacedBy(2.dp), Alignment.CenterHorizontally) {
-            Text(value, style = MaterialTheme.typography.headlineSmall, color = colors.primary)
+            Text("${rememberCountUp(value, 1100)}", style = MaterialTheme.typography.headlineSmall, color = colors.primary)
             Text(label, style = MaterialTheme.typography.labelSmall, color = colors.onSurfaceVariant, textAlign = TextAlign.Center, maxLines = 2)
         }
     }

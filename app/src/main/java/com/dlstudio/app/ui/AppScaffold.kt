@@ -50,6 +50,7 @@ fun AppScaffold(state: AppState, vm: AppViewModel) {
     val activity = LocalContext.current as? Activity
     var openId by rememberSaveable { mutableStateOf<String?>(null) }
     val topic = state.topics.firstOrNull { it.id == openId }
+    val open = { id: String -> vm.visit(id); openId = id }
     val toSettings = { scope.launch { pager.animateScrollToPage(Tabs.all.lastIndex); Unit } }
 
     BackHandler {
@@ -75,8 +76,8 @@ fun AppScaffold(state: AppState, vm: AppViewModel) {
                 ) { padding ->
                     HorizontalPager(pager, Modifier.fillMaxSize().padding(padding)) { page ->
                         when (page) {
-                            0 -> StartScreen(state, { openId = it }, { toSettings() })
-                            1 -> MapScreen(state, { openId = it }, { toSettings() })
+                            0 -> StartScreen(state, open, { toSettings() })
+                            1 -> MapScreen(state, open, { toSettings() })
                             2 -> ProgressScreen(state)
                             else -> SettingsScreen(state, vm)
                         }

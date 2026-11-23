@@ -1,7 +1,5 @@
 package com.dlstudio.app.ui.components
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -18,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,7 +56,7 @@ fun Pill(text: String, modifier: Modifier = Modifier, accent: Boolean = false) {
 fun ProgressBar(fraction: Float, modifier: Modifier = Modifier, height: Dp = 8.dp) {
     val track = MaterialTheme.colorScheme.outline
     val shape = RoundedCornerShape(height)
-    val shown by animateFloatAsState(fraction.coerceIn(0f, 1f), tween(600), label = "bar")
+    val shown = rememberGrow(fraction.coerceIn(0f, 1f), 600)
     Box(modifier.fillMaxWidth().height(height).clip(shape).background(track)) {
         Box(Modifier.fillMaxHeight().fillMaxWidth(shown).clip(shape).background(Brush.linearGradient(LocalAccent.current.gradientColors())))
     }
@@ -70,7 +67,7 @@ fun ProgressBar(fraction: Float, modifier: Modifier = Modifier, height: Dp = 8.d
 fun Ring(fraction: Float, diameter: Dp, thickness: Dp, modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
     val accent = Color(LocalAccent.current.main)
     val track = MaterialTheme.colorScheme.outline
-    val shown by animateFloatAsState(fraction.coerceIn(0f, 1f), tween(900), label = "ring")
+    val shown = rememberGrow(fraction.coerceIn(0f, 1f))
     Box(modifier.size(diameter), Alignment.Center) {
         Canvas(Modifier.fillMaxSize()) {
             val w = thickness.toPx()

@@ -6,6 +6,9 @@ enum class Mood { FIRST_STEP, DONE_TODAY, KEEP_STREAK, COMEBACK }
 /** Часть суток для приветствия. */
 enum class DayPart { MORNING, DAY, EVENING, NIGHT }
 
+/** Где человек в цели дня: не начал, начал, больше половины, почти у цели, цель выполнена. */
+enum class GoalPhase { START, EARLY, HALF, CLOSE, DONE }
+
 /** Выбор приветствия, настроения и «слова дня» без каких-либо самооценок пользователя. */
 object Motivation {
     fun mood(p: Progress, today: Long): Mood = when {
@@ -20,6 +23,14 @@ object Motivation {
         in 11..16 -> DayPart.DAY
         in 17..22 -> DayPart.EVENING
         else -> DayPart.NIGHT
+    }
+
+    fun goalPhase(todayXp: Int, goal: Int): GoalPhase = when {
+        todayXp >= goal -> GoalPhase.DONE
+        todayXp <= 0 -> GoalPhase.START
+        (goal - todayXp) * 4 <= goal -> GoalPhase.CLOSE
+        todayXp * 2 >= goal -> GoalPhase.HALF
+        else -> GoalPhase.EARLY
     }
 
     /** Элемент списка на сегодня: один и тот же весь день, назавтра — следующий. */

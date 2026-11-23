@@ -39,7 +39,7 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val store = TopicStore(app)
     private val speaker = Speaker(app)
     private val listener = Listener(app)
-    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, prefs.catalogUrl, ProgressJson.decode(prefs.progressJson), prefs.dailyGoal, speech = SpeechUi(chosen = prefs.voices, rate = prefs.speechRate)))
+    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, prefs.catalogUrl, ProgressJson.decode(prefs.progressJson), prefs.dailyGoal, lastTopic = prefs.lastTopic, speech = SpeechUi(chosen = prefs.voices, rate = prefs.speechRate)))
     val state: StateFlow<AppState> = mutable.asStateFlow()
 
     init {
@@ -123,6 +123,13 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
             store.removeAll()
             reload()
         }
+    }
+
+    /** Запоминает последнюю открытую тему: по ней карта раскрывает урок и встаёт на тему при следующем запуске. */
+    fun visit(id: String) {
+        if (id == mutable.value.lastTopic) return
+        prefs.lastTopic = id
+        mutable.update { it.copy(lastTopic = id) }
     }
 
     private fun reward(r: Reward) {

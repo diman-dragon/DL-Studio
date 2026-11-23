@@ -1,6 +1,7 @@
 package com.dlstudio.app.i18n
 
 import com.dlstudio.app.progress.DayPart
+import com.dlstudio.app.progress.GoalPhase
 import com.dlstudio.app.progress.Mood
 import com.dlstudio.app.settings.ThemeMode
 
@@ -53,7 +54,30 @@ object StringsEn : Strings {
         "Tired? Take a break. Your brain keeps memorising while you rest."
     )
 
+    override fun goalNudge(phase: GoalPhase, left: Int) = when (phase) {
+        GoalPhase.START -> "Start with a single card: that’s +2 XP right away"
+        GoalPhase.EARLY -> "$left XP to go — about ${(left + 4) / 5} correct ${if ((left + 4) / 5 == 1) "answer" else "answers"}"
+        GoalPhase.HALF -> "More than halfway there! $left XP left"
+        GoalPhase.CLOSE -> "Almost there: just $left XP more!"
+        GoalPhase.DONE -> "Everything on top is a bonus toward your next level"
+    }
+    override val cheers = listOf(
+        "You’ve got this. I believe in you! 💪",
+        "One topic — and you can rest easy.",
+        "Every word is a brick. Let’s keep building!",
+        "Repetition is the mother of learning. A few cards?",
+        "The streak won’t extend itself 😉",
+        "Five minutes today and you’re ahead of yesterday’s you.",
+        "Great day to learn something new!",
+        "Mistakes are fine. That’s how things stick."
+    )
+    override val questsTitle = "Quests"; override val questGoal = "Hit today’s goal"
+    override fun questBadge(name: String) = "Badge “$name”"; override fun questLevel(level: Int) = "Reach level $level"
+    override val pathTitle = "Your path"
+
     override val continueLabel = "Continue"
+    override val collapseAll = "Collapse all"; override val expandAll = "Expand all"
+    override fun lastSeen(title: String) = "You left off at “$title”"
     override val mapEmptyTitle = "No topics yet"; override val mapEmptyHint = "Download topics in settings or install a file: a topic json or a zip with topics."
     override val openSettings = "Open settings"; override val noGroup = "Topics"
     override fun groupProgress(done: Int, total: Int) = "$done of $total ${if (total == 1) "topic" else "topics"}"

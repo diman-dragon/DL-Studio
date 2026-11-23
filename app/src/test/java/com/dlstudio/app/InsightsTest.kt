@@ -2,6 +2,7 @@ package com.dlstudio.app
 
 import com.dlstudio.app.i18n.StringsEn
 import com.dlstudio.app.i18n.StringsRu
+import com.dlstudio.app.progress.GoalPhase
 import com.dlstudio.app.progress.Achievements
 import com.dlstudio.app.progress.Badge
 import com.dlstudio.app.progress.Progress
@@ -52,6 +53,8 @@ class InsightsTest {
             assertEquals(Badge.values().size, s.badgeNames.size)
             assertEquals(Badge.values().size, s.badgeHints.size)
             assertEquals(7, s.weekdays.size)
+            assertTrue(s.cheers.isNotEmpty())
+            GoalPhase.values().forEach { assertTrue(s.goalNudge(it, 12).isNotBlank()) }
         }
     }
 

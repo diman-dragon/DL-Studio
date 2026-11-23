@@ -33,6 +33,7 @@ data class AppState(
     val catalogUrl: String,
     val progress: Progress,
     val dailyGoal: Int,
+    val lastTopic: String = "",
     val topics: List<Topic> = emptyList(),
     val catalog: List<CatalogEntry> = emptyList(),
     val catalogLoading: Boolean = false,

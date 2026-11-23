@@ -1,6 +1,7 @@
 package com.dlstudio.app.i18n
 
 import com.dlstudio.app.progress.DayPart
+import com.dlstudio.app.progress.GoalPhase
 import com.dlstudio.app.progress.Mood
 import com.dlstudio.app.settings.ThemeMode
 
@@ -53,7 +54,30 @@ object StringsRu : Strings {
         "Устали — сделайте перерыв. Мозг запоминает и во время отдыха."
     )
 
+    override fun goalNudge(phase: GoalPhase, left: Int) = when (phase) {
+        GoalPhase.START -> "Начните с одной карточки: это сразу +2 XP"
+        GoalPhase.EARLY -> "Ещё $left XP — это примерно ${(left + 4) / 5} ${ruPlural((left + 4) / 5, "верный ответ", "верных ответа", "верных ответов")}"
+        GoalPhase.HALF -> "Больше половины позади! Осталось $left XP"
+        GoalPhase.CLOSE -> "Совсем чуть-чуть: ещё $left XP!"
+        GoalPhase.DONE -> "Всё, что сверху, — бонус к уровню"
+    }
+    override val cheers = listOf(
+        "Вы справитесь. Я в вас верю! 💪",
+        "Одна тема — и можно со спокойной душой отдыхать.",
+        "Каждое слово — кирпичик. Строим дальше!",
+        "Повторение — мать учения. Хотите, повторим пару карточек?",
+        "Серия сама себя не продлит 😉",
+        "Пять минут сегодня — и вы уже впереди себя вчерашнего.",
+        "Отличный день, чтобы выучить что-то новое!",
+        "Ошибаться — нормально. Так и запоминается."
+    )
+    override val questsTitle = "Задания"; override val questGoal = "Набрать цель дня"
+    override fun questBadge(name: String) = "Награда «$name»"; override fun questLevel(level: Int) = "Дойти до уровня $level"
+    override val pathTitle = "Ваш путь"
+
     override val continueLabel = "Продолжить"
+    override val collapseAll = "Свернуть всё"; override val expandAll = "Развернуть всё"
+    override fun lastSeen(title: String) = "Остановились: «$title»"
     override val mapEmptyTitle = "Пока нет тем"; override val mapEmptyHint = "Скачайте темы в настройках или поставьте файл: json темы или zip с темами."
     override val openSettings = "Открыть настройки"; override val noGroup = "Темы"
     override fun groupProgress(done: Int, total: Int) = "$done из $total ${ruPlural(total, "темы", "тем", "тем")}"

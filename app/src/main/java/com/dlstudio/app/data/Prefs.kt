@@ -45,6 +45,11 @@ class Prefs(context: Context) {
         get() = sp.getFloat("speechRate", 1f)
         set(value) { sp.edit().putFloat("speechRate", value).apply() }
 
+    /** Последняя открытая тема (`id`): карта при запуске раскрывает её урок и встаёт на неё. */
+    var lastTopic: String
+        get() = sp.getString("lastTopic", "").orEmpty()
+        set(value) = sp.putPref("lastTopic", value)
+
     var progressJson: String?
         get() = sp.getString("progress", null)
         set(value) = sp.putPref("progress", value)

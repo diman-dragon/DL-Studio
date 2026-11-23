@@ -1,6 +1,7 @@
 package com.dlstudio.app.i18n
 
 import com.dlstudio.app.progress.DayPart
+import com.dlstudio.app.progress.GoalPhase
 import com.dlstudio.app.progress.Mood
 import com.dlstudio.app.settings.ThemeMode
 
@@ -19,7 +20,13 @@ interface Strings {
     val statTopics: String; val statCards: String; val statAnswers: String; val quoteMore: String
     val quoteTitle: String; val quotes: List<String>; val tipTitle: String; val tips: List<String>
 
+    fun goalNudge(phase: GoalPhase, left: Int): String
+    val cheers: List<String>
+    val questsTitle: String; val questGoal: String; fun questBadge(name: String): String; fun questLevel(level: Int): String
+    val pathTitle: String
+
     val continueLabel: String
+    val collapseAll: String; val expandAll: String; fun lastSeen(title: String): String
     val mapEmptyTitle: String; val mapEmptyHint: String; val openSettings: String; val noGroup: String
     fun groupProgress(done: Int, total: Int): String
     fun cardsCount(n: Int): String
