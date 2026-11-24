@@ -54,9 +54,10 @@ private const val MOUTH_PERIOD = 170
  * Говорит, когда вслух произносится реплика его пола (если задан `text` — именно эта реплика). Нажатие (`onClick`) необязательно.
  */
 @Composable
-fun TeacherAvatar(gender: Int, size: Dp, modifier: Modifier = Modifier, text: String? = null, mood: Mood = Mood.NEUTRAL, onClick: (() -> Unit)? = null) {
+fun TeacherAvatar(gender: Int, size: Dp, modifier: Modifier = Modifier, text: String? = null, mood: Mood = Mood.NEUTRAL, speakerId: String? = null, onClick: (() -> Unit)? = null) {
     val speaking = LocalSpeaking.current
-    val talking = speaking != null && speaking.gender == gender && (text == null || speaking.text == text)
+    val expectedId = speakerId ?: if (gender == Gender.F) "grace" else "leo"
+    val talking = speaking != null && (speaking.characterId == expectedId || (speaking.characterId == null && speaking.gender == gender)) && (text == null || speaking.text == text)
     val clock = rememberInfiniteTransition(label = "teacher")
     val blink by clock.animateFloat(
         0f, 1f,

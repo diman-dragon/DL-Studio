@@ -16,7 +16,7 @@ private const val SAFETY_PER_CHAR_MS = 120L
 typealias Speak = (String) -> Unit
 
 /** Кто сейчас говорит: пол героя (Gender.F или Gender.M) и произносимый текст. По нему аватары преподавателей двигают ртом. */
-data class Speaking(val gender: Int, val text: String)
+data class Speaking(val gender: Int, val text: String, val characterId: String? = null)
 
 /** Озвучка в роли: пол и номер голоса героя диалога (см. Role); основной голос — роль по умолчанию. */
 typealias SpeakAs = (String, Role) -> Unit
@@ -49,11 +49,11 @@ class Speaker(private val context: Context) {
     private fun finish(id: String?) { if (id == current) talk.value = null }
 
     /** Произносит текст и отмечает, кто говорит; на случай, если движок не сообщит об окончании, отметка снимается по таймеру. */
-    private fun say(e: TextToSpeech, text: String, gender: Int) {
+    private fun say(e: TextToSpeech, text: String, gender: Int, characterId: String? = null) {
         current = "dl${++counter}"
         val id = current
         e.setOnUtteranceProgressListener(listener)
-        talk.value = Speaking(gender, text)
+        talk.value = Speaking(gender, text, characterId)
         e.speak(text, TextToSpeech.QUEUE_FLUSH, null, id)
         handler.postDelayed({ finish(id) }, SAFETY_MS + text.length * SAFETY_PER_CHAR_MS)
     }
@@ -75,12 +75,13 @@ class Speaker(private val context: Context) {
         val locale = Locale.forLanguageTag(tag)
         prepare(e, locale)
         val lang = VoiceNames.language(tag)
-        val explicit = listOfNotNull(chosen["$lang:f"]?.let { Gender.F to it }, chosen["$lang:m"]?.let { Gender.M to it }).toMap()
-        val cast = VoiceCast.pick(installed(e, locale), role, explicit)
+        val explicit = if (role.characterId == null) listOfNotNull(chosen["$lang:f"]?.let { Gender.F to it }, chosen["$lang:m"]?.let { Gender.M to it }).toMap() else emptyMap()
+        val characterVoice = role.characterId?.let { chosen["$lang:$it"] }
+        val cast = VoiceCast.pick(installed(e, locale), role, explicit, characterVoice)
         applyVoice(e, cast.voice ?: defaults[locale.language], locale)
         e.setPitch(cast.pitch)
         e.setSpeechRate(rate)
-        say(e, text, role.speaker())
+        say(e, text, role.speaker(), role.characterId)
     }
 
     /** Язык ставится всегда; голос по умолчанию для языка запоминается до первой смены голоса, чтобы к нему можно было вернуться. */

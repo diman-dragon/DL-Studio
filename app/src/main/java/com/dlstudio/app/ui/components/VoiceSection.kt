@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.speech.Gender
+import com.dlstudio.app.speech.Characters
 import com.dlstudio.app.speech.PackState
 import com.dlstudio.app.speech.Role
 import com.dlstudio.app.speech.VoiceChoice
@@ -55,21 +56,29 @@ fun VoiceSection(state: AppState, vm: AppViewModel) {
         CycleTile(s.voiceRate, listOf(s.rateSlow to RATES[0], s.rateNormal to RATES[1], s.rateFast to RATES[2]), state.speech.rate, vm::setSpeechRate)
         if (langs.size > 1) PickerTile(s.voiceLanguage, languageName(lang, shown), langs.map { PickItem(it, languageName(it, shown), selected = it == lang) }, { picked = it })
         Text(s.teachersTitle, Modifier.padding(start = 6.dp, top = 4.dp), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
-        TeacherHeader(Gender.F, s.teacherFName, s.teacherFInfo) { greet(Gender.F, lang, tags, vm) }
-        VoicePicker(s.teacherFName, lang, "$lang:f", Gender.F, shown, state, vm)
-        TeacherHeader(Gender.M, s.teacherMName, s.teacherMInfo) { greet(Gender.M, lang, tags, vm) }
-        VoicePicker(s.teacherMName, lang, "$lang:m", Gender.M, shown, state, vm)
+        TeacherHeader(Gender.F, s.teacherFName, s.teacherFInfo) { greet("grace", lang, tags, vm) }
+        VoicePicker(s.teacherFName, lang, "$lang:grace", Gender.F, shown, state, vm)
+        TeacherHeader(Gender.M, s.teacherMName, s.teacherMInfo) { greet("leo", lang, tags, vm) }
+        VoicePicker(s.teacherMName, lang, "$lang:leo", Gender.M, shown, state, vm)
+        Text("Другие персонажи", Modifier.padding(start = 6.dp, top = 6.dp), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        VoicePicker("Beatrice", lang, "$lang:beatrice", Gender.F, shown, state, vm)
+        VoicePicker("Sergei", lang, "$lang:sergei", Gender.M, shown, state, vm)
         Text(s.voiceGenderHint, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         PackPicker(tags.filter { VoiceNames.language(it) == lang }, shown, state, vm)
     }
 }
 
 /** Преподаватель здоровается на языке тем своим голосом (по нажатию на его аватар). */
-private fun greet(gender: Int, lang: String, tags: List<String>, vm: AppViewModel) {
+private fun greet(characterId: String, lang: String, tags: List<String>, vm: AppViewModel) {
+    val profile = Characters.get(characterId) ?: return
+    val gender = profile.gender
     val tag = tags.firstOrNull { VoiceNames.language(it) == lang } ?: return
-    val name = if (gender == Gender.F) "Miss Grace" else "Mr. Leo"
-    val text = if (lang == "ru") "Здравствуйте! Меня зовут ${if (gender == Gender.F) "мисс Грейс" else "мистер Лео"}." else "Hello! My name is $name."
-    vm.speak(text, tag, Role(gender))
+    val text = when (lang) {
+        "ru" -> "Здравствуйте! Меня зовут ${profile.name}."
+        "it" -> "Ciao! Mi chiamo ${profile.name}."
+        else -> "Hello! My name is ${profile.name}."
+    }
+    vm.speak(text, tag, Role.character(characterId))
 }
 
 fun languageName(lang: String, shown: Locale) = Locale.forLanguageTag(lang).getDisplayLanguage(shown).replaceFirstChar { it.uppercase() }

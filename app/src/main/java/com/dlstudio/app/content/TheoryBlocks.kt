@@ -30,7 +30,7 @@ sealed interface Block {
  * - `- ` — пункт списка (подряд идущие собираются в один список);
  * - `!tip `, `!note `, `!warn `, `!fun ` — цветная выноска;
  * - `~ English | перевод | что озвучить` — фраза с кнопкой озвучки и переводом под ней; третье поле необязательно (если пусто, озвучивается сама фраза);
- *   отметка роли для реплик диалога: `~f ` — женский голос, `~m ` — мужской (`~f2 `, `~m2 ` — вторая женщина или второй мужчина, до `~f4`), `~1 `…`~4 ` — другой голос
+ *   постоянные персонажи: `~grace `, `~leo `, `~beatrice `, `~sergei `, `~narrator `; совместимые старые отметки: `~f `, `~m `, `~f2 `, `~m2 ` и `~1`…`~4`
  *   без указания пола. Мужская реплика всегда звучит мужским голосом, женская — женским. Две-четыре фразы подряд без отметки сами получают разные голоса;
  * - `| a | b | c` — строка таблицы (подряд идущие — одна таблица, первая строка — шапка);
  * - `@image путь | подпись`, `@audio …`, `@video …` — картинка, звук или видео (путь относительно папки медиа темы или адрес https);
@@ -39,6 +39,7 @@ sealed interface Block {
 object TheoryBlocks {
     private const val UNSET = -1
     private const val MAX_VOICES = 4
+    private val CHARACTER_MARK = Regex("^~(grace|leo|beatrice|sergei|narrator) ", RegexOption.IGNORE_CASE)
     private val MARK = Regex("^~([fm]?)([1-4]?) ")
 
     fun parse(paragraphs: List<String>): List<Block> {
@@ -50,6 +51,9 @@ object TheoryBlocks {
             when {
                 p.startsWith("## ") -> out.add(Block.Sub(p.drop(3).trim()))
                 p.startsWith("- ") -> merge(out, last, Block.Bullets(listOf(p.drop(2).trim())))
+                p.startsWith("~") && CHARACTER_MARK.containsMatchIn(p) -> CHARACTER_MARK.find(p)?.let { match ->
+                    out.add(say(p.drop(match.value.length), Role.character(match.groupValues[1].lowercase())))
+                }
                 p.startsWith("~") && MARK.containsMatchIn(p) -> MARK.find(p)?.let { out.add(say(p.drop(it.value.length), role(it))) }
                 p.startsWith("|") -> merge(out, last, Block.Table(listOf(cells(p))))
                 p.startsWith("@") -> out.add(media(p) ?: Block.Text(p))

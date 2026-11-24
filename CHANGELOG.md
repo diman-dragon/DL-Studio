@@ -1,3 +1,11 @@
+# 0.4.14 — Character-based dialogue and voice casting
+
+- Added stable character IDs for Miss Grace, Mr. Leo, Beatrice, Sergei and narrator.
+- Added character-specific voice preferences with fallback to the existing female/male voice preferences and Android TTS defaults.
+- Added exact speaker identity to speech state so only the active character is animated.
+- Added character labels/markers to dialogue rows.
+- Preserved legacy `~f`, `~m`, `~f2`, `~m2` and numbered role markup for old lesson packs.
+
 # История версий
 
 Версия лежит в `version.txt` и поднимается при **каждом** изменении: меняется последняя цифра (0.3.0 → 0.3.1 → …).

@@ -66,6 +66,20 @@ class LessonLogicTest {
         assertTrue(TheoryBlocks.parse(listOf("~for you"))[0] is Block.Text)
     }
 
+    @Test fun stableCharacterMarksKeepIdentityAndVoiceRole() {
+        val parsed = roles("~grace Hello | привет", "~leo Hi | привет", "~beatrice Thanks | спасибо", "~sergei Sure | конечно")
+        assertEquals(listOf("grace", "leo", "beatrice", "sergei"), parsed.map { it.characterId })
+        assertEquals(listOf(Gender.F, Gender.M, Gender.F, Gender.M), parsed.map { it.speaker() })
+        assertEquals(listOf(0, 0, 1, 1), parsed.map { it.index() })
+        assertEquals(Gender.ANY, Role.character("narrator").speaker())
+    }
+
+    @Test fun characterSpecificVoiceOverridesGenderFallback() {
+        val voices = listOf(cand("graceVoice", Gender.F), cand("beaVoice", Gender.F), cand("leoVoice", Gender.M))
+        assertEquals("beaVoice", VoiceCast.pick(voices, Role.character("beatrice"), emptyMap(), "beaVoice").voice)
+        assertEquals("graceVoice", VoiceCast.pick(voices, Role.character("grace"), emptyMap()).voice)
+    }
+
     @Test fun genderIsOnlyTakenFromExplicitMarks() {
         assertEquals(Gender.F, Gender.of("en-us-x-sfg#female_1-local"))
         assertEquals(Gender.M, Gender.of("en-us-x-abc#male_2-local"))

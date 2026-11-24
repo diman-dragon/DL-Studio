@@ -40,6 +40,7 @@ import com.dlstudio.app.content.Tile
 import com.dlstudio.app.content.TileKind
 import com.dlstudio.app.speech.Speak
 import com.dlstudio.app.speech.Gender
+import com.dlstudio.app.speech.Characters
 import com.dlstudio.app.speech.SpeakAs
 import com.dlstudio.app.ui.components.Markup
 import com.dlstudio.app.ui.components.SmallSpeaker
@@ -135,14 +136,34 @@ private fun SayRow(say: Block.Say, speak: SpeakAs?) {
         Modifier.fillMaxWidth().clip(shape).background(colors.primaryContainer).padding(start = 16.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
         Arrangement.spacedBy(10.dp), Alignment.CenterVertically
     ) {
-        if (say.role.gender != Gender.ANY) TeacherAvatar(say.role.gender, 48.dp, text = say.say.ifBlank { say.text })
+        if (say.role.gender != Gender.ANY) {
+            val id = say.role.characterId
+            if (id == null || id == "grace" || id == "leo") {
+                TeacherAvatar(say.role.gender, 48.dp, text = say.say.ifBlank { say.text }, speakerId = id)
+            } else {
+                CharacterMark(id)
+            }
+        }
         Column(Modifier.weight(1f), Arrangement.spacedBy(2.dp)) {
+            if (say.role.characterId != null) Text(Characters.name(say.role.characterId) ?: "", style = MaterialTheme.typography.labelSmall, color = colors.primary)
             Text(say.text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             if (say.note.isNotBlank()) Text(say.note, style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
         }
         if (speak != null) SmallSpeaker(say.say.ifBlank { say.text }, { text -> speak(text, say.role) }, size = 42.dp)
     }
 }
+
+/** Компактный знак отдельного участника диалога; не подменяет лицо преподавателя чужим аватаром. */
+@Composable
+private fun CharacterMark(id: String) {
+    val profile = Characters.get(id)
+    val initial = profile?.name?.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
+    val tint = if (profile?.gender == Gender.F) Color(0xFFB7A4F5) else Color(0xFFE7B45C)
+    Box(Modifier.size(48.dp).clip(CircleShape).background(tint.copy(alpha = 0.28f)), Alignment.Center) {
+        Text(initial, style = MaterialTheme.typography.titleLarge, color = tint, fontWeight = FontWeight.Bold)
+    }
+}
+
 
 /** Таблица: первая строка — шапка с заливкой, дальше строки через одну тоном светлее. */
 @Composable
