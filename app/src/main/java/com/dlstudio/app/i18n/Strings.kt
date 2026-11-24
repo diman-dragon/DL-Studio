@@ -73,7 +73,7 @@ interface Strings {
     val voicesLoading: String; val voicesMore: String; val voiceLanguage: String; val packOn: String; val packOff: String
     val recogTitle: String; val recogHint: String
     val teachersTitle: String; val teacherFName: String; val teacherMName: String; val teacherFInfo: String; val teacherMInfo: String
-    val genderAutoHint: String; val voiceGenderHint: String; val genderFemale: String; val genderMale: String
+    val genderAutoHint: String; val voiceGenderHint: String; val otherCharacters: String; val genderFemale: String; val genderMale: String
     val statusRecog: String; val statusNoLangs: String
     val downloadNeeded: String; val allReady: String; val offerTitle: String; val later: String
     fun offerText(languages: String): String

@@ -77,7 +77,9 @@ class LessonLogicTest {
     @Test fun characterSpecificVoiceOverridesGenderFallback() {
         val voices = listOf(cand("graceVoice", Gender.F), cand("beaVoice", Gender.F), cand("leoVoice", Gender.M))
         assertEquals("beaVoice", VoiceCast.pick(voices, Role.character("beatrice"), emptyMap(), "beaVoice").voice)
-        assertEquals("graceVoice", VoiceCast.pick(voices, Role.character("grace"), emptyMap()).voice)
+        assertEquals("graceVoice", VoiceCast.pick(voices, Role.character("grace"), emptyMap(), "graceVoice").voice)
+        assertEquals("beaVoice", VoiceCast.pick(voices, Role.character("grace"), emptyMap()).voice)
+        assertEquals("leoVoice", VoiceCast.pick(voices, Role.character("sergei"), emptyMap()).voice)
     }
 
     @Test fun genderIsOnlyTakenFromExplicitMarks() {

@@ -155,6 +155,7 @@ object StringsEn : Strings {
     override val offerTitle = "Language packs needed"; override val later = "Later"
     override fun offerText(languages: String) = "The installed topics need more voices or recognition packs: $languages. Download what’s missing?"
     override val teachersTitle = "Teachers"
+    override val otherCharacters = "Other characters"
     override val teacherFName = "Miss Grace"; override val teacherMName = "Mr. Leo"
     override val teacherFInfo = "A strict teacher: glasses, business suit, pointer. Speaks clearly and to the point. Voices female lines and explanations."
     override val teacherMInfo = "A young enthusiast: beard, sweater, bow tie. Explains with a joke. Voices male lines."

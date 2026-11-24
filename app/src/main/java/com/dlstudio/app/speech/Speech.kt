@@ -75,14 +75,19 @@ class Speaker(private val context: Context) {
         val locale = Locale.forLanguageTag(tag)
         prepare(e, locale)
         val lang = VoiceNames.language(tag)
-        val explicit = if (role.characterId == null) listOfNotNull(chosen["$lang:f"]?.let { Gender.F to it }, chosen["$lang:m"]?.let { Gender.M to it }).toMap() else emptyMap()
-        val characterVoice = role.characterId?.let { chosen["$lang:$it"] }
+        val explicit = if (role.characterId == null) listOfNotNull(chosen.teacher(lang, "grace", "f")?.let { Gender.F to it }, chosen.teacher(lang, "leo", "m")?.let { Gender.M to it }).toMap() else emptyMap()
+        val characterVoice = role.characterId?.let { id -> chosen["$lang:$id"] ?: legacyKey(id)?.let { chosen["$lang:$it"] } }
         val cast = VoiceCast.pick(installed(e, locale), role, explicit, characterVoice)
         applyVoice(e, cast.voice ?: defaults[locale.language], locale)
         e.setPitch(cast.pitch)
         e.setSpeechRate(rate)
         say(e, text, role.speaker(), role.characterId)
     }
+
+    private fun Map<String, String>.teacher(lang: String, id: String, legacy: String) = this["$lang:$id"] ?: this["$lang:$legacy"]
+
+    /** Ключ настройки до 0.4.14: голос учительницы хранился как «lang:f», преподавателя — «lang:m». */
+    private fun legacyKey(id: String) = when (id) { "grace" -> "f"; "leo" -> "m"; else -> null }
 
     /** Язык ставится всегда; голос по умолчанию для языка запоминается до первой смены голоса, чтобы к нему можно было вернуться. */
     private fun prepare(e: TextToSpeech, locale: Locale) {
@@ -127,5 +132,5 @@ class Speaker(private val context: Context) {
     /** Прервать озвучку (перед записью микрофона, чтобы динамик не попал в запись). */
     fun stop() { tts?.stop(); talk.value = null }
 
-    fun shutdown() { tts?.stop(); tts?.shutdown(); tts = null; ready = false; queued.clear(); defaults.clear() }
+    fun shutdown() { handler.removeCallbacksAndMessages(null); tts?.stop(); tts?.shutdown(); tts = null; ready = false; queued.clear(); defaults.clear() }
 }

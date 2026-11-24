@@ -60,9 +60,9 @@ fun VoiceSection(state: AppState, vm: AppViewModel) {
         VoicePicker(s.teacherFName, lang, "$lang:grace", Gender.F, shown, state, vm)
         TeacherHeader(Gender.M, s.teacherMName, s.teacherMInfo) { greet("leo", lang, tags, vm) }
         VoicePicker(s.teacherMName, lang, "$lang:leo", Gender.M, shown, state, vm)
-        Text("Другие персонажи", Modifier.padding(start = 6.dp, top = 6.dp), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
-        VoicePicker("Beatrice", lang, "$lang:beatrice", Gender.F, shown, state, vm)
-        VoicePicker("Sergei", lang, "$lang:sergei", Gender.M, shown, state, vm)
+        Text(s.otherCharacters, Modifier.padding(start = 6.dp, top = 6.dp), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        VoicePicker(Characters.name("beatrice").orEmpty(), lang, "$lang:beatrice", Gender.F, shown, state, vm)
+        VoicePicker(Characters.name("sergei").orEmpty(), lang, "$lang:sergei", Gender.M, shown, state, vm)
         Text(s.voiceGenderHint, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         PackPicker(tags.filter { VoiceNames.language(it) == lang }, shown, state, vm)
     }
@@ -71,11 +71,9 @@ fun VoiceSection(state: AppState, vm: AppViewModel) {
 /** Преподаватель здоровается на языке тем своим голосом (по нажатию на его аватар). */
 private fun greet(characterId: String, lang: String, tags: List<String>, vm: AppViewModel) {
     val profile = Characters.get(characterId) ?: return
-    val gender = profile.gender
     val tag = tags.firstOrNull { VoiceNames.language(it) == lang } ?: return
     val text = when (lang) {
         "ru" -> "Здравствуйте! Меня зовут ${profile.name}."
-        "it" -> "Ciao! Mi chiamo ${profile.name}."
         else -> "Hello! My name is ${profile.name}."
     }
     vm.speak(text, tag, Role.character(characterId))
