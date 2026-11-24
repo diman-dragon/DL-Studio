@@ -99,7 +99,7 @@ object StringsEn : Strings {
     override val pronNoPack = "There’s no speech recognition pack for this language."
     override val tileVowel = "vowels"; override val tileConsonant = "consonants"
     override val listenPrompt = "Listen and pick what you heard"; override val speakPrompt = "Say it out loud"
-    override val dictationPrompt = "Listen and type what you heard"; override val typeAnswer = "Your answer"
+    override val quietOn = "🔇 Sound off"; override val quietOff = "🔊 Sound on"; override val dictationPrompt = "Listen and type what you heard"; override val typeAnswer = "Your answer"
     override val check = "Check"; override val skip = "Skip"; override val speakSkipped = "No worries, let’s move on"
     override val bankPlaceholder = "Tap the words below to build the answer"
     override val matchPrompt = "Match the pairs"; override val matchHint = "Tap any item, then its match on the other side"; override val matchWrong = "Pairs matched, with a few mistakes"

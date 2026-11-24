@@ -1,7 +1,14 @@
 package com.dlstudio.app.ui.topic
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
+import com.dlstudio.app.ui.components.Pill
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -41,13 +48,20 @@ private const val SCROLL_DELAY_MS = 250L
 @Composable
 fun QuizStage(items: List<QuizItem>, done: Boolean, speak: SpeakAs?, check: Check?, onAnswer: (Int, Boolean) -> Unit, modifier: Modifier = Modifier) {
     val s = LocalStrings.current
-    val order = remember(items, speak != null) { items.indices.filter { speak != null || !items[it].kind.needsVoice } }
+    var quiet by rememberSaveable { mutableStateOf(false) }
+    val sound = speak != null && !quiet
+    val order = remember(items, sound) { playable(items, sound) }
     var pos by rememberSaveable { mutableStateOf(0) }
     var correct by rememberSaveable { mutableStateOf(0) }
     var result by remember(pos) { mutableStateOf<Boolean?>(null) }
     val scroll = rememberScrollState()
     LaunchedEffect(result) { if (result != null) { delay(SCROLL_DELAY_MS); scroll.animateScrollTo(scroll.maxValue) } }
     Column(modifier.fillMaxSize().verticalScroll(scroll).padding(16.dp), Arrangement.spacedBy(16.dp)) {
+        if (speak != null && items.any { it.needsSound }) QuietSwitch(quiet) {
+            val next = playable(items, quiet)
+            pos = order.getOrNull(pos)?.let { here -> next.indexOfFirst { it >= here }.let { if (it < 0) next.size else it } } ?: next.size
+            quiet = !quiet
+        }
         if (pos >= order.size) {
             QuizResult(correct, order.size, correct * 100 >= order.size * PASS_PERCENT, done) { pos = 0; correct = 0 }
         } else {
@@ -55,7 +69,7 @@ fun QuizStage(items: List<QuizItem>, done: Boolean, speak: SpeakAs?, check: Chec
             val item = items[index]
             QuizHeader(pos, order.size, correct)
             key(pos) {
-                Question(item, speak, check) { ok ->
+                Question(item, speak.takeIf { sound }, check) { ok ->
                     if (result == null) {
                         result = ok
                         if (ok) correct += 1
@@ -67,6 +81,18 @@ fun QuizStage(items: List<QuizItem>, done: Boolean, speak: SpeakAs?, check: Chec
                 Reveal(0) { FeedbackPanel(ok, reactor(item, pos), verdict(s, item, ok), if (pos == order.lastIndex) s.seeResult else s.next) { pos += 1 } }
             }
         }
+    }
+}
+
+/** Номера вопросов, которые можно решать: без звука не показываются те, где он нужен. */
+private fun playable(items: List<QuizItem>, sound: Boolean): List<Int> = items.indices.filter { sound || !items[it].needsSound }
+
+/** Переключатель «Без звука» на этот раз (в автобусе, в тишине): прячет вопросы «на слух» и «произнеси»; не запоминается. */
+@Composable
+private fun QuietSwitch(quiet: Boolean, onToggle: () -> Unit) {
+    val s = LocalStrings.current
+    Row(Modifier.fillMaxWidth(), Arrangement.End) {
+        Pill(if (quiet) s.quietOff else s.quietOn, Modifier.clip(RoundedCornerShape(16.dp)).clickable(role = Role.Switch, onClick = onToggle), accent = quiet)
     }
 }
 

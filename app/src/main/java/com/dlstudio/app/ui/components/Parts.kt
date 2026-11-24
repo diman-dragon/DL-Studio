@@ -58,7 +58,7 @@ fun ProgressBar(fraction: Float, modifier: Modifier = Modifier, height: Dp = 8.d
     val shape = RoundedCornerShape(height)
     val shown = rememberGrow(fraction.coerceIn(0f, 1f), 600)
     Box(modifier.fillMaxWidth().height(height).clip(shape).background(track)) {
-        Box(Modifier.fillMaxHeight().fillMaxWidth(shown).clip(shape).background(Brush.linearGradient(LocalAccent.current.gradientColors())))
+        Box(Modifier.fillMaxHeight().fillMaxWidth(shown.coerceIn(0f, 1f)).clip(shape).background(Brush.linearGradient(LocalAccent.current.gradientColors())))
     }
 }
 

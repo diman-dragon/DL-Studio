@@ -40,7 +40,10 @@ data class QuizItem(
     val question: String, val answer: String, val options: List<String>, val kind: QuizKind = QuizKind.CHOICE,
     val say: String = "", val alt: List<String> = emptyList(), val pairs: List<Pair<String, String>> = emptyList(), val hint: String = "",
     val who: String? = null
-)
+) {
+    /** Без звука такой вопрос не решить: «на слух», «произнеси» и диктант (вписать то, что услышал, когда текста вопроса нет). */
+    val needsSound: Boolean get() = kind.needsVoice || (kind == QuizKind.FILL && say.isNotBlank() && question.isBlank())
+}
 
 /**
  * Тема = одна колода: теория, карточки и практика. `course` — название курса, `group` — метка уровня («A1»…),

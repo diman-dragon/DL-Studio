@@ -49,7 +49,7 @@ interface Strings {
     fun wrongAnswer(answer: String): String
     fun quizResult(ok: Int, total: Int): String
     val tileVowel: String; val tileConsonant: String
-    val listenPrompt: String; val speakPrompt: String; val dictationPrompt: String; val typeAnswer: String; val check: String; val skip: String; val speakSkipped: String
+    val listenPrompt: String; val speakPrompt: String; val dictationPrompt: String; val quietOn: String; val quietOff: String; val typeAnswer: String; val check: String; val skip: String; val speakSkipped: String
     val bankPlaceholder: String; val matchPrompt: String; val matchHint: String; val matchWrong: String
     val retry: String; val stageDone: String; val topicDone: String; val seeResult: String
 

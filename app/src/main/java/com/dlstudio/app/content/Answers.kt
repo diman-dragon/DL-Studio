@@ -33,12 +33,26 @@ object Answers {
     /** Варианты ответа в случайном порядке при каждом показе вопроса: верный не стоит всегда на одном месте (ни первым, ни последним). */
     fun order(options: List<String>, random: Random = Random): List<String> = options.shuffled(random)
 
-    /** Правая колонка заданий «соедини пары», перемешанная одинаково при каждом показе вопроса. */
-    fun shuffledRight(item: QuizItem): List<String> {
-        val right = item.pairs.map { it.second }
-        val mixed = right.shuffled(Random(item.question.hashCode() + right.size))
-        return if (mixed == right && right.toSet().size > 1) mixed.reversed() else mixed
+    /**
+     * Порядок показа пар «соедини»: номера пар для левой и правой колонки. Обе колонки перемешаны, одинаково при каждом показе вопроса;
+     * по возможности ни одна не стоит «по порядку» и они не совпадают друг с другом (иначе пары лежали бы строго напротив).
+     */
+    fun matchOrder(item: QuizItem): Pair<List<Int>, List<Int>> {
+        val n = item.pairs.size
+        val plain = List(n) { it }
+        val random = Random(item.question.hashCode() + n)
+        var left = plain
+        var right = plain
+        if (n < 2) return left to right
+        repeat(MIX_TRIES) {
+            left = plain.shuffled(random)
+            right = plain.shuffled(random)
+            if (left != plain && right != plain && left != right) return left to right
+        }
+        return if (n == 2) plain.reversed() to plain else plain.drop(1) + plain.first() to plain.reversed()
     }
+
+    private const val MIX_TRIES = 20
 
     /** Достаточно ли чисто соединены пары: допускается одна ошибка, если пар не меньше четырёх. */
     fun matchOk(pairCount: Int, mistakes: Int): Boolean = mistakes <= if (pairCount >= 4) 1 else 0

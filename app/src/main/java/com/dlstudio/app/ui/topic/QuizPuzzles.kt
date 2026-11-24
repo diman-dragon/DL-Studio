@@ -97,7 +97,9 @@ private enum class PairMark { IDLE, PICKED, DONE, WRONG }
 @Composable
 fun MatchQuestion(item: QuizItem, onDone: (Boolean) -> Unit) {
     val s = LocalStrings.current
-    val right = remember(item) { Answers.shuffledRight(item) }
+    val order = remember(item) { Answers.matchOrder(item) }
+    val leftAt = order.first
+    val rightAt = order.second
     var pickedLeft by remember(item) { mutableStateOf<Int?>(null) }
     var pickedRight by remember(item) { mutableStateOf<Int?>(null) }
     var leftDone by remember(item) { mutableStateOf(setOf<Int>()) }
@@ -107,7 +109,7 @@ fun MatchQuestion(item: QuizItem, onDone: (Boolean) -> Unit) {
 
     /** Проверяет пару «слева i, справа j»; начинать можно с любой стороны. */
     fun check(i: Int, j: Int) {
-        if (item.pairs[i].second == right[j]) {
+        if (item.pairs[leftAt[i]].second == item.pairs[rightAt[j]].second) {
             leftDone = leftDone + i
             rightDone = rightDone + j
             wrong = null
@@ -139,15 +141,15 @@ fun MatchQuestion(item: QuizItem, onDone: (Boolean) -> Unit) {
         }
         Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(12.dp)) {
             Column(Modifier.weight(1f), Arrangement.spacedBy(10.dp)) {
-                item.pairs.forEachIndexed { i, pair ->
+                leftAt.forEachIndexed { i, at ->
                     val mark = when { i in leftDone -> PairMark.DONE; wrong?.first == i -> PairMark.WRONG; pickedLeft == i -> PairMark.PICKED; else -> PairMark.IDLE }
-                    PairChip(pair.first, mark) { tapLeft(i) }
+                    PairChip(item.pairs[at].first, mark) { tapLeft(i) }
                 }
             }
             Column(Modifier.weight(1f), Arrangement.spacedBy(10.dp)) {
-                right.forEachIndexed { j, text ->
+                rightAt.forEachIndexed { j, at ->
                     val mark = when { j in rightDone -> PairMark.DONE; wrong?.second == j -> PairMark.WRONG; pickedRight == j -> PairMark.PICKED; else -> PairMark.IDLE }
-                    PairChip(text, mark) { tapRight(j) }
+                    PairChip(item.pairs[at].second, mark) { tapRight(j) }
                 }
             }
         }

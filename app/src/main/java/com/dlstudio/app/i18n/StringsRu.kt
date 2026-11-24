@@ -99,7 +99,7 @@ object StringsRu : Strings {
     override val pronNoPack = "Для этого языка нет пакета распознавания речи."
     override val tileVowel = "гласные"; override val tileConsonant = "согласные"
     override val listenPrompt = "Послушайте и выберите, что услышали"; override val speakPrompt = "Произнесите вслух"
-    override val dictationPrompt = "Послушайте и впишите, что услышали"; override val typeAnswer = "Ваш ответ"
+    override val quietOn = "🔇 Без звука"; override val quietOff = "🔊 Со звуком"; override val dictationPrompt = "Послушайте и впишите, что услышали"; override val typeAnswer = "Ваш ответ"
     override val check = "Проверить"; override val skip = "Пропустить"; override val speakSkipped = "Ничего страшного, пойдём дальше"
     override val bankPlaceholder = "Нажимайте на слова внизу, чтобы собрать ответ"
     override val matchPrompt = "Соедините пары"; override val matchHint = "Нажмите любой вариант, потом его пару с другой стороны"; override val matchWrong = "Пары собраны, но с ошибками"

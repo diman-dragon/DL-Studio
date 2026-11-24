@@ -56,7 +56,8 @@ fun SegmentedTabs(labels: List<String>, selected: Int, onSelect: (Int) -> Unit, 
 @Composable
 fun StackedBars(values: List<List<Int>>, segmentColors: List<Color>, labels: List<String>, modifier: Modifier = Modifier, height: Dp = 140.dp) {
     val axis = MaterialTheme.colorScheme.outlineVariant
-    val peak = maxOf(1, values.maxOfOrNull { it.sum() } ?: 1)
+    if (values.isEmpty()) return
+    val peak = maxOf(1, values.maxOfOrNull { row -> row.sumOf { maxOf(0, it) } } ?: 1)
     Column(modifier.fillMaxWidth(), Arrangement.spacedBy(4.dp)) {
         Canvas(Modifier.fillMaxWidth().height(height)) {
             val slot = size.width / values.size
@@ -65,8 +66,8 @@ fun StackedBars(values: List<List<Int>>, segmentColors: List<Color>, labels: Lis
             values.forEachIndexed { i, segments ->
                 var top = size.height
                 segments.forEachIndexed { k, amount ->
-                    val h = amount / peak.toFloat() * size.height
-                    drawRect(segmentColors[k], Offset(i * slot + (slot - barWidth) / 2, top - h), Size(barWidth, h))
+                    val h = maxOf(0, amount) / peak.toFloat() * size.height
+                    drawRect(segmentColors.getOrElse(k) { axis }, Offset(i * slot + (slot - barWidth) / 2, top - h), Size(barWidth, h))
                     top -= h
                 }
             }
@@ -81,15 +82,15 @@ fun StackedBars(values: List<List<Int>>, segmentColors: List<Color>, labels: Lis
 @Composable
 fun Donut(parts: List<Pair<Int, Color>>, diameter: Dp, thickness: Dp, modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
     val empty = MaterialTheme.colorScheme.outlineVariant
-    val total = parts.sumOf { it.first }
+    val total = parts.sumOf { maxOf(0, it.first) }
     Box(modifier.size(diameter), Alignment.Center) {
         Canvas(Modifier.size(diameter)) {
             val stroke = Stroke(thickness.toPx(), cap = StrokeCap.Butt)
             val inset = thickness.toPx() / 2
-            val box = Size(size.width - 2 * inset, size.height - 2 * inset)
-            if (total == 0) drawArc(empty, 0f, 360f, false, Offset(inset, inset), box, style = stroke)
+            val box = Size(maxOf(0f, size.width - 2 * inset), maxOf(0f, size.height - 2 * inset))
+            if (total <= 0) drawArc(empty, 0f, 360f, false, Offset(inset, inset), box, style = stroke)
             var start = -90f
-            parts.filter { it.first > 0 }.forEach { (amount, color) ->
+            if (total > 0) parts.filter { it.first > 0 }.forEach { (amount, color) ->
                 val sweep = amount * 360f / total
                 drawArc(color, start, maxOf(0f, sweep - GAP_DEGREES), false, Offset(inset, inset), box, style = stroke)
                 start += sweep

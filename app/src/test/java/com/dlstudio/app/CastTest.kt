@@ -168,4 +168,31 @@ class CastTest {
         assertNull(quiz("bob"))
         assertNull(quiz(""))
     }
+
+    private fun match(n: Int, q: String = "m") = QuizItem(q, "", emptyList(), QuizKind.MATCH, pairs = List(n) { "l$it" to "r$it" })
+
+    @Test fun matchColumnsAreBothShuffledAndStable() {
+        for (n in 3..7) for (q in listOf("a", "b", "Соедини", "x$n")) {
+            val (left, right) = Answers.matchOrder(match(n, q))
+            val plain = List(n) { it }
+            assertEquals(plain, left.sorted())
+            assertEquals(plain, right.sorted())
+            assertNotEquals(plain, left)
+            assertNotEquals(plain, right)
+            assertNotEquals(left, right)
+            assertEquals(left to right, Answers.matchOrder(match(n, q)))
+        }
+        assertEquals(listOf(1, 0), Answers.matchOrder(match(2)).first)
+        assertEquals(listOf(0) to listOf(0), Answers.matchOrder(match(1)))
+    }
+
+    @Test fun needsSoundCoversListenSpeakAndDictation() {
+        fun item(kind: QuizKind, say: String = "", q: String = "q") = QuizItem(q, "a", listOf("a", "b"), kind, say = say)
+        assertTrue(item(QuizKind.LISTEN, "Hi").needsSound)
+        assertTrue(item(QuizKind.SPEAK, "Hi").needsSound)
+        assertTrue(item(QuizKind.FILL, "Hi", "").needsSound)
+        assertTrue(!item(QuizKind.FILL, "Hi", "Fill the gap").needsSound)
+        assertTrue(!item(QuizKind.CHOICE).needsSound)
+        assertTrue(!item(QuizKind.MATCH).needsSound)
+    }
 }
