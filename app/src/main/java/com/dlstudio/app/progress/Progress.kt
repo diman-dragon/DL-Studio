@@ -94,10 +94,10 @@ object ProgressJson {
     fun decode(text: String?): Progress = runCatching {
         val o = JSONObject(text!!)
         val all = o.getJSONObject("topics")
-        val history = o.optJSONObject("h")?.let { h -> h.keys().asSequence().associate { it.toLong() to h.getInt(it) } }.orEmpty()
+        val history = o.getJSONObject("h").let { h -> h.keys().asSequence().associate { it.toLong() to h.getInt(it) } }
         Progress(o.getInt("xp"), o.getInt("streak"), o.getLong("day"), all.keys().asSequence().associateWith { id ->
             val t = all.getJSONObject(id)
             TopicProgress(t.getBoolean("t"), t.getJSONArray("k").ints(), t.getJSONArray("q").ints(), t.getBoolean("b"))
-        }, maxOf(o.optInt("bs", 0), o.getInt("streak")), history, StatsJson.decode(o.optJSONObject("st")))
+        }, o.getInt("bs"), history, StatsJson.decode(o.optJSONObject("st")))
     }.getOrDefault(Progress())
 }

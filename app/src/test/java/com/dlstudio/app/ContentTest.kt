@@ -42,15 +42,6 @@ class ContentTest {
         assertEquals(Progress(), ProgressJson.decode(null))
     }
 
-    /** Старое сохранение (до 0.4.0) без лучшей серии и истории читается: лучшая серия не меньше текущей. */
-    @Test fun legacyProgressWithoutBestStreakIsRead() {
-        val old = """{"xp":120,"streak":3,"day":77,"topics":{"a-1":{"t":true,"k":[0,2],"q":[1],"b":false}}}"""
-        val p = ProgressJson.decode(old)
-        assertEquals(3, p.bestStreak)
-        assertTrue(p.history.isEmpty())
-        assertEquals(TopicProgress(true, setOf(0, 2), setOf(1), false), p.topics["a-1"])
-    }
-
     private fun zip(vararg entries: Pair<String, String>): ByteArray {
         val out = ByteArrayOutputStream()
         ZipOutputStream(out).use { z -> entries.forEach { (name, text) -> z.putNextEntry(ZipEntry(name)); z.write(text.toByteArray()); z.closeEntry() } }

@@ -15,15 +15,15 @@ private const val SAFETY_PER_CHAR_MS = 120L
 /** Озвучить текст языком темы (BCP 47, например en-US). */
 typealias Speak = (String) -> Unit
 
-/** Кто сейчас говорит: пол героя (Gender.F или Gender.M) и произносимый текст. По нему аватары преподавателей двигают ртом. */
-data class Speaking(val gender: Int, val text: String, val characterId: String? = null)
+/** Кто сейчас говорит: ID персонажа (null — пробное воспроизведение голоса) и произносимый текст. По нему аватары двигают ртом. */
+data class Speaking(val characterId: String?, val text: String)
 
-/** Озвучка в роли: пол и номер голоса героя диалога (см. Role); основной голос — роль по умолчанию. */
-typealias SpeakAs = (String, Role) -> Unit
+/** Озвучка голосом персонажа (ID из Characters); null — мисс Грейс. */
+typealias SpeakAs = (String, String?) -> Unit
 
 /**
  * Один встроенный движок синтеза речи Android на приложение: создаётся при первой озвучке, а не при каждом входе на экран.
- * `chosen` — выбранные голоса: «en:f» — голос учительницы, «en:m» — голос преподавателя; `rate` — скорость речи; пусто — лучший голос своего пола.
+ * `chosen` — выбранные голоса персонажей: «en:grace», «en:leo», «en:beatrice», «en:john», «en:narrator»; `rate` — скорость речи; нет записи — лучший голос пола персонажа.
  * `speaking` — кто и что говорит сейчас (null — тишина).
  */
 class Speaker(private val context: Context) {
@@ -49,11 +49,11 @@ class Speaker(private val context: Context) {
     private fun finish(id: String?) { if (id == current) talk.value = null }
 
     /** Произносит текст и отмечает, кто говорит; на случай, если движок не сообщит об окончании, отметка снимается по таймеру. */
-    private fun say(e: TextToSpeech, text: String, gender: Int, characterId: String? = null) {
+    private fun say(e: TextToSpeech, text: String, characterId: String?) {
         current = "dl${++counter}"
         val id = current
         e.setOnUtteranceProgressListener(listener)
-        talk.value = Speaking(gender, text, characterId)
+        talk.value = Speaking(characterId, text)
         e.speak(text, TextToSpeech.QUEUE_FLUSH, null, id)
         handler.postDelayed({ finish(id) }, SAFETY_MS + text.length * SAFETY_PER_CHAR_MS)
     }
@@ -69,25 +69,18 @@ class Speaker(private val context: Context) {
         if (ready) job() else queued.add(job)
     }
 
-    /** Озвучивает голосом роли: у героя с полом — голос этого пола (см. VoiceCast), у остальных — основной или другие голоса языка. */
-    fun speak(text: String, tag: String, role: Role = Role()) = whenReady {
+    /** Озвучивает голосом персонажа `who` (null — мисс Грейс): выбранный в настройках или лучший голос его пола (см. VoiceCast). */
+    fun speak(text: String, tag: String, who: String? = null) = whenReady {
         val e = tts ?: return@whenReady
         val locale = Locale.forLanguageTag(tag)
         prepare(e, locale)
-        val lang = VoiceNames.language(tag)
-        val explicit = if (role.characterId == null) listOfNotNull(chosen.teacher(lang, "grace", "f")?.let { Gender.F to it }, chosen.teacher(lang, "leo", "m")?.let { Gender.M to it }).toMap() else emptyMap()
-        val characterVoice = role.characterId?.let { id -> chosen["$lang:$id"] ?: legacyKey(id)?.let { chosen["$lang:$it"] } }
-        val cast = VoiceCast.pick(installed(e, locale), role, explicit, characterVoice)
+        val profile = Characters.of(who)
+        val cast = VoiceCast.pick(installed(e, locale), profile, chosen["${VoiceNames.language(tag)}:${profile.id}"])
         applyVoice(e, cast.voice ?: defaults[locale.language], locale)
         e.setPitch(cast.pitch)
         e.setSpeechRate(rate)
-        say(e, text, role.speaker(), role.characterId)
+        say(e, text, profile.id)
     }
-
-    private fun Map<String, String>.teacher(lang: String, id: String, legacy: String) = this["$lang:$id"] ?: this["$lang:$legacy"]
-
-    /** Ключ настройки до 0.4.14: голос учительницы хранился как «lang:f», преподавателя — «lang:m». */
-    private fun legacyKey(id: String) = when (id) { "grace" -> "f"; "leo" -> "m"; else -> null }
 
     /** Язык ставится всегда; голос по умолчанию для языка запоминается до первой смены голоса, чтобы к нему можно было вернуться. */
     private fun prepare(e: TextToSpeech, locale: Locale) {
@@ -108,7 +101,7 @@ class Speaker(private val context: Context) {
         applyVoice(e, voice, Locale.forLanguageTag(tag))
         e.setPitch(1f)
         e.setSpeechRate(rate)
-        say(e, text, Gender.of(voice))
+        say(e, text, null)
     }
 
     /** Ставит голос, если он есть у движка и подходит по языку; иначе остаётся голос по умолчанию для языка. */

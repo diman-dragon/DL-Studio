@@ -16,7 +16,6 @@ import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.speech.Gender
 import com.dlstudio.app.speech.Characters
 import com.dlstudio.app.speech.PackState
-import com.dlstudio.app.speech.Role
 import com.dlstudio.app.speech.VoiceChoice
 import com.dlstudio.app.speech.VoiceNames
 import com.dlstudio.app.ui.AppState
@@ -62,7 +61,7 @@ fun VoiceSection(state: AppState, vm: AppViewModel) {
         VoicePicker(s.teacherMName, lang, "$lang:leo", Gender.M, shown, state, vm)
         Text(s.otherCharacters, Modifier.padding(start = 6.dp, top = 6.dp), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
         VoicePicker(Characters.name("beatrice").orEmpty(), lang, "$lang:beatrice", Gender.F, shown, state, vm)
-        VoicePicker(Characters.name("sergei").orEmpty(), lang, "$lang:sergei", Gender.M, shown, state, vm)
+        VoicePicker(Characters.name("john").orEmpty(), lang, "$lang:john", Gender.M, shown, state, vm)
         Text(s.voiceGenderHint, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         PackPicker(tags.filter { VoiceNames.language(it) == lang }, shown, state, vm)
     }
@@ -76,13 +75,13 @@ private fun greet(characterId: String, lang: String, tags: List<String>, vm: App
         "ru" -> "Здравствуйте! Меня зовут ${profile.name}."
         else -> "Hello! My name is ${profile.name}."
     }
-    vm.speak(text, tag, Role.character(characterId))
+    vm.speak(text, tag, characterId)
 }
 
 fun languageName(lang: String, shown: Locale) = Locale.forLanguageTag(lang).getDisplayLanguage(shown).replaceFirstChar { it.uppercase() }
 
 /**
- * Голос преподавателя: «Авто» (самый качественный) и голоса своего пола с именами; `key` — «en:f» (учительница) или «en:m» (преподаватель).
+ * Голос преподавателя: «Авто» (самый качественный) и голоса своего пола с именами; `key` — «язык:персонаж», например «en:grace».
  * Не скачанный голос скачивается через экран загрузки голосов самого движка.
  */
 @Composable

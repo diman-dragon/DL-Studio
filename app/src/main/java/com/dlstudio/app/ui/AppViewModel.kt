@@ -23,7 +23,6 @@ import com.dlstudio.app.speech.VoiceChoice
 import com.dlstudio.app.speech.Phase
 import com.dlstudio.app.speech.Pronounce
 import com.dlstudio.app.speech.Pronunciation
-import com.dlstudio.app.speech.Role
 import com.dlstudio.app.speech.LangNeed
 import com.dlstudio.app.speech.Speaker
 import kotlinx.coroutines.Dispatchers
@@ -146,7 +145,7 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
 
     val speaking = speaker.speaking
 
-    fun speak(text: String, tag: String, role: Role = Role()) { count { it.listened() }; speaker.speak(text, tag, role) }
+    fun speak(text: String, tag: String, who: String? = null) { count { it.listened() }; speaker.speak(text, tag, who) }
 
     private fun updateSpeech(change: (SpeechUi) -> SpeechUi) = mutable.update { it.copy(speech = change(it.speech)) }
 

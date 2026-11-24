@@ -15,7 +15,7 @@ import com.dlstudio.app.speech.LangNeed
 import com.dlstudio.app.speech.Needs
 import com.dlstudio.app.speech.PackState
 import com.dlstudio.app.speech.RawVoice
-import com.dlstudio.app.speech.Role
+import com.dlstudio.app.speech.Characters
 import com.dlstudio.app.speech.VoiceCast
 import com.dlstudio.app.speech.VoiceNames
 import org.junit.Assert.assertEquals
@@ -51,35 +51,37 @@ class LessonLogicTest {
         assertEquals("hello", (b[5] as Block.Say).say)
     }
 
-    private fun roles(vararg lines: String) = TheoryBlocks.parse(lines.toList()).map { (it as Block.Say).role }
+    private fun speakers(vararg lines: String) = TheoryBlocks.parse(lines.toList()).map { (it as Block.Say).who }
 
-    @Test fun neighbourPhrasesGetDifferentVoices() {
-        assertEquals(listOf(0), roles("~ Hi").map { it.n })
-        assertEquals(listOf(0, 1), roles("~ Hi", "~ Hello").map { it.n })
-        assertEquals(listOf(0, 1, 2, 3), roles("~ a", "~ b", "~ c", "~ d").map { it.n })
-        assertEquals(listOf(0, 0, 0, 0, 0), roles("~ a", "~ b", "~ c", "~ d", "~ e").map { it.n })
+    @Test fun marksSetCharacterAndNothingElse() {
+        assertEquals(listOf("grace", "leo", "beatrice", "john", "narrator", null), speakers("~grace Hello | Привет", "~leo Hi", "~beatrice Thanks", "~john Sure", "~narrator Listen", "~ Plain"))
+        assertEquals("Hello", (TheoryBlocks.parse(listOf("~grace Hello | Привет"))[0] as Block.Say).text)
     }
 
-    @Test fun marksSetGenderAndNumber() {
-        assertEquals(listOf(Role(Gender.F, 0), Role(Gender.M, 0), Role(Gender.F, 1), Role(Gender.ANY, 2)), roles("~f Hello | Привет", "~m Hi", "~f2 Bye", "~3 Yo"))
-        assertEquals("Hello", (TheoryBlocks.parse(listOf("~f Hello | Привет"))[0] as Block.Say).text)
-        assertTrue(TheoryBlocks.parse(listOf("~for you"))[0] is Block.Text)
+    @Test fun neighbourPhrasesWithoutMarkStayWithOneVoice() {
+        assertEquals(listOf(null, null, null, null, null), speakers("~ a", "~ b", "~ c", "~ d", "~ e"))
     }
 
-    @Test fun stableCharacterMarksKeepIdentityAndVoiceRole() {
-        val parsed = roles("~grace Hello | привет", "~leo Hi | привет", "~beatrice Thanks | спасибо", "~sergei Sure | конечно")
-        assertEquals(listOf("grace", "leo", "beatrice", "sergei"), parsed.map { it.characterId })
-        assertEquals(listOf(Gender.F, Gender.M, Gender.F, Gender.M), parsed.map { it.speaker() })
-        assertEquals(listOf(0, 0, 1, 1), parsed.map { it.index() })
-        assertEquals(Gender.ANY, Role.character("narrator").speaker())
+    @Test fun oldMarksAreNotRecognised() {
+        for (old in listOf("~f Hi", "~m Hi", "~f2 Hi", "~1 Hi", "~sergei Hi", "~for you")) assertTrue(old, TheoryBlocks.parse(listOf(old))[0] is Block.Text)
     }
 
-    @Test fun characterSpecificVoiceOverridesGenderFallback() {
+    @Test fun charactersHaveGenderAndVoiceOrder() {
+        assertEquals(listOf(Gender.F, Gender.M, Gender.F, Gender.M, Gender.ANY), Characters.all.map { it.gender })
+        assertEquals("grace", Characters.of(null).id)
+        assertEquals("john", Characters.of("john").id)
+    }
+
+    private fun pick(voices: List<Cand>, who: String, chosen: String? = null) = VoiceCast.pick(voices, Characters.of(who), chosen)
+
+    @Test fun characterSpecificVoiceOverridesRanking() {
         val voices = listOf(cand("graceVoice", Gender.F), cand("beaVoice", Gender.F), cand("leoVoice", Gender.M))
-        assertEquals("beaVoice", VoiceCast.pick(voices, Role.character("beatrice"), emptyMap(), "beaVoice").voice)
-        assertEquals("graceVoice", VoiceCast.pick(voices, Role.character("grace"), emptyMap(), "graceVoice").voice)
-        assertEquals("beaVoice", VoiceCast.pick(voices, Role.character("grace"), emptyMap()).voice)
-        assertEquals("leoVoice", VoiceCast.pick(voices, Role.character("sergei"), emptyMap()).voice)
+        assertEquals("beaVoice", pick(voices, "beatrice", "beaVoice").voice)
+        assertEquals("graceVoice", pick(voices, "grace", "graceVoice").voice)
+        assertEquals("beaVoice", pick(voices, "grace").voice)
+        assertEquals("graceVoice", pick(voices, "beatrice").voice)
+        assertEquals("leoVoice", pick(voices, "john").voice)
+        assertEquals("beaVoice", pick(voices, "grace", "leoVoice").voice)
     }
 
     @Test fun genderIsOnlyTakenFromExplicitMarks() {
@@ -97,38 +99,29 @@ class LessonLogicTest {
 
     @Test fun teachersTakeBestQualityVoiceOfTheirGender() {
         val all = listOf(cand("f1", Gender.F, 300), cand("f2", Gender.F, 500), cand("m1", Gender.M, 400))
-        assertEquals("f2", VoiceCast.pick(all, Role(Gender.F), emptyMap()).voice)
-        assertEquals("m1", VoiceCast.pick(all, Role(Gender.M), emptyMap()).voice)
-        assertEquals("f1", VoiceCast.pick(all, Role(Gender.F), mapOf(Gender.F to "f1")).voice)
-        assertEquals("f1", VoiceCast.pick(all, Role(Gender.F, 1), emptyMap()).voice)
+        assertEquals("f2", pick(all, "grace").voice)
+        assertEquals("m1", pick(all, "leo").voice)
+        assertEquals("f1", pick(all, "beatrice").voice)
+        assertEquals("f1", pick(all, "grace", "f1").voice)
     }
 
-    @Test fun maleRoleNeverGetsFemaleVoice() {
+    @Test fun maleCharacterNeverGetsFemaleVoice() {
         val onlyFemale = listOf(cand("f1", Gender.F), cand("f2", Gender.F))
-        val cast = VoiceCast.pick(onlyFemale, Role(Gender.M), emptyMap())
+        val cast = pick(onlyFemale, "leo")
         assertEquals(null, cast.voice)
         assertTrue(cast.pitch < 1f)
-        val men = listOf(cand("m1", Gender.M), cand("m2", Gender.M))
-        assertEquals(listOf("m1", "m2", "m1"), (0..2).map { VoiceCast.pick(men, Role(Gender.M, it), emptyMap()).voice })
-        assertTrue(VoiceCast.pick(men, Role(Gender.M, 2), emptyMap()).pitch < 1f)
+        val men = listOf(cand("m1", Gender.M))
+        assertEquals(listOf("m1", "m1"), listOf("leo", "john").map { pick(men, it).voice })
+        assertTrue(pick(men, "john").pitch < 1f)
     }
 
-    @Test fun roleWithoutGenderAlternatesTeachers() {
-        val all = listOf(cand("f1", Gender.F, 500), cand("f2", Gender.F), cand("m1", Gender.M))
-        assertEquals(listOf("f1", "m1", "f2"), (0..2).map { VoiceCast.pick(all, Role(Gender.ANY, it), emptyMap()).voice })
-    }
-
-    @Test fun speakerOfRoleIsTeacherByGenderOrTurn() {
-        assertEquals(Gender.F, Role().speaker())
-        assertEquals(Gender.M, Role(Gender.ANY, 1).speaker())
-        assertEquals(Gender.F, Role(Gender.ANY, 2).speaker())
-        assertEquals(1, Role(Gender.ANY, 3).index())
-        assertEquals(Gender.M, Role(Gender.M, 1).speaker())
-        assertEquals(1, Role(Gender.M, 1).index())
+    @Test fun narratorTakesBestVoiceOfAnyGender() {
+        val all = listOf(cand("f1", Gender.F, 300), cand("m1", Gender.M, 500))
+        assertEquals("m1", pick(all, "narrator").voice)
     }
 
     @Test fun needsFindLanguageAndMissingPieces() {
-        val topic = Topic("t", "c", "g", 1, "T", "en-US", listOf(TheoryPage("", listOf("~f Hi"))), emptyList(), emptyList())
+        val topic = Topic("t", "c", "g", 1, "T", "en-US", listOf(TheoryPage("", listOf("~ Hi"))), emptyList(), emptyList())
         val voices = listOf(RawVoice("v#female_1", "en-US", 400, false, true, Gender.F), RawVoice("v#male_1", "en-US", 400, false, false, Gender.M))
         val need = Needs.of(listOf(topic), voices, mapOf("en-US" to PackState.AVAILABLE)).single()
         assertEquals("en", need.lang)

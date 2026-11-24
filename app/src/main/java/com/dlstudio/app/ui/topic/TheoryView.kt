@@ -103,7 +103,7 @@ private fun BlockView(block: Block, speak: SpeakAs?, mediaDir: File?) {
         is Block.Callout -> CalloutBox(block.kind, block.text)
         is Block.Say -> SayRow(block, speak)
         is Block.Table -> TableView(block.rows)
-        is Block.Tiles -> TileGrid(block.tiles, speak?.let { f -> { text: String -> f(text, com.dlstudio.app.speech.Role()) } })
+        is Block.Tiles -> TileGrid(block.tiles, speak?.let { f -> { text: String -> f(text, null) } })
         is Block.Media -> MediaView(block, mediaDir)
     }
 }
@@ -136,20 +136,20 @@ private fun SayRow(say: Block.Say, speak: SpeakAs?) {
         Modifier.fillMaxWidth().clip(shape).background(colors.primaryContainer).padding(start = 16.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
         Arrangement.spacedBy(10.dp), Alignment.CenterVertically
     ) {
-        if (say.role.gender != Gender.ANY) {
-            val id = say.role.characterId
-            if (id == null || id == "grace" || id == "leo") {
-                TeacherAvatar(say.role.gender, 48.dp, text = say.say.ifBlank { say.text }, speakerId = id)
+        val profile = Characters.get(say.who)
+        if (profile != null && profile.gender != Gender.ANY) {
+            if (profile.id == "grace" || profile.id == "leo") {
+                TeacherAvatar(profile.gender, 48.dp, text = say.say.ifBlank { say.text }, speakerId = profile.id)
             } else {
-                CharacterMark(id)
+                CharacterMark(profile.id)
             }
         }
         Column(Modifier.weight(1f), Arrangement.spacedBy(2.dp)) {
-            if (say.role.characterId != null) Text(Characters.name(say.role.characterId) ?: "", style = MaterialTheme.typography.labelSmall, color = colors.primary)
+            if (profile != null) Text(profile.name, style = MaterialTheme.typography.labelSmall, color = colors.primary)
             Text(say.text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             if (say.note.isNotBlank()) Text(say.note, style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
         }
-        if (speak != null) SmallSpeaker(say.say.ifBlank { say.text }, { text -> speak(text, say.role) }, size = 42.dp)
+        if (speak != null) SmallSpeaker(say.say.ifBlank { say.text }, { text -> speak(text, say.who) }, size = 42.dp)
     }
 }
 

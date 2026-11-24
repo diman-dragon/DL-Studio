@@ -1,7 +1,6 @@
 package com.dlstudio.app.content
 
-import com.dlstudio.app.speech.Gender
-import com.dlstudio.app.speech.Role
+import com.dlstudio.app.speech.Characters
 
 /** Вид выноски: совет, заметка, предупреждение, интересный факт. */
 enum class CalloutKind(val mark: String) { TIP("!tip "), NOTE("!note "), WARN("!warn "), FUN("!fun ") }
@@ -18,7 +17,7 @@ sealed interface Block {
     data class Sub(val text: String) : Block
     data class Bullets(val items: List<String>) : Block
     data class Callout(val kind: CalloutKind, val text: String) : Block
-    data class Say(val text: String, val note: String, val say: String, val role: Role = Role()) : Block
+    data class Say(val text: String, val note: String, val say: String, val who: String? = null) : Block
     data class Table(val rows: List<List<String>>) : Block
     data class Tiles(val tiles: List<Tile>) : Block
     data class Media(val kind: MediaKind, val src: String, val caption: String) : Block
@@ -30,17 +29,13 @@ sealed interface Block {
  * - `- ` — пункт списка (подряд идущие собираются в один список);
  * - `!tip `, `!note `, `!warn `, `!fun ` — цветная выноска;
  * - `~ English | перевод | что озвучить` — фраза с кнопкой озвучки и переводом под ней; третье поле необязательно (если пусто, озвучивается сама фраза);
- *   постоянные персонажи: `~grace `, `~leo `, `~beatrice `, `~sergei `, `~narrator `; совместимые старые отметки: `~f `, `~m `, `~f2 `, `~m2 ` и `~1`…`~4`
- *   без указания пола. Мужская реплика всегда звучит мужским голосом, женская — женским. Две-четыре фразы подряд без отметки сами получают разные голоса;
+ *   говорящий задаётся ID персонажа: `~grace `, `~leo `, `~beatrice `, `~john `, `~narrator `; без ID (`~ `) звучит голос мисс Грейс;
  * - `| a | b | c` — строка таблицы (подряд идущие — одна таблица, первая строка — шапка);
  * - `@image путь | подпись`, `@audio …`, `@video …` — картинка, звук или видео (путь относительно папки медиа темы или адрес https);
  * - `::v A a | эй | /eɪ/ | ay` — плитка (v — гласная, c — согласная, b — обе); последнее поле (что озвучить) необязательно; подряд идущие — сетка.
  */
 object TheoryBlocks {
-    private const val UNSET = -1
-    private const val MAX_VOICES = 4
-    private val CHARACTER_MARK = Regex("^~(grace|leo|beatrice|sergei|narrator) ", RegexOption.IGNORE_CASE)
-    private val MARK = Regex("^~([fm]?)([1-4]?) ")
+    private val MARK = Regex("^~(${Characters.all.joinToString("|") { it.id }})? ", RegexOption.IGNORE_CASE)
 
     fun parse(paragraphs: List<String>): List<Block> {
         val out = ArrayList<Block>()
@@ -51,39 +46,12 @@ object TheoryBlocks {
             when {
                 p.startsWith("## ") -> out.add(Block.Sub(p.drop(3).trim()))
                 p.startsWith("- ") -> merge(out, last, Block.Bullets(listOf(p.drop(2).trim())))
-                p.startsWith("~") && CHARACTER_MARK.containsMatchIn(p) -> CHARACTER_MARK.find(p)?.let { match ->
-                    out.add(say(p.drop(match.value.length), Role.character(match.groupValues[1].lowercase())))
-                }
-                p.startsWith("~") && MARK.containsMatchIn(p) -> MARK.find(p)?.let { out.add(say(p.drop(it.value.length), role(it))) }
+                p.startsWith("~") && MARK.containsMatchIn(p) -> MARK.find(p)?.let { out.add(say(p.drop(it.value.length), it.groupValues[1].lowercase().ifEmpty { null })) }
                 p.startsWith("|") -> merge(out, last, Block.Table(listOf(cells(p))))
                 p.startsWith("@") -> out.add(media(p) ?: Block.Text(p))
                 p.startsWith("::") -> tile(p)?.let { merge(out, last, Block.Tiles(listOf(it))) } ?: out.add(Block.Text(p))
                 else -> out.add(callout(p) ?: Block.Text(p))
             }
-        }
-        return voices(out)
-    }
-
-    /** Роль из отметки: `~ ` — не задана (UNSET), `~f `, `~m ` — первый голос пола, цифра — номер голоса. */
-    private fun role(m: MatchResult): Role {
-        val gender = when (m.groupValues[1]) { "f" -> Gender.F; "m" -> Gender.M; else -> Gender.ANY }
-        val digit = m.groupValues[2]
-        return Role(gender, if (digit.isNotEmpty()) digit.toInt() - 1 else if (gender == Gender.ANY) UNSET else 0)
-    }
-
-    /** Две-четыре фразы подряд без явной роли звучат разными голосами; длинные ряды (слова списком) — одним. */
-    private fun voices(blocks: List<Block>): List<Block> {
-        val out = ArrayList<Block>(blocks)
-        var i = 0
-        while (i < out.size) {
-            if (out[i] !is Block.Say) { i++; continue }
-            var j = i
-            while (j < out.size && out[j] is Block.Say) j++
-            for (k in i until j) {
-                val b = out[k] as Block.Say
-                if (b.role.n == UNSET) out[k] = b.copy(role = Role(Gender.ANY, if (j - i in 2..MAX_VOICES) k - i else 0))
-            }
-            i = j
         }
         return out
     }
@@ -102,9 +70,9 @@ object TheoryBlocks {
     private fun callout(p: String): Block.Callout? =
         CalloutKind.values().firstOrNull { p.startsWith(it.mark) }?.let { Block.Callout(it, p.drop(it.mark.length).trim()) }
 
-    private fun say(body: String, role: Role): Block.Say {
+    private fun say(body: String, who: String?): Block.Say {
         val parts = body.split(" | ", limit = 3).map { it.trim() }
-        return Block.Say(parts[0], parts.getOrElse(1) { "" }, parts.getOrElse(2) { "" }, role)
+        return Block.Say(parts[0], parts.getOrElse(1) { "" }, parts.getOrElse(2) { "" }, who)
     }
 
     private fun media(p: String): Block.Media? {

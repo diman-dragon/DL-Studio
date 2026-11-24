@@ -51,13 +51,13 @@ private const val MOUTH_PERIOD = 170
  * Преподаватель, нарисованный кодом и живой: дышит, моргает, шевелит ртом, пока говорит, и меняет настроение.
  * Gender.F — мисс Грейс: строгая учительница, пучок, очки, тёмный деловой костюм с белым воротничком.
  * Gender.M — мистер Лео: молодой энтузиаст, взъерошенная чёлка, борода, горчичный свитер, красная бабочка.
- * Говорит, когда вслух произносится реплика его пола (если задан `text` — именно эта реплика). Нажатие (`onClick`) необязательно.
+ * Говорит, когда вслух звучит его голос (если задан `text` — именно эта реплика). Нажатие (`onClick`) необязательно.
  */
 @Composable
 fun TeacherAvatar(gender: Int, size: Dp, modifier: Modifier = Modifier, text: String? = null, mood: Mood = Mood.NEUTRAL, speakerId: String? = null, onClick: (() -> Unit)? = null) {
     val speaking = LocalSpeaking.current
     val expectedId = speakerId ?: if (gender == Gender.F) "grace" else "leo"
-    val talking = speaking != null && (speaking.characterId == expectedId || (speaking.characterId == null && speaking.gender == gender)) && (text == null || speaking.text == text)
+    val talking = speaking != null && speaking.characterId == expectedId && (text == null || speaking.text == text)
     val clock = rememberInfiniteTransition(label = "teacher")
     val blink by clock.animateFloat(
         0f, 1f,

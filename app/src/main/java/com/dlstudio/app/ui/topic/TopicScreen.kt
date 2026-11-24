@@ -27,7 +27,6 @@ import com.dlstudio.app.progress.Xp
 import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.speech.Check
 import com.dlstudio.app.speech.Speak
-import com.dlstudio.app.speech.Role as VoiceRole
 import com.dlstudio.app.speech.SpeakAs
 import com.dlstudio.app.ui.AppState
 import com.dlstudio.app.ui.AppViewModel
@@ -52,7 +51,7 @@ fun TopicScreen(topic: Topic, state: AppState, vm: AppViewModel, onBack: () -> U
     var picked by rememberSaveable(topic.id) { mutableStateOf(0) }
     val index = picked.coerceIn(0, stages.lastIndex)
     val speak: Speak? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> { text: String -> vm.speak(text, tag) } }
-    val speakAs: SpeakAs? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> { text: String, role: VoiceRole -> vm.speak(text, tag, role) } }
+    val speakAs: SpeakAs? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> { text: String, who: String? -> vm.speak(text, tag, who) } }
     val check: Check? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> Check(state.pronounce, { vm.listen(it, tag) }, vm::stopListening, vm::micDenied, { vm.downloadPack(tag) }) }
 
     TopicNeeds(topic, state, vm, Locale.forLanguageTag(if (state.lang == AppLang.RU) "ru" else "en"))
