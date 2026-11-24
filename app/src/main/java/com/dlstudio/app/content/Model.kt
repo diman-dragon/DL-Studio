@@ -1,5 +1,6 @@
 package com.dlstudio.app.content
 
+import com.dlstudio.app.speech.Characters
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -25,11 +26,13 @@ enum class QuizKind(val tag: String) {
 /**
  * Вопрос практики. Поля зависят от вида: `answer` — верный вариант (choice, listen), фраза для произнесения (speak),
  * верный порядок слов через пробел (bank) или верный ввод (fill); `options` — варианты (choice, listen) или лишние слова в мешке (bank);
- * `say` — что озвучить (listen, speak, fill-диктант); `alt` — другие верные вводы (fill); `pairs` — пары для соединения (match); `hint` — подсказка.
+ * `say` — что озвучить (listen, speak, fill-диктант); `alt` — другие верные вводы (fill); `pairs` — пары для соединения (match); `hint` — подсказка;
+ * `who` — ID персонажа, чьим голосом звучит `say` (в json поле `who`; пусто или неизвестный ID — мисс Грейс).
  */
 data class QuizItem(
     val question: String, val answer: String, val options: List<String>, val kind: QuizKind = QuizKind.CHOICE,
-    val say: String = "", val alt: List<String> = emptyList(), val pairs: List<Pair<String, String>> = emptyList(), val hint: String = ""
+    val say: String = "", val alt: List<String> = emptyList(), val pairs: List<Pair<String, String>> = emptyList(), val hint: String = "",
+    val who: String? = null
 )
 
 /**
@@ -72,7 +75,8 @@ object TopicJson {
         val options = o.optJSONArray("options").strings()
         val pairs = o.optJSONArray("pairs").pairs()
         val say = o.optString("say").ifBlank { if (kind == QuizKind.LISTEN || kind == QuizKind.SPEAK) answer else "" }
-        val item = QuizItem(o.optString("q"), answer, options, kind, say, o.optJSONArray("alt").strings(), pairs, o.optString("hint"))
+        val who = o.optString("who").lowercase().takeIf { Characters.get(it) != null }
+        val item = QuizItem(o.optString("q"), answer, options, kind, say, o.optJSONArray("alt").strings(), pairs, o.optString("hint"), who)
         val ok = when (kind) {
             QuizKind.CHOICE -> answer in options
             QuizKind.LISTEN -> answer in options && say.isNotBlank()

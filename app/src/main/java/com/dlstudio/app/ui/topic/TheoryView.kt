@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,17 +35,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dlstudio.app.content.Block
 import com.dlstudio.app.content.CalloutKind
+import com.dlstudio.app.content.CourseCast
 import com.dlstudio.app.content.TheoryBlocks
 import com.dlstudio.app.content.TheoryPage
 import com.dlstudio.app.content.Tile
 import com.dlstudio.app.content.TileKind
-import com.dlstudio.app.speech.Speak
-import com.dlstudio.app.speech.Gender
+import com.dlstudio.app.speech.CharRole
 import com.dlstudio.app.speech.Characters
-import com.dlstudio.app.speech.SpeakAs
+import com.dlstudio.app.speech.Speak
+import com.dlstudio.app.speech.Utter
+import com.dlstudio.app.ui.components.CharacterAvatar
+import com.dlstudio.app.ui.components.LocalSpeaking
 import com.dlstudio.app.ui.components.Markup
-import com.dlstudio.app.ui.components.SmallSpeaker
-import com.dlstudio.app.ui.components.TeacherAvatar
 import com.dlstudio.app.ui.theme.LocalAccent
 import com.dlstudio.app.ui.theme.LocalStrings
 import com.dlstudio.app.ui.theme.gradientColors
@@ -55,23 +57,53 @@ private val CONSONANT_COLOR = Color(0xFF4C8DFF)
 private const val TILES_PER_ROW = 4
 private const val TILE_ALPHA = 0.2f
 
-/** Карточка теории: яркая шапка со значком, заголовком и преподавателем (`teacher` — Gender.F или Gender.M, оживает, когда говорит), под ней блоки страницы (текст, выноски, фразы с озвучкой, таблицы, плитки-буквы). */
+/**
+ * Карточка теории: яркая шапка со значком, заголовком и портретом того, кто сейчас говорит на странице (пока никто не говорит — ведущего: первый преподаватель
+ * среди говорящих, иначе мисс Грейс), под ней блоки страницы (текст, выноски, реплики персонажей, таблицы, плитки-буквы). Персонажи, которых ученик ещё
+ * не встречал, представляются прямо перед первой своей репликой; над диалогом из нескольких реплик — кнопка «Слушать диалог».
+ * `pageIndex` — номер страницы (для меток строк), `talk` — голоса, язык и знакомства.
+ */
 @Composable
-fun TheoryCard(page: TheoryPage, speak: SpeakAs?, mediaDir: File?, teacher: Int, modifier: Modifier = Modifier) {
+fun TheoryCard(page: TheoryPage, pageIndex: Int, talk: Talk, mediaDir: File?, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(28.dp)
     val blocks = remember(page) { TheoryBlocks.parse(page.paragraphs) }
+    val fresh = remember(page) { CourseCast.fresh(page, talk.met) }
+    LaunchedEffect(page) { fresh.forEach(talk.onMeet) }
     Column(
         modifier.fillMaxWidth().shadow(14.dp, shape, ambientColor = colors.primary, spotColor = colors.primary).clip(shape)
             .background(colors.surfaceVariant).border(1.dp, colors.primary.copy(alpha = 0.35f), shape)
     ) {
-        if (page.heading.isNotBlank() || page.icon.isNotBlank()) CardHeader(page, teacher)
-        Column(Modifier.fillMaxWidth().padding(18.dp), Arrangement.spacedBy(14.dp)) { blocks.forEach { BlockView(it, speak, mediaDir) } }
+        if (page.heading.isNotBlank() || page.icon.isNotBlank()) CardHeader(page)
+        Column(Modifier.fillMaxWidth().padding(18.dp), Arrangement.spacedBy(14.dp)) {
+            val introduced = HashSet<String>()
+            blocks.forEachIndexed { i, block ->
+                if (block is Block.Say) {
+                    if (talk.voiced && (i == 0 || blocks[i - 1] !is Block.Say)) DialogueOf(blocks, i, pageIndex, talk)
+                    val id = Characters.of(block.who).id
+                    if (id in fresh && introduced.add(id)) MeetBanner(id, talk)
+                }
+                BlockView(block, lineId(pageIndex, i), talk, mediaDir)
+            }
+        }
     }
 }
 
+/** Кнопка диалога перед подряд идущими репликами, если в них говорят хотя бы двое разных. */
 @Composable
-private fun CardHeader(page: TheoryPage, teacher: Int) {
+private fun DialogueOf(blocks: List<Block>, start: Int, pageIndex: Int, talk: Talk) {
+    val run = blocks.drop(start).takeWhile { it is Block.Say }.filterIsInstance<Block.Say>()
+    val ids = run.map { Characters.of(it.who).id }.distinct()
+    if (ids.size < 2) return
+    val items = run.mapIndexed { j, say -> Utter(say.say.ifBlank { say.text }, say.who, lineId(pageIndex, start + j)) }
+    DialogueBar(ids, items, talk)
+}
+
+@Composable
+private fun CardHeader(page: TheoryPage) {
+    val speakers = remember(page) { (CourseCast.onPage(page) + Characters.DEFAULT).distinct() }
+    val lead = remember(page) { speakers.firstOrNull { Characters.of(it).role == CharRole.TEACHER } ?: speakers.first() }
+    val now = LocalSpeaking.current?.characterId
     Row(
         Modifier.fillMaxWidth().background(Brush.linearGradient(LocalAccent.current.gradientColors())).padding(horizontal = 18.dp, vertical = 16.dp),
         Arrangement.spacedBy(14.dp), Alignment.CenterVertically
@@ -82,12 +114,12 @@ private fun CardHeader(page: TheoryPage, teacher: Int) {
             }
         }
         Text(page.heading, Modifier.weight(1f), Color.White, style = MaterialTheme.typography.headlineSmall)
-        TeacherAvatar(teacher, 60.dp)
+        CharacterAvatar(now?.takeIf { it in speakers } ?: lead, 60.dp)
     }
 }
 
 @Composable
-private fun BlockView(block: Block, speak: SpeakAs?, mediaDir: File?) {
+private fun BlockView(block: Block, line: String, talk: Talk, mediaDir: File?) {
     val colors = MaterialTheme.colorScheme
     when (block) {
         is Block.Text -> Text(Markup.annotate(block.text), style = MaterialTheme.typography.bodyLarge)
@@ -101,9 +133,9 @@ private fun BlockView(block: Block, speak: SpeakAs?, mediaDir: File?) {
             }
         }
         is Block.Callout -> CalloutBox(block.kind, block.text)
-        is Block.Say -> SayRow(block, speak)
+        is Block.Say -> SayRow(block, line, talk)
         is Block.Table -> TableView(block.rows)
-        is Block.Tiles -> TileGrid(block.tiles, speak?.let { f -> { text: String -> f(text, null) } })
+        is Block.Tiles -> TileGrid(block.tiles, if (talk.voiced) { { text: String -> talk.say(text, null, null) } } else null)
         is Block.Media -> MediaView(block, mediaDir)
     }
 }
@@ -126,44 +158,6 @@ private fun CalloutBox(kind: CalloutKind, text: String) {
         Text(Markup.annotate(text), Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
     }
 }
-
-/** Фраза на изучаемом языке с кнопкой озвучки и переводом под ней. */
-@Composable
-private fun SayRow(say: Block.Say, speak: SpeakAs?) {
-    val colors = MaterialTheme.colorScheme
-    val shape = RoundedCornerShape(18.dp)
-    Row(
-        Modifier.fillMaxWidth().clip(shape).background(colors.primaryContainer).padding(start = 16.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
-        Arrangement.spacedBy(10.dp), Alignment.CenterVertically
-    ) {
-        val profile = Characters.get(say.who)
-        if (profile != null && profile.gender != Gender.ANY) {
-            if (profile.id == "grace" || profile.id == "leo") {
-                TeacherAvatar(profile.gender, 48.dp, text = say.say.ifBlank { say.text }, speakerId = profile.id)
-            } else {
-                CharacterMark(profile.id)
-            }
-        }
-        Column(Modifier.weight(1f), Arrangement.spacedBy(2.dp)) {
-            if (profile != null) Text(profile.name, style = MaterialTheme.typography.labelSmall, color = colors.primary)
-            Text(say.text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            if (say.note.isNotBlank()) Text(say.note, style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
-        }
-        if (speak != null) SmallSpeaker(say.say.ifBlank { say.text }, { text -> speak(text, say.who) }, size = 42.dp)
-    }
-}
-
-/** Компактный знак отдельного участника диалога; не подменяет лицо преподавателя чужим аватаром. */
-@Composable
-private fun CharacterMark(id: String) {
-    val profile = Characters.get(id)
-    val initial = profile?.name?.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
-    val tint = if (profile?.gender == Gender.F) Color(0xFFB7A4F5) else Color(0xFFE7B45C)
-    Box(Modifier.size(48.dp).clip(CircleShape).background(tint.copy(alpha = 0.28f)), Alignment.Center) {
-        Text(initial, style = MaterialTheme.typography.titleLarge, color = tint, fontWeight = FontWeight.Bold)
-    }
-}
-
 
 /** Таблица: первая строка — шапка с заливкой, дальше строки через одну тоном светлее. */
 @Composable

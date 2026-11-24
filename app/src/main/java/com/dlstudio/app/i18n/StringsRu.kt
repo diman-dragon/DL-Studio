@@ -4,6 +4,7 @@ import com.dlstudio.app.progress.DayPart
 import com.dlstudio.app.progress.GoalPhase
 import com.dlstudio.app.progress.Mood
 import com.dlstudio.app.settings.ThemeMode
+import com.dlstudio.app.speech.How
 
 object StringsRu : Strings {
     override val tabStart = "Старт"; override val tabMap = "Карта"; override val tabProgress = "Прогресс"; override val tabSettings = "Настройки"
@@ -154,13 +155,37 @@ object StringsRu : Strings {
     override val downloadNeeded = "Скачать недостающее"; override val allReady = "Всё нужное установлено"
     override val offerTitle = "Нужны языковые пакеты"; override val later = "Позже"
     override fun offerText(languages: String) = "Для установленных тем не хватает голосов или пакетов распознавания: $languages. Скачать недостающее?"
-    override val teachersTitle = "Преподаватели"
-    override val otherCharacters = "Другие персонажи"
-    override val teacherFName = "Мисс Грейс"; override val teacherMName = "Мистер Лео"
-    override val teacherFInfo = "Строгая учительница: очки, деловой костюм, указка. Говорит чётко и по делу. Озвучивает женские реплики и объяснения."
-    override val teacherMInfo = "Молодой энтузиаст: борода, свитер, бабочка. Объясняет с шуткой. Озвучивает мужские реплики."
-    override val genderAutoHint = "Самый качественный голос подберётся сам"
-    override val voiceGenderHint = "В списках только голоса с явно известным полом (по рекомендациям Google). Голоса без указания пола не используются."
+    override val charactersTitle = "Персонажи"
+    override val genderAutoHint = "Голос подберётся сам и закрепится за персонажем"
+    override val voiceGenderHint = "В списках только голоса с явно известным полом (по рекомендациям Google). Если подходящего голоса нет, персонаж говорит голосом системы или голосом, общим с другим персонажем, но со своим тембром и скоростью."
+    override val statusFemale = "Женский голос"; override val statusMale = "Мужской голос"
+
+    override fun characterName(id: String) = when (id) { "grace" -> "Мисс Грейс"; "leo" -> "Мистер Лео"; "beatrice" -> "Беатрис"; "john" -> "Джон"; else -> "Диктор" }
+    override fun characterRole(id: String) = when (id) { "grace" -> "Преподавательница"; "leo" -> "Преподаватель"; "beatrice" -> "Ученица"; "john" -> "Ученик"; else -> "Диктор" }
+    override fun characterBio(id: String) = when (id) {
+        "grace" -> "Строгая, но справедливая: очки, деловой воротничок, волосы до плеч. Объясняет правила чётко и по делу, ведёт урок."
+        "leo" -> "Молодой энтузиаст с бородой, в горчичном свитере. Объясняет на примерах, шутит и поддерживает."
+        "beatrice" -> "Любознательная студентка с фиолетовой стрижкой. Задаёт вопросы, ошибается и учится вместе с вами."
+        "john" -> "Спокойный парень в очках. Отвечает, уточняет и разыгрывает диалоги."
+        else -> "Невозмутимый голос за кадром: читает инструкции и задания."
+    }
+    override fun voiceHow(how: How) = when (how) {
+        How.CHOSEN -> "голос выбран вами"
+        How.OWN -> "свой голос, закреплён"
+        How.SHARED -> "голос общий с другим персонажем, тембр и скорость свои"
+        How.DEFAULT -> "голос системы, тембр и скорость свои"
+    }
+    override val sayHello = "Поздороваться"; override val introAgain = "Показать знакомство заново"
+    override val introAgainHint = "Героев курсов и первые появления персонажей представят ещё раз."
+    override val portraitsCredit = "Портреты персонажей: Micah, автор Micah Lanier (DiceBear), лицензия CC BY 4.0."
+    override fun castTitle(course: String) = "Герои курса «$course»"
+    override val castText = "Эти персонажи ведут уроки и разыгрывают диалоги. У каждого свой голос и свой портрет: нажмите на портрет, чтобы услышать."
+    override val castStart = "К урокам"
+    override fun meetTitle(name: String) = "Знакомьтесь: $name"
+    override val dialogueListen = "Слушать диалог"; override val dialogueStop = "Остановить"
+    override val problemNoEngine = "Озвучки нет: на устройстве не найден синтезатор речи. Текст остаётся на экране, персонажи говорят без звука."
+    override val problemNoLanguage = "Нет голоса для языка темы, поэтому звука нет. Скачайте голос, и персонажи заговорят."
+    override val problemOk = "Понятно"
     override val tabOverview = "Обзор"; override val tabStats = "Статистика"; override val downloadPack = "Скачать пакет распознавания"
     override fun voiceCounts(installed: Int, known: Int) = "Скачано голосов: $installed, из них с известным полом: $known"
     override val statsEmpty = "Пока нечего показать: решайте задания, листайте карточки и теорию, и здесь появится статистика."

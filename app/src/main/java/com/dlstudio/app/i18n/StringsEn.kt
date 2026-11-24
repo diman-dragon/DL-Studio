@@ -4,6 +4,7 @@ import com.dlstudio.app.progress.DayPart
 import com.dlstudio.app.progress.GoalPhase
 import com.dlstudio.app.progress.Mood
 import com.dlstudio.app.settings.ThemeMode
+import com.dlstudio.app.speech.How
 
 object StringsEn : Strings {
     override val tabStart = "Start"; override val tabMap = "Map"; override val tabProgress = "Progress"; override val tabSettings = "Settings"
@@ -154,13 +155,37 @@ object StringsEn : Strings {
     override val downloadNeeded = "Download what’s missing"; override val allReady = "Everything needed is installed"
     override val offerTitle = "Language packs needed"; override val later = "Later"
     override fun offerText(languages: String) = "The installed topics need more voices or recognition packs: $languages. Download what’s missing?"
-    override val teachersTitle = "Teachers"
-    override val otherCharacters = "Other characters"
-    override val teacherFName = "Miss Grace"; override val teacherMName = "Mr. Leo"
-    override val teacherFInfo = "A strict teacher: glasses, business suit, pointer. Speaks clearly and to the point. Voices female lines and explanations."
-    override val teacherMInfo = "A young enthusiast: beard, sweater, bow tie. Explains with a joke. Voices male lines."
-    override val genderAutoHint = "The best-quality voice is picked automatically"
-    override val voiceGenderHint = "Only voices whose gender is explicitly known are listed (per Google’s naming). Voices without a known gender are not used."
+    override val charactersTitle = "Characters"
+    override val genderAutoHint = "A voice is picked automatically and stays with the character"
+    override val voiceGenderHint = "Only voices whose gender is explicitly known are listed (per Google’s naming). With no suitable voice a character uses the system voice, or a voice shared with another character, with its own pitch and pace."
+    override val statusFemale = "Female voice"; override val statusMale = "Male voice"
+
+    override fun characterName(id: String) = when (id) { "grace" -> "Miss Grace"; "leo" -> "Mr. Leo"; "beatrice" -> "Beatrice"; "john" -> "John"; else -> "Narrator" }
+    override fun characterRole(id: String) = when (id) { "grace", "leo" -> "Teacher"; "beatrice", "john" -> "Student"; else -> "Narrator" }
+    override fun characterBio(id: String) = when (id) {
+        "grace" -> "Strict but fair: glasses, a business collar, shoulder-length hair. Explains the rules clearly and runs the lesson."
+        "leo" -> "A young enthusiast with a beard and a mustard sweater. Explains with examples, jokes and encouragement."
+        "beatrice" -> "A curious student with a purple bob. Asks questions, makes mistakes and learns along with you."
+        "john" -> "A calm guy in glasses. Answers, clarifies and acts out dialogues."
+        else -> "An unflappable voice off screen: reads instructions and tasks."
+    }
+    override fun voiceHow(how: How) = when (how) {
+        How.CHOSEN -> "voice chosen by you"
+        How.OWN -> "own voice, kept"
+        How.SHARED -> "voice shared with another character, own pitch and pace"
+        How.DEFAULT -> "system voice, own pitch and pace"
+    }
+    override val sayHello = "Say hello"; override val introAgain = "Show introductions again"
+    override val introAgainHint = "Course casts and first appearances will be introduced once more."
+    override val portraitsCredit = "Character portraits: Micah by Micah Lanier (DiceBear), CC BY 4.0."
+    override fun castTitle(course: String) = "Meet the cast of “$course”"
+    override val castText = "These characters teach the lessons and act out the dialogues. Each has their own voice and portrait: tap a portrait to listen."
+    override val castStart = "To the lessons"
+    override fun meetTitle(name: String) = "Meet $name"
+    override val dialogueListen = "Play dialogue"; override val dialogueStop = "Stop"
+    override val problemNoEngine = "No speech: no text-to-speech engine was found on this device. The text stays on screen and characters speak without sound."
+    override val problemNoLanguage = "There is no voice for this topic’s language, so there is no sound. Download a voice and the characters will speak."
+    override val problemOk = "Got it"
     override val tabOverview = "Overview"; override val tabStats = "Statistics"; override val downloadPack = "Download recognition pack"
     override fun voiceCounts(installed: Int, known: Int) = "Voices downloaded: $installed, with a known gender: $known"
     override val statsEmpty = "Nothing to show yet: do exercises and flip cards or theory pages, and statistics will appear here."

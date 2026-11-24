@@ -1,0 +1,4 @@
+Character portraits are generated with DiceBear (https://www.dicebear.com) using the "Micah" style.
+"Micah" by Micah Lanier (https://www.figma.com/community/file/1136679018012226688), licensed under CC BY 4.0
+(https://creativecommons.org/licenses/by/4.0/). The portraits in app/src/main/res/drawable-nodpi/ch_*.webp are adapted
+from that work (colors, hair, glasses, mouth and eyes chosen per character) by scripts/portraits.mjs.

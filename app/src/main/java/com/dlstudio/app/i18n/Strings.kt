@@ -4,6 +4,7 @@ import com.dlstudio.app.progress.DayPart
 import com.dlstudio.app.progress.GoalPhase
 import com.dlstudio.app.progress.Mood
 import com.dlstudio.app.settings.ThemeMode
+import com.dlstudio.app.speech.How
 
 /** Все тексты интерфейса. Новый язык = новая реализация; забытая строка не соберётся. */
 interface Strings {
@@ -72,9 +73,19 @@ interface Strings {
     val voiceAuto: String; val voiceHigh: String; val voiceNetwork: String; val voiceNotInstalled: String
     val voicesLoading: String; val voicesMore: String; val voiceLanguage: String; val packOn: String; val packOff: String
     val recogTitle: String; val recogHint: String
-    val teachersTitle: String; val teacherFName: String; val teacherMName: String; val teacherFInfo: String; val teacherMInfo: String
-    val genderAutoHint: String; val voiceGenderHint: String; val otherCharacters: String; val genderFemale: String; val genderMale: String
-    val statusRecog: String; val statusNoLangs: String
+    val charactersTitle: String; val genderAutoHint: String; val voiceGenderHint: String; val genderFemale: String; val genderMale: String
+    val statusFemale: String; val statusMale: String; val statusRecog: String; val statusNoLangs: String
+
+    fun characterName(id: String): String
+    fun characterRole(id: String): String
+    fun characterBio(id: String): String
+    fun voiceHow(how: How): String
+    val sayHello: String; val introAgain: String; val introAgainHint: String; val portraitsCredit: String
+    fun castTitle(course: String): String
+    val castText: String; val castStart: String
+    fun meetTitle(name: String): String
+    val dialogueListen: String; val dialogueStop: String
+    val problemNoEngine: String; val problemNoLanguage: String; val problemOk: String
     val downloadNeeded: String; val allReady: String; val offerTitle: String; val later: String
     fun offerText(languages: String): String
     val packInstalled: String; val packAvailable: String; val packDownloading: String; val packUnsupported: String; val packUnknown: String

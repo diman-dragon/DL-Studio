@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -21,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.R
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dlstudio.app.content.CourseCast
 import com.dlstudio.app.content.Topic
 import com.dlstudio.app.progress.TopicProgress
 import com.dlstudio.app.progress.Xp
@@ -32,6 +35,8 @@ import com.dlstudio.app.ui.AppState
 import com.dlstudio.app.ui.AppViewModel
 import com.dlstudio.app.ui.components.AppIcon
 import com.dlstudio.app.ui.components.BackButton
+import com.dlstudio.app.ui.components.CastIntro
+import com.dlstudio.app.ui.components.SpeechProblemBar
 import com.dlstudio.app.ui.components.TopicNeeds
 import com.dlstudio.app.ui.theme.LocalStrings
 import java.util.Locale
@@ -51,10 +56,16 @@ fun TopicScreen(topic: Topic, state: AppState, vm: AppViewModel, onBack: () -> U
     var picked by rememberSaveable(topic.id) { mutableStateOf(0) }
     val index = picked.coerceIn(0, stages.lastIndex)
     val speak: Speak? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> { text: String -> vm.speak(text, tag) } }
-    val speakAs: SpeakAs? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> { text: String, who: String? -> vm.speak(text, tag, who) } }
+    val speakAs: SpeakAs? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> { text: String, who: String?, line: String? -> vm.speak(text, tag, who, line) } }
+    val silent: SpeakAs = { _, _, _ -> }
+    val talk = Talk(speakAs ?: silent, { items -> vm.speakAll(items, topic.tag) }, vm::stopSpeaking, topic.tag, state.met, vm::meet)
+    val problem by vm.problem.collectAsStateWithLifecycle()
+    val cast = remember(state.topics, topic.course) { CourseCast.of(state.topics.filter { it.course == topic.course }) }
+    val introPending = topic.course.isNotBlank() && cast.isNotEmpty() && topic.course !in state.introduced
     val check: Check? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> Check(state.pronounce, { vm.listen(it, tag) }, vm::stopListening, vm::micDenied, { vm.downloadPack(tag) }) }
 
-    TopicNeeds(topic, state, vm, Locale.forLanguageTag(if (state.lang == AppLang.RU) "ru" else "en"))
+    if (introPending) CastIntro(topic.course, cast, topic.tag, speakAs?.let { f -> { id: String, text: String, line: String -> f(text, id, line) } }) { vm.introduce(topic.course) }
+    else TopicNeeds(topic, state, vm, Locale.forLanguageTag(if (state.lang == AppLang.RU) "ru" else "en"))
     Column(Modifier.fillMaxSize().padding(top = 12.dp)) {
         Row(Modifier.padding(horizontal = 16.dp), Arrangement.spacedBy(12.dp), Alignment.CenterVertically) {
             BackButton(onBack)
@@ -71,11 +82,12 @@ fun TopicScreen(topic: Topic, state: AppState, vm: AppViewModel, onBack: () -> U
                 StageChip(label, i == index, done, { picked = i }, Modifier.weight(1f))
             }
         }
+        if (topic.tag.isNotBlank()) SpeechProblemBar(problem, vm::downloadVoice)
         val content = Modifier.weight(1f)
         when (stages[index]) {
-            Stage.THEORY -> TheoryStage(topic.theory, speakAs, vm.mediaDir(topic.id), vm::seePage, { vm.finishTheory(topic); if (index < stages.lastIndex) picked = index + 1 }, content)
+            Stage.THEORY -> TheoryStage(topic.theory, talk, vm.mediaDir(topic.id), vm::seePage, { vm.finishTheory(topic); if (index < stages.lastIndex) picked = index + 1 }, content)
             Stage.CARDS -> CardsStage(topic.cards, progress.seen, speak, check, { vm.seeCard(topic, it) }, content)
-            Stage.QUIZ -> QuizStage(topic.quiz, Xp.quizDone(topic, progress), speak, check, { i, ok -> vm.answer(topic, i, ok) }, content)
+            Stage.QUIZ -> QuizStage(topic.quiz, Xp.quizDone(topic, progress), speakAs, check, { i, ok -> vm.answer(topic, i, ok) }, content)
         }
     }
 }

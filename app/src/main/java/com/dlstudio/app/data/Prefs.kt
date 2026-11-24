@@ -35,6 +35,21 @@ class Prefs(context: Context) {
         get() = runCatching { JSONObject(sp.getString("voices", "{}").orEmpty()).let { o -> o.keys().asSequence().associateWith { o.getString(it) } } }.getOrDefault(emptyMap())
         set(value) = sp.putPref("voices", JSONObject(value).toString())
 
+    /** Голоса, которые приложение подобрало персонажам само и закрепило («en:grace» → голос): персонаж не меняет голос, когда в системе появляются новые. */
+    var castAuto: Map<String, String>
+        get() = runCatching { JSONObject(sp.getString("castAuto", "{}").orEmpty()).let { o -> o.keys().asSequence().associateWith { o.getString(it) } } }.getOrDefault(emptyMap())
+        set(value) = sp.putPref("castAuto", JSONObject(value).toString())
+
+    /** Персонажи, с которыми ученик уже познакомился (первое появление в уроке показано). */
+    var met: Set<String>
+        get() = sp.getStringSet("met", emptySet()).orEmpty().toSet()
+        set(value) { sp.edit().putStringSet("met", value).apply() }
+
+    /** Курсы, в начале которых героев уже представили. */
+    var introduced: Set<String>
+        get() = sp.getStringSet("introduced", emptySet()).orEmpty().toSet()
+        set(value) { sp.edit().putStringSet("introduced", value).apply() }
+
     /** Скорость озвучки: 1 — обычная, меньше — медленнее. */
     var speechRate: Float
         get() = sp.getFloat("speechRate", 1f)

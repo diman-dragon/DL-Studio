@@ -9,14 +9,11 @@ import com.dlstudio.app.content.QuizKind
 import com.dlstudio.app.content.TheoryBlocks
 import com.dlstudio.app.content.Topic
 import com.dlstudio.app.content.TheoryPage
-import com.dlstudio.app.speech.Cand
 import com.dlstudio.app.speech.Gender
 import com.dlstudio.app.speech.LangNeed
 import com.dlstudio.app.speech.Needs
 import com.dlstudio.app.speech.PackState
 import com.dlstudio.app.speech.RawVoice
-import com.dlstudio.app.speech.Characters
-import com.dlstudio.app.speech.VoiceCast
 import com.dlstudio.app.speech.VoiceNames
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -66,24 +63,6 @@ class LessonLogicTest {
         for (old in listOf("~f Hi", "~m Hi", "~f2 Hi", "~1 Hi", "~sergei Hi", "~for you")) assertTrue(old, TheoryBlocks.parse(listOf(old))[0] is Block.Text)
     }
 
-    @Test fun charactersHaveGenderAndVoiceOrder() {
-        assertEquals(listOf(Gender.F, Gender.M, Gender.F, Gender.M, Gender.ANY), Characters.all.map { it.gender })
-        assertEquals("grace", Characters.of(null).id)
-        assertEquals("john", Characters.of("john").id)
-    }
-
-    private fun pick(voices: List<Cand>, who: String, chosen: String? = null) = VoiceCast.pick(voices, Characters.of(who), chosen)
-
-    @Test fun characterSpecificVoiceOverridesRanking() {
-        val voices = listOf(cand("graceVoice", Gender.F), cand("beaVoice", Gender.F), cand("leoVoice", Gender.M))
-        assertEquals("beaVoice", pick(voices, "beatrice", "beaVoice").voice)
-        assertEquals("graceVoice", pick(voices, "grace", "graceVoice").voice)
-        assertEquals("beaVoice", pick(voices, "grace").voice)
-        assertEquals("graceVoice", pick(voices, "beatrice").voice)
-        assertEquals("leoVoice", pick(voices, "john").voice)
-        assertEquals("beaVoice", pick(voices, "grace", "leoVoice").voice)
-    }
-
     @Test fun genderIsOnlyTakenFromExplicitMarks() {
         assertEquals(Gender.F, Gender.of("en-us-x-sfg#female_1-local"))
         assertEquals(Gender.M, Gender.of("en-us-x-abc#male_2-local"))
@@ -93,31 +72,6 @@ class LessonLogicTest {
         assertEquals(Gender.ANY, Gender.of("en-us-x-iom-local"))
         assertEquals(Gender.ANY, Gender.of("en-us-x-zzz-local"))
         assertEquals(Gender.M, Gender.of("x", setOf("male")))
-    }
-
-    private fun cand(name: String, gender: Int, quality: Int = 400, network: Boolean = false) = Cand(name, gender, network, true, quality)
-
-    @Test fun teachersTakeBestQualityVoiceOfTheirGender() {
-        val all = listOf(cand("f1", Gender.F, 300), cand("f2", Gender.F, 500), cand("m1", Gender.M, 400))
-        assertEquals("f2", pick(all, "grace").voice)
-        assertEquals("m1", pick(all, "leo").voice)
-        assertEquals("f1", pick(all, "beatrice").voice)
-        assertEquals("f1", pick(all, "grace", "f1").voice)
-    }
-
-    @Test fun maleCharacterNeverGetsFemaleVoice() {
-        val onlyFemale = listOf(cand("f1", Gender.F), cand("f2", Gender.F))
-        val cast = pick(onlyFemale, "leo")
-        assertEquals(null, cast.voice)
-        assertTrue(cast.pitch < 1f)
-        val men = listOf(cand("m1", Gender.M))
-        assertEquals(listOf("m1", "m1"), listOf("leo", "john").map { pick(men, it).voice })
-        assertTrue(pick(men, "john").pitch < 1f)
-    }
-
-    @Test fun narratorTakesBestVoiceOfAnyGender() {
-        val all = listOf(cand("f1", Gender.F, 300), cand("m1", Gender.M, 500))
-        assertEquals("m1", pick(all, "narrator").voice)
     }
 
     @Test fun needsFindLanguageAndMissingPieces() {

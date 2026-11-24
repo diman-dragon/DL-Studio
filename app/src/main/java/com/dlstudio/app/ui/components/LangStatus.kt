@@ -32,12 +32,12 @@ private fun rememberNeeds(state: AppState): List<LangNeed> =
 
 private fun mark(ok: Boolean) = if (ok) "✓" else "✗"
 
-/** Строка состояния языка: голос учительницы, голос преподавателя, распознавание. */
+/** Строка состояния языка: есть ли женский и мужской голос (для персонажей диалогов), распознавание. */
 private fun statusLine(s: Strings, need: LangNeed, packs: Map<String, PackState>): String {
     val states = need.tags.map { packs[it] ?: PackState.UNKNOWN }
     return listOfNotNull(
-        "${mark(!need.lackFemale)} ${s.teacherFName}",
-        "${mark(!need.lackMale)} ${s.teacherMName}",
+        "${mark(!need.lackFemale)} ${s.statusFemale}",
+        "${mark(!need.lackMale)} ${s.statusMale}",
         when {
             states.all { it == PackState.INSTALLED } -> "✓ ${s.statusRecog}"
             need.packs.isNotEmpty() -> "✗ ${s.statusRecog}"
@@ -99,7 +99,7 @@ fun LoadVoicesOnResume(tags: List<String>, vm: AppViewModel) {
 }
 
 /**
- * Открыв тему, предлагает сразу скачать то, чего её языку не хватает (голос учительницы или преподавателя, пакет распознавания), и скачивает по согласию
+ * Открыв тему, предлагает сразу скачать то, чего её языку не хватает (женский или мужской голос, пакет распознавания), и скачивает по согласию
  * прямо с этого экрана. Спрашивает один раз за открытие темы; пока состояние пакетов не проверено, молчит.
  */
 @Composable

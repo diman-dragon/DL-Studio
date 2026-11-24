@@ -16,6 +16,7 @@ import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.speech.Gender
 import com.dlstudio.app.speech.Characters
 import com.dlstudio.app.speech.PackState
+import com.dlstudio.app.speech.VoiceCast
 import com.dlstudio.app.speech.VoiceChoice
 import com.dlstudio.app.speech.VoiceNames
 import com.dlstudio.app.ui.AppState
@@ -31,9 +32,9 @@ private const val KEY_AUTO = "\u0000auto"
 private const val KEY_MORE = "\u0000more"
 
 /**
- * Раздел «Языки и озвучка». Языки берутся из установленных тем: для каждого видно, чего не хватает (голос, женский или мужской голос для диалогов,
- * пакет распознавания), и есть кнопка «Скачать недостающее». Для выбранного языка — выпадающие списки: основной голос, женский и мужской голос диалогов,
- * пакеты распознавания. Не скачанные голоса и пакеты скачиваются по нажатию. Ничего своего: всё делают системные движки.
+ * Раздел «Языки и озвучка». Языки берутся из установленных тем: для каждого видно, чего не хватает (женский и мужской голос, пакет распознавания),
+ * и есть кнопка «Скачать недостающее». Для выбранного языка — карточки всех персонажей (портрет, роль, характер, откуда у него голос) с выпадающим списком
+ * голоса у каждого, затем пакеты распознавания. Не скачанные голоса и пакеты скачиваются по нажатию. Ничего своего: всё делают системные движки.
  * Список голосов обновляется при возвращении в приложение (например, после загрузки голоса).
  */
 @Composable
@@ -54,41 +55,36 @@ fun VoiceSection(state: AppState, vm: AppViewModel) {
         LangStatus(state, vm, shown)
         CycleTile(s.voiceRate, listOf(s.rateSlow to RATES[0], s.rateNormal to RATES[1], s.rateFast to RATES[2]), state.speech.rate, vm::setSpeechRate)
         if (langs.size > 1) PickerTile(s.voiceLanguage, languageName(lang, shown), langs.map { PickItem(it, languageName(it, shown), selected = it == lang) }, { picked = it })
-        Text(s.teachersTitle, Modifier.padding(start = 6.dp, top = 4.dp), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
-        TeacherHeader(Gender.F, s.teacherFName, s.teacherFInfo) { greet("grace", lang, tags, vm) }
-        VoicePicker(s.teacherFName, lang, "$lang:grace", Gender.F, shown, state, vm)
-        TeacherHeader(Gender.M, s.teacherMName, s.teacherMInfo) { greet("leo", lang, tags, vm) }
-        VoicePicker(s.teacherMName, lang, "$lang:leo", Gender.M, shown, state, vm)
-        Text(s.otherCharacters, Modifier.padding(start = 6.dp, top = 6.dp), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
-        VoicePicker(Characters.name("beatrice").orEmpty(), lang, "$lang:beatrice", Gender.F, shown, state, vm)
-        VoicePicker(Characters.name("john").orEmpty(), lang, "$lang:john", Gender.M, shown, state, vm)
+        Text(s.charactersTitle, Modifier.padding(start = 6.dp, top = 4.dp), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        val speech = state.speech
+        val tag = tags.first { VoiceNames.language(it) == lang }
+        val plan = remember(speech.voices, speech.chosen, speech.auto, tag) { VoiceCast.plan(speech.voices, tag, speech.chosen, speech.auto) }
+        Characters.all.forEach { c ->
+            CharacterCard(c.id, plan[c.id]?.takeIf { speech.loaded }?.let { s.voiceHow(it.how) }) { greet(c.id, lang, tag, vm) }
+            VoicePicker(s.characterName(c.id), lang, "$lang:${c.id}", c.gender, shown, state, vm)
+        }
         Text(s.voiceGenderHint, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         PackPicker(tags.filter { VoiceNames.language(it) == lang }, shown, state, vm)
+        ActionTile(s.introAgain, vm::resetIntros)
+        Text(s.introAgainHint, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(s.portraitsCredit, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
-/** Преподаватель здоровается на языке тем своим голосом (по нажатию на его аватар). */
-private fun greet(characterId: String, lang: String, tags: List<String>, vm: AppViewModel) {
-    val profile = Characters.get(characterId) ?: return
-    val tag = tags.firstOrNull { VoiceNames.language(it) == lang } ?: return
-    val text = when (lang) {
-        "ru" -> "Здравствуйте! Меня зовут ${profile.name}."
-        else -> "Hello! My name is ${profile.name}."
-    }
-    vm.speak(text, tag, characterId)
-}
+/** Персонаж здоровается на языке тем своим голосом (по нажатию на его портрет в настройках). */
+private fun greet(characterId: String, lang: String, tag: String, vm: AppViewModel) = vm.speak(hello(characterId, lang), tag, characterId)
 
 fun languageName(lang: String, shown: Locale) = Locale.forLanguageTag(lang).getDisplayLanguage(shown).replaceFirstChar { it.uppercase() }
 
 /**
- * Голос преподавателя: «Авто» (самый качественный) и голоса своего пола с именами; `key` — «язык:персонаж», например «en:grace».
+ * Голос персонажа: «Авто» (подбирается и закрепляется) и голоса его пола с именами (у диктора — любые); `key` — «язык:персонаж», например «en:grace».
  * Не скачанный голос скачивается через экран загрузки голосов самого движка.
  */
 @Composable
 private fun VoicePicker(title: String, lang: String, key: String, gender: Int, shown: Locale, state: AppState, vm: AppViewModel) {
     val s = LocalStrings.current
     val speech = state.speech
-    val voices = remember(speech.voices, lang, shown, gender) { VoiceNames.choices(speech.voices, lang, shown.language == "ru").filter { it.gender == gender } }
+    val voices = remember(speech.voices, lang, shown, gender) { VoiceNames.choices(speech.voices, lang, shown.language == "ru").filter { gender == Gender.ANY || it.gender == gender } }
     val current = speech.chosen[key]
     val value = when {
         !speech.loaded -> s.voicesLoading

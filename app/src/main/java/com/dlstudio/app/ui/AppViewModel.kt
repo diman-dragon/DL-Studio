@@ -25,6 +25,7 @@ import com.dlstudio.app.speech.Pronounce
 import com.dlstudio.app.speech.Pronunciation
 import com.dlstudio.app.speech.LangNeed
 import com.dlstudio.app.speech.Speaker
+import com.dlstudio.app.speech.Utter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,11 +41,13 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val store = TopicStore(app)
     private val speaker = Speaker(app)
     private val listener = Listener(app)
-    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, ProgressJson.decode(prefs.progressJson), prefs.dailyGoal, lastTopic = prefs.lastTopic, speech = SpeechUi(chosen = prefs.voices, rate = prefs.speechRate)))
+    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, ProgressJson.decode(prefs.progressJson), prefs.dailyGoal, lastTopic = prefs.lastTopic, speech = SpeechUi(chosen = prefs.voices, rate = prefs.speechRate, auto = prefs.castAuto), met = prefs.met, introduced = prefs.introduced))
     val state: StateFlow<AppState> = mutable.asStateFlow()
 
     init {
         speaker.chosen = prefs.voices
+        speaker.sticky = prefs.castAuto
+        speaker.onSticky = { auto -> prefs.castAuto = auto; updateSpeech { it.copy(auto = auto) } }
         speaker.rate = prefs.speechRate
         viewModelScope.launch(Dispatchers.IO) { reload() }
     }
@@ -144,8 +147,36 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     fun clearGain() = mutable.update { it.copy(gain = null) }
 
     val speaking = speaker.speaking
+    val problem = speaker.problem
 
-    fun speak(text: String, tag: String, who: String? = null) { count { it.listened() }; speaker.speak(text, tag, who) }
+    fun speak(text: String, tag: String, who: String? = null, line: String? = null) { count { it.listened() }; speaker.speak(text, tag, who, line) }
+
+    /** Останавливает озвучку и диалог. */
+    fun stopSpeaking() = speaker.stop()
+
+    /** Озвучивает диалог целиком: реплики подряд, каждая голосом своего персонажа. */
+    fun speakAll(items: List<Utter>, tag: String) { count { it.listened() }; speaker.speakAll(items, tag) }
+
+    /** Ученик познакомился с персонажем: его представление больше не показывается. */
+    fun meet(id: String) {
+        if (id in mutable.value.met) return
+        val met = mutable.value.met + id
+        prefs.met = met
+        mutable.update { it.copy(met = met) }
+    }
+
+    /** Героев курса представили. */
+    fun introduce(course: String) {
+        val done = mutable.value.introduced + course
+        prefs.introduced = done
+        mutable.update { it.copy(introduced = done) }
+    }
+
+    /** Показать знакомства заново: представления героев курсов и первых появлений. */
+    fun resetIntros() {
+        prefs.met = emptySet(); prefs.introduced = emptySet()
+        mutable.update { it.copy(met = emptySet(), introduced = emptySet()) }
+    }
 
     private fun updateSpeech(change: (SpeechUi) -> SpeechUi) = mutable.update { it.copy(speech = change(it.speech)) }
 
@@ -159,7 +190,7 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
         SpeechPacks.check(app, tag) { found -> updateSpeech { it.copy(packs = it.packs + (tag to found)) } }
     }
 
-    /** Выбор голоса: `key` — язык («en», основной голос) или язык с полом («en:f», «en:m», голоса диалогов); `name` — служебное имя, null — автоматически. */
+    /** Выбор голоса персонажа: `key` — «язык:персонаж» («en:grace»); `name` — служебное имя, null — автоматически (закреплённый голос остаётся). */
     fun chooseVoice(key: String, name: String?) {
         val chosen = if (name == null) mutable.value.speech.chosen - key else mutable.value.speech.chosen + (key to name)
         prefs.voices = chosen

@@ -17,14 +17,14 @@ data class Gain(val xp: Int, val finished: Boolean, val id: Int, val goal: Boole
 
 /**
  * Озвучка и распознавание речи: голоса встроенного движка (`voices`, пусто до первой загрузки — `loaded`), выбранные голоса по языкам,
- * скорость речи и состояние офлайн-пакетов распознавания по тегам языков тем.
+ * скорость речи, закреплённые за персонажами голоса (`auto`) и состояние офлайн-пакетов распознавания по тегам языков тем.
  */
 data class SpeechUi(
     val voices: List<RawVoice> = emptyList(), val loaded: Boolean = false, val chosen: Map<String, String> = emptyMap(),
-    val rate: Float = 1f, val packs: Map<String, PackState> = emptyMap()
+    val rate: Float = 1f, val packs: Map<String, PackState> = emptyMap(), val auto: Map<String, String> = emptyMap()
 )
 
-/** Всё, что рисует интерфейс. `offer` — после установки тем предложить скачать недостающие языковые пакеты. */
+/** Всё, что рисует интерфейс. `offer` — после установки тем предложить скачать недостающие языковые пакеты; `met` — персонажи, которых ученик уже встречал; `introduced` — курсы, чьих героев уже представили. */
 data class AppState(
     val theme: ThemeMode,
     val lang: AppLang,
@@ -37,5 +37,7 @@ data class AppState(
     val offer: Boolean = false,
     val gain: Gain? = null,
     val pronounce: Pronounce = Pronounce(),
-    val speech: SpeechUi = SpeechUi()
+    val speech: SpeechUi = SpeechUi(),
+    val met: Set<String> = emptySet(),
+    val introduced: Set<String> = emptySet()
 )

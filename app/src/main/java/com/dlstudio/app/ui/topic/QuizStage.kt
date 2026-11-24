@@ -26,12 +26,13 @@ import com.dlstudio.app.content.QuizItem
 import com.dlstudio.app.content.QuizKind
 import com.dlstudio.app.i18n.Strings
 import com.dlstudio.app.speech.Check
-import com.dlstudio.app.speech.Gender
+import com.dlstudio.app.speech.Characters
 import com.dlstudio.app.speech.Speak
+import com.dlstudio.app.speech.SpeakAs
+import com.dlstudio.app.ui.components.CharacterAvatar
 import com.dlstudio.app.ui.components.GradientButton
 import com.dlstudio.app.ui.components.Mood
 import com.dlstudio.app.ui.components.ProgressBar
-import com.dlstudio.app.ui.components.TeacherAvatar
 import com.dlstudio.app.ui.theme.LocalStrings
 
 private const val PASS_PERCENT = 60
@@ -39,10 +40,10 @@ private const val PASS_PERCENT = 60
 /**
  * Практика: вопросы по порядку, виды — выбор из четырёх, «на слух», произнести вслух, мешок слов, вписать, соединить пары.
  * Верный ответ даёт XP (один раз за вопрос), неверный показывает правильный. Вопросы, которым нужны озвучка и микрофон,
- * показываются только в темах с языком озвучки. Преподаватели радуются верному ответу и огорчаются неверному (мисс Грейс и мистер Лео по очереди). В конце — результат с мисс Грейс и «Пройти снова». Этап считается пройденным, когда верно решено 60% вопросов (`done` приходит снаружи).
+ * показываются только в темах с языком озвучки. Персонаж радуется верному ответу и огорчается неверному: тот, чей голос звучал в вопросе, а у неозвученных — преподаватели по очереди. В конце — результат с мисс Грейс и «Пройти снова». Этап считается пройденным, когда верно решено 60% вопросов (`done` приходит снаружи).
  */
 @Composable
-fun QuizStage(items: List<QuizItem>, done: Boolean, speak: Speak?, check: Check?, onAnswer: (Int, Boolean) -> Unit, modifier: Modifier = Modifier) {
+fun QuizStage(items: List<QuizItem>, done: Boolean, speak: SpeakAs?, check: Check?, onAnswer: (Int, Boolean) -> Unit, modifier: Modifier = Modifier) {
     val s = LocalStrings.current
     val order = remember(items, speak != null) { items.indices.filter { speak != null || !items[it].kind.needsVoice } }
     var pos by rememberSaveable { mutableStateOf(0) }
@@ -51,7 +52,7 @@ fun QuizStage(items: List<QuizItem>, done: Boolean, speak: Speak?, check: Check?
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), Arrangement.spacedBy(16.dp)) {
         if (pos >= order.size) {
             val good = correct * 100 >= order.size * PASS_PERCENT
-            Box(Modifier.fillMaxWidth().padding(top = 16.dp), Alignment.Center) { TeacherAvatar(Gender.F, 140.dp, mood = if (good) Mood.HAPPY else Mood.SAD) }
+            Box(Modifier.fillMaxWidth().padding(top = 16.dp), Alignment.Center) { CharacterAvatar(Characters.DEFAULT, 140.dp, mood = if (good) Mood.HAPPY else Mood.SAD) }
             Text(s.quizResult(correct, order.size), Modifier.fillMaxWidth(), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
             if (done) Text(s.stageDone, Modifier.fillMaxWidth(), MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
             GradientButton(s.retry, { pos = 0; correct = 0 })
@@ -70,7 +71,7 @@ fun QuizStage(items: List<QuizItem>, done: Boolean, speak: Speak?, check: Check?
             }
             result?.let { ok ->
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    TeacherAvatar(if (pos % 2 == 0) Gender.F else Gender.M, 64.dp, mood = if (ok) Mood.HAPPY else Mood.SAD)
+                    CharacterAvatar(reactor(item, pos), 64.dp, mood = if (ok) Mood.HAPPY else Mood.SAD)
                     Text(verdict(s, item, ok), Modifier.weight(1f), MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleMedium)
                 }
                 GradientButton(if (pos == order.lastIndex) s.seeResult else s.next, { pos += 1 })
@@ -79,8 +80,16 @@ fun QuizStage(items: List<QuizItem>, done: Boolean, speak: Speak?, check: Check?
     }
 }
 
+/** Кто реагирует на ответ: если вопрос озвучен, то тот, чей голос звучал (портрет и голос совпадают); иначе преподаватели по очереди. */
+private fun reactor(item: QuizItem, pos: Int): String = when {
+    item.who != null -> item.who
+    item.say.isNotBlank() -> Characters.DEFAULT
+    else -> Characters.teachers[pos % Characters.teachers.size].id
+}
+
 @Composable
-private fun Question(item: QuizItem, speak: Speak?, check: Check?, onDone: (Boolean) -> Unit) {
+private fun Question(item: QuizItem, speakAs: SpeakAs?, check: Check?, onDone: (Boolean) -> Unit) {
+    val speak: Speak? = speakAs?.let { f -> { text: String -> f(text, item.who, QUIZ_LINE) } }
     when (item.kind) {
         QuizKind.CHOICE, QuizKind.LISTEN -> ChoiceQuestion(item, speak, onDone)
         QuizKind.SPEAK -> if (speak != null) SpeakQuestion(item, speak, check, onDone)
