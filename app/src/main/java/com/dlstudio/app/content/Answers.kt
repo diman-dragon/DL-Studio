@@ -30,6 +30,9 @@ object Answers {
         return if (mixed == right && right.toSet().size > 1) mixed.reversed() else mixed
     }
 
+    /** Варианты ответа в случайном порядке при каждом показе вопроса: верный не стоит всегда на одном месте (ни первым, ни последним). */
+    fun order(options: List<String>, random: Random = Random): List<String> = options.shuffled(random)
+
     /** Правая колонка заданий «соедини пары», перемешанная одинаково при каждом показе вопроса. */
     fun shuffledRight(item: QuizItem): List<String> {
         val right = item.pairs.map { it.second }

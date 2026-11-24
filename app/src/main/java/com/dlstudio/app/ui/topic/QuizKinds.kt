@@ -35,42 +35,45 @@ import com.dlstudio.app.ui.components.ChoiceOptions
 import com.dlstudio.app.ui.components.GradientButton
 import com.dlstudio.app.ui.components.OutlineButton
 import com.dlstudio.app.ui.components.PronounceRow
-import com.dlstudio.app.ui.components.SettingCard
+import com.dlstudio.app.ui.components.QuestionShell
 import com.dlstudio.app.ui.components.SmallSpeaker
+import com.dlstudio.app.ui.components.kindIcon
 import com.dlstudio.app.ui.theme.LocalStrings
 
-/** Размер большой кнопки озвучки в вопросах «на слух» и диктанте и портрета говорящего рядом с ней. */
+/** Размер большой кнопки озвучки в вопросах «на слух» и диктанте и портрета говорящего в шапке карточки. */
 private val BIG_SPEAKER = 76.dp
-private val AVATAR = 72.dp
+private val AVATAR = 46.dp
 
 /** Метка строки вопроса: оживает портрет того, чей голос звучит в вопросе (`who`, по умолчанию мисс Грейс). */
 const val QUIZ_LINE = "quiz"
 
-/** Карточка с текстом вопроса; у вопросов с озвучкой над текстом стоят портрет говорящего и большая кнопка динамика. */
+/** Портрет говорящего в шапке карточки вопроса: показывается там, где вопрос озвучен. */
+fun SpeakerAside(who: String?, voiced: Boolean): (@Composable () -> Unit)? =
+    if (voiced) { { CharacterAvatar(Characters.of(who).id, AVATAR, line = QUIZ_LINE) } } else null
+
+/** Карточка вопроса в стиле приложения: шапка с видом задания и портретом говорящего, в теле — большая кнопка динамика (если вопрос озвучен), текст и подсказка. */
 @Composable
-private fun QuestionCard(text: String, speak: Speak?, say: String, who: String?, hint: String = "") {
-    SettingCard(gap = 12.dp) {
-        if (speak != null && say.isNotBlank()) {
-            Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(14.dp, Alignment.CenterHorizontally), Alignment.CenterVertically) {
-                CharacterAvatar(Characters.of(who).id, AVATAR, line = QUIZ_LINE)
-                SmallSpeaker(say, speak, size = BIG_SPEAKER)
-            }
-        }
-        if (text.isNotBlank()) Text(text, Modifier.fillMaxWidth(), style = MaterialTheme.typography.headlineSmall, textAlign = if (say.isBlank()) TextAlign.Start else TextAlign.Center)
-        if (hint.isNotBlank()) Text("💡 $hint", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+private fun QuestionCard(item: QuizItem, text: String, speak: Speak?, dictation: Boolean = false) {
+    val s = LocalStrings.current
+    val voiced = speak != null && item.say.isNotBlank()
+    QuestionShell(kindIcon(item.kind, dictation), s.quizKind(item.kind, dictation), aside = SpeakerAside(item.who, voiced)) {
+        if (speak != null && voiced) Row(Modifier.fillMaxWidth(), Arrangement.Center) { SmallSpeaker(item.say, speak, size = BIG_SPEAKER) }
+        if (text.isNotBlank()) Text(text, Modifier.fillMaxWidth(), style = MaterialTheme.typography.headlineSmall, textAlign = if (voiced) TextAlign.Center else TextAlign.Start)
+        if (item.hint.isNotBlank()) Text("💡 ${item.hint}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
-/** Выбор из четырёх. У вопроса «на слух» (`listen`) фраза сама звучит при показе, повторить можно кнопкой динамика. */
+/** Выбор из вариантов: порядок плиток случайный при каждом показе, верный ответ не привязан к месту. У вопроса «на слух» (`listen`) фраза сама звучит при показе, повторить можно кнопкой динамика. */
 @Composable
 fun ChoiceQuestion(item: QuizItem, speak: Speak?, onDone: (Boolean) -> Unit) {
     val s = LocalStrings.current
     val listen = item.kind == QuizKind.LISTEN
     var picked by remember(item) { mutableStateOf<String?>(null) }
+    val options = remember(item) { Answers.order(item.options) }
     if (listen) LaunchedEffect(item) { speak?.invoke(item.say) }
     Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(16.dp)) {
-        QuestionCard(item.question.ifBlank { if (listen) s.listenPrompt else "" }, speak.takeIf { listen }, item.say, item.who, item.hint)
-        ChoiceOptions(item.options, item.answer, picked, { choice -> picked = choice; onDone(choice == item.answer) })
+        QuestionCard(item, item.question.ifBlank { if (listen) s.listenPrompt else "" }, speak.takeIf { listen })
+        ChoiceOptions(options, item.answer, picked, { choice -> picked = choice; onDone(choice == item.answer) })
     }
 }
 
@@ -89,7 +92,7 @@ fun SpeakQuestion(item: QuizItem, speak: Speak, check: Check?, onDone: (Boolean)
         if (fresh && !finished && Pronunciation.grade(now!!.score) != Grade.RETRY) { finished = true; onDone(true) }
     }
     Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(16.dp), Alignment.CenterHorizontally) {
-        SettingCard(gap = 10.dp) {
+        QuestionShell(kindIcon(item.kind), s.quizKind(item.kind, false), aside = SpeakerAside(item.who, true)) {
             Text(item.question.ifBlank { s.speakPrompt }, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(item.answer, style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
             if (item.hint.isNotBlank()) Text("💡 ${item.hint}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -111,7 +114,7 @@ fun FillQuestion(item: QuizItem, speak: Speak?, onDone: (Boolean) -> Unit) {
         if (!locked && text.isNotBlank()) { locked = true; onDone(Answers.fillOk(item, text)) }
     }
     Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(16.dp)) {
-        QuestionCard(item.question.ifBlank { if (dictation) s.dictationPrompt else "" }, speak.takeIf { dictation }, item.say, item.who, item.hint)
+        QuestionCard(item, item.question.ifBlank { if (dictation) s.dictationPrompt else "" }, speak.takeIf { dictation }, dictation)
         OutlinedTextField(
             text, { text = it }, Modifier.fillMaxWidth(), enabled = !locked, singleLine = true, textStyle = MaterialTheme.typography.titleLarge,
             placeholder = { Text(s.typeAnswer) },

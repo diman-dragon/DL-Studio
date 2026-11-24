@@ -1,44 +1,40 @@
 package com.dlstudio.app.ui.topic
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.content.QuizItem
 import com.dlstudio.app.content.QuizKind
 import com.dlstudio.app.i18n.Strings
-import com.dlstudio.app.speech.Check
 import com.dlstudio.app.speech.Characters
+import com.dlstudio.app.speech.Check
 import com.dlstudio.app.speech.Speak
 import com.dlstudio.app.speech.SpeakAs
-import com.dlstudio.app.ui.components.CharacterAvatar
-import com.dlstudio.app.ui.components.GradientButton
-import com.dlstudio.app.ui.components.Mood
-import com.dlstudio.app.ui.components.ProgressBar
+import com.dlstudio.app.ui.components.FeedbackPanel
+import com.dlstudio.app.ui.components.QuizHeader
+import com.dlstudio.app.ui.components.QuizResult
+import com.dlstudio.app.ui.components.Reveal
 import com.dlstudio.app.ui.theme.LocalStrings
+import kotlinx.coroutines.delay
 
 private const val PASS_PERCENT = 60
+private const val SCROLL_DELAY_MS = 250L
 
 /**
- * Практика: вопросы по порядку, виды — выбор из четырёх, «на слух», произнести вслух, мешок слов, вписать, соединить пары.
+ * Практика в стиле приложения: сверху номер вопроса, прогресс и счёт, затем карточка вопроса с яркой шапкой, внизу реакция персонажа. Вопросы по порядку, виды — выбор из четырёх, «на слух», произнести вслух, мешок слов, вписать, соединить пары.
  * Верный ответ даёт XP (один раз за вопрос), неверный показывает правильный. Вопросы, которым нужны озвучка и микрофон,
  * показываются только в темах с языком озвучки. Персонаж радуется верному ответу и огорчается неверному: тот, чей голос звучал в вопросе, а у неозвученных — преподаватели по очереди. В конце — результат с мисс Грейс и «Пройти снова». Этап считается пройденным, когда верно решено 60% вопросов (`done` приходит снаружи).
  */
@@ -49,17 +45,15 @@ fun QuizStage(items: List<QuizItem>, done: Boolean, speak: SpeakAs?, check: Chec
     var pos by rememberSaveable { mutableStateOf(0) }
     var correct by rememberSaveable { mutableStateOf(0) }
     var result by remember(pos) { mutableStateOf<Boolean?>(null) }
-    Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), Arrangement.spacedBy(16.dp)) {
+    val scroll = rememberScrollState()
+    LaunchedEffect(result) { if (result != null) { delay(SCROLL_DELAY_MS); scroll.animateScrollTo(scroll.maxValue) } }
+    Column(modifier.fillMaxSize().verticalScroll(scroll).padding(16.dp), Arrangement.spacedBy(16.dp)) {
         if (pos >= order.size) {
-            val good = correct * 100 >= order.size * PASS_PERCENT
-            Box(Modifier.fillMaxWidth().padding(top = 16.dp), Alignment.Center) { CharacterAvatar(Characters.DEFAULT, 140.dp, mood = if (good) Mood.HAPPY else Mood.SAD) }
-            Text(s.quizResult(correct, order.size), Modifier.fillMaxWidth(), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
-            if (done) Text(s.stageDone, Modifier.fillMaxWidth(), MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
-            GradientButton(s.retry, { pos = 0; correct = 0 })
+            QuizResult(correct, order.size, correct * 100 >= order.size * PASS_PERCENT, done) { pos = 0; correct = 0 }
         } else {
             val index = order[pos]
             val item = items[index]
-            ProgressBar(pos / order.size.toFloat())
+            QuizHeader(pos, order.size, correct)
             key(pos) {
                 Question(item, speak, check) { ok ->
                     if (result == null) {
@@ -70,11 +64,7 @@ fun QuizStage(items: List<QuizItem>, done: Boolean, speak: SpeakAs?, check: Chec
                 }
             }
             result?.let { ok ->
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    CharacterAvatar(reactor(item, pos), 64.dp, mood = if (ok) Mood.HAPPY else Mood.SAD)
-                    Text(verdict(s, item, ok), Modifier.weight(1f), MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleMedium)
-                }
-                GradientButton(if (pos == order.lastIndex) s.seeResult else s.next, { pos += 1 })
+                Reveal(0) { FeedbackPanel(ok, reactor(item, pos), verdict(s, item, ok), if (pos == order.lastIndex) s.seeResult else s.next) { pos += 1 } }
             }
         }
     }

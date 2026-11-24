@@ -1,5 +1,6 @@
 package com.dlstudio.app
 
+import com.dlstudio.app.content.Answers
 import com.dlstudio.app.content.CourseCast
 import com.dlstudio.app.content.QuizItem
 import com.dlstudio.app.content.QuizKind
@@ -152,6 +153,12 @@ class CastTest {
             {"front":"cat","back":"кот"}]}""").cards
         assertEquals(listOf("глагол", "/ɡoʊ/", "go — went — gone", "I go.", "Я иду.", "Объяснение"), with(cards[0]) { listOf(pos, ipa, forms, example, exampleTr, note) })
         assertEquals(listOf("", "", "", "", "", ""), with(cards[1]) { listOf(pos, ipa, forms, example, exampleTr, note) })
+    }
+
+    @Test fun choiceOptionsAreShuffledSoAnswerMovesAround() {
+        val options = listOf("a", "b", "c", "d")
+        val places = (1..300).map { Answers.order(options, kotlin.random.Random(it)).also { o -> assertEquals(options, o.sorted()) }.indexOf("a") }.toSet()
+        assertEquals(setOf(0, 1, 2, 3), places)
     }
 
     @Test fun quizWhoIsReadFromJsonAndUnknownIsDropped() {

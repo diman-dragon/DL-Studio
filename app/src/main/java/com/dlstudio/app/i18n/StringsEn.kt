@@ -3,6 +3,7 @@ package com.dlstudio.app.i18n
 import com.dlstudio.app.progress.DayPart
 import com.dlstudio.app.progress.GoalPhase
 import com.dlstudio.app.progress.Mood
+import com.dlstudio.app.content.QuizKind
 import com.dlstudio.app.settings.ThemeMode
 import com.dlstudio.app.speech.How
 
@@ -105,6 +106,12 @@ object StringsEn : Strings {
     override fun cardCounter(index: Int, total: Int, seen: Int) = "$index of $total · seen $seen"
     override val correct = "Correct!"
     override fun wrongAnswer(answer: String) = "Correct answer: $answer"
+    override fun quizKind(kind: QuizKind, dictation: Boolean) = when {
+        dictation -> "Dictation"
+        kind == QuizKind.CHOICE -> "Pick the answer"; kind == QuizKind.LISTEN -> "Listen and pick"; kind == QuizKind.SPEAK -> "Say it aloud"
+        kind == QuizKind.BANK -> "Build the phrase"; kind == QuizKind.FILL -> "Type the answer"; else -> "Match the pairs"
+    }
+    override fun resultHeadline(good: Boolean) = if (good) "Great result!" else "Room to grow — try again?"
     override fun quizResult(ok: Int, total: Int) = "$ok of $total correct"
     override val retry = "Try again"; override val stageDone = "Stage complete"; override val topicDone = "Topic complete!"; override val seeResult = "Result"
 

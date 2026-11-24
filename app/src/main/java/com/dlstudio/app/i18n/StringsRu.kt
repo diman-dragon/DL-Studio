@@ -3,6 +3,7 @@ package com.dlstudio.app.i18n
 import com.dlstudio.app.progress.DayPart
 import com.dlstudio.app.progress.GoalPhase
 import com.dlstudio.app.progress.Mood
+import com.dlstudio.app.content.QuizKind
 import com.dlstudio.app.settings.ThemeMode
 import com.dlstudio.app.speech.How
 
@@ -106,6 +107,12 @@ object StringsRu : Strings {
     override val correct = "Верно!"
     override fun wrongAnswer(answer: String) = "Правильно: $answer"
     override fun quizResult(ok: Int, total: Int) = "Верно $ok из $total"
+    override fun quizKind(kind: QuizKind, dictation: Boolean) = when {
+        dictation -> "Диктант"
+        kind == QuizKind.CHOICE -> "Выбери ответ"; kind == QuizKind.LISTEN -> "Послушай и выбери"; kind == QuizKind.SPEAK -> "Скажи вслух"
+        kind == QuizKind.BANK -> "Собери фразу"; kind == QuizKind.FILL -> "Впиши ответ"; else -> "Соедини пары"
+    }
+    override fun resultHeadline(good: Boolean) = if (good) "Отличный результат!" else "Можно лучше — ещё раз?"
     override val retry = "Пройти снова"; override val stageDone = "Этап пройден"; override val topicDone = "Тема пройдена!"; override val seeResult = "Результат"
 
     override fun levelTitle(level: Int) = "Уровень $level"

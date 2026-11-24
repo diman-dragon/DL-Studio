@@ -3,6 +3,7 @@ package com.dlstudio.app.i18n
 import com.dlstudio.app.progress.DayPart
 import com.dlstudio.app.progress.GoalPhase
 import com.dlstudio.app.progress.Mood
+import com.dlstudio.app.content.QuizKind
 import com.dlstudio.app.settings.ThemeMode
 import com.dlstudio.app.speech.How
 
@@ -43,6 +44,8 @@ interface Strings {
     val pronNoPack: String
     fun cardCounter(index: Int, total: Int, seen: Int): String
     val correct: String
+    fun quizKind(kind: QuizKind, dictation: Boolean): String
+    fun resultHeadline(good: Boolean): String
     fun wrongAnswer(answer: String): String
     fun quizResult(ok: Int, total: Int): String
     val tileVowel: String; val tileConsonant: String

@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -126,34 +125,46 @@ fun SmallSpeaker(text: String, onSpeak: Speak, modifier: Modifier = Modifier, si
     GlowButton(R.drawable.ic_volume, LocalAccent.current.gradientColors(), { onSpeak(text) }, LocalStrings.current.speak, modifier, size = size)
 }
 
-/** Варианты ответа сеткой 2×N: выбранный верный — акцентом, выбранный неверный — красным, верный после ответа подсвечивается. */
+private const val LETTERS = "ABCDEFGH"
+
+/**
+ * Варианты ответа списком крупных плиток с буквами A, B, C…: выбранный верный — акцентом, выбранный неверный — красным, верный после ответа подсвечивается.
+ * Порядок вариантов задаёт вызывающий (в практике он каждый раз случайный). Плитки появляются по очереди.
+ */
 @Composable
 fun ChoiceOptions(options: List<String>, correct: String, selected: String?, onPick: (String) -> Unit, modifier: Modifier = Modifier) {
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        options.chunked(2).forEach { row ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                row.forEach { option ->
-                    ChoiceButton(option, { onPick(option) }, Modifier.weight(1f), selected != null && option == selected, selected != null && option == correct, selected == null)
-                }
-                if (row.size == 1) Spacer(Modifier.weight(1f))
+        options.forEachIndexed { i, option ->
+            Reveal(i) {
+                ChoiceButton(LETTERS[i % LETTERS.length].toString(), option, { onPick(option) }, selected != null && option == selected, selected != null && option == correct, selected == null)
             }
         }
     }
 }
 
 @Composable
-private fun ChoiceButton(text: String, onClick: () -> Unit, modifier: Modifier, isChosen: Boolean, isTarget: Boolean, enabled: Boolean) {
+private fun ChoiceButton(letter: String, text: String, onClick: () -> Unit, isChosen: Boolean, isTarget: Boolean, enabled: Boolean) {
     val cs = MaterialTheme.colorScheme
-    val shape = RoundedCornerShape(16.dp)
+    val shape = RoundedCornerShape(18.dp)
+    val source = remember { MutableInteractionSource() }
     val (bg, border) = when {
         isChosen && isTarget -> cs.primary.copy(alpha = 0.22f) to cs.primary
         isChosen -> cs.error.copy(alpha = 0.22f) to cs.error
         isTarget -> cs.primary.copy(alpha = 0.16f) to cs.primary.copy(alpha = 0.7f)
         else -> cs.surfaceContainerHigh to cs.outlineVariant
     }
-    Box(
-        modifier.heightIn(min = 64.dp).clip(shape).background(bg).border(BorderStroke(1.dp, border), shape)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp),
-        contentAlignment = Alignment.Center
-    ) { Text(text, color = cs.onSurface, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center) }
+    val badge = when {
+        isTarget -> Brush.linearGradient(listOf(cs.primary, cs.primary))
+        isChosen -> Brush.linearGradient(listOf(cs.error, cs.error))
+        else -> Brush.linearGradient(LocalAccent.current.gradientColors())
+    }
+    val mark = when { isTarget -> "✓"; isChosen -> "✗"; else -> letter }
+    Row(
+        Modifier.fillMaxWidth().heightIn(min = 64.dp).pressScale(source).clip(shape).background(bg).border(BorderStroke(1.5.dp, border), shape)
+            .clickable(source, null, enabled = enabled, role = Role.Button, onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp),
+        Arrangement.spacedBy(12.dp), Alignment.CenterVertically
+    ) {
+        Box(Modifier.size(38.dp).clip(CircleShape).background(badge), Alignment.Center) { Text(mark, color = Color.White, style = MaterialTheme.typography.titleMedium) }
+        Text(text, Modifier.weight(1f), cs.onSurface, style = MaterialTheme.typography.titleMedium)
+    }
 }

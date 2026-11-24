@@ -30,7 +30,8 @@ import androidx.compose.ui.unit.dp
 import com.dlstudio.app.content.Answers
 import com.dlstudio.app.content.QuizItem
 import com.dlstudio.app.ui.components.GradientButton
-import com.dlstudio.app.ui.components.SettingCard
+import com.dlstudio.app.ui.components.QuestionShell
+import com.dlstudio.app.ui.components.kindIcon
 import com.dlstudio.app.ui.theme.LocalStrings
 
 private val SLOT_HEIGHT = 72.dp
@@ -49,7 +50,7 @@ fun BankQuestion(item: QuizItem, onDone: (Boolean) -> Unit) {
     var result by remember(item) { mutableStateOf<Boolean?>(null) }
     val open = result == null
     Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(14.dp)) {
-        SettingCard(gap = 6.dp) {
+        QuestionShell(kindIcon(item.kind), s.quizKind(item.kind, false)) {
             Text(item.question, style = MaterialTheme.typography.headlineSmall)
             if (item.hint.isNotBlank()) Text("💡 ${item.hint}", style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
         }
@@ -132,7 +133,7 @@ fun MatchQuestion(item: QuizItem, onDone: (Boolean) -> Unit) {
     }
 
     Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(14.dp)) {
-        SettingCard(gap = 4.dp) {
+        QuestionShell(kindIcon(item.kind), s.quizKind(item.kind, false)) {
             Text(item.question.ifBlank { s.matchPrompt }, style = MaterialTheme.typography.headlineSmall)
             Text(s.matchHint, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
