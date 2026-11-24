@@ -10,14 +10,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -60,7 +63,8 @@ private const val VERY_LONG_TEXT = 32
 /**
  * Карточки: листаются свайпом (соседние карточки чуть повёрнуты и уменьшены), тап плавно переворачивает. Увидел ответ — карточка засчитана
  * и даёт XP (один раз). Никаких «знаю / не знаю»: учитывается только то, что пользователь сделал.
- * У карточек с озвучкой рядом с динамиком есть микрофон — проверка произношения.
+ * Лицо: часть речи, слово, транскрипция; оборот: перевод, формы, пример с переводом, объяснение — у каждого поля своё место, пустые не рисуются.
+ * Озвучка и микрофон (проверка произношения) — только у слова и примера, то есть только на изучаемом языке.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -146,36 +150,58 @@ private fun Modifier.decor(tint: Color): Modifier = drawBehind {
     drawCircle(tint.copy(alpha = 0.07f), size.minDimension * 0.4f, Offset(size.width * 0.02f, size.height * 0.98f))
 }
 
+/** Лицо: часть речи, слово на изучаемом языке, транскрипция и озвучка с проверкой произношения. Пустые поля не показываются. */
 @Composable
 private fun Front(card: Card, speak: Speak?, check: Check?) {
-    Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(22.dp), Alignment.CenterHorizontally) {
+    val colors = MaterialTheme.colorScheme
+    Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()), Arrangement.spacedBy(14.dp), Alignment.CenterHorizontally) {
+        if (card.pos.isNotBlank()) {
+            Text(
+                card.pos, Modifier.clip(CircleShape).background(colors.primary.copy(alpha = 0.18f)).padding(horizontal = 12.dp, vertical = 3.dp),
+                style = MaterialTheme.typography.labelLarge, color = colors.primary
+            )
+        }
         Text(card.front, style = sized(card.front), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+        if (card.ipa.isNotBlank()) Text(card.ipa, style = MaterialTheme.typography.titleMedium, color = colors.primary, textAlign = TextAlign.Center)
         if (speak != null) PronounceRow(card.say.ifBlank { card.front }, speak, check.takeIf { card.mic })
     }
 }
 
+/**
+ * Оборот: перевод, формы слова, пример на изучаемом языке (с озвучкой и проверкой) и его перевод, объяснение. Озвучка и микрофон только у примера:
+ * перевод и объяснение написаны не на изучаемом языке. Пустые поля не показываются.
+ */
 @Composable
 private fun Back(card: Card, speak: Speak?, check: Check?) {
     val white = Color.White
-    Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(14.dp), Alignment.CenterHorizontally) {
+    Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()), Arrangement.spacedBy(14.dp), Alignment.CenterHorizontally) {
         Text(card.back, style = sized(card.back), color = white, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-        if (card.ipa.isNotBlank()) {
+        if (card.forms.isNotBlank()) {
             Text(
-                card.ipa, Modifier.clip(CircleShape).background(white.copy(alpha = 0.22f)).padding(horizontal = 16.dp, vertical = 6.dp),
-                style = MaterialTheme.typography.titleMedium, color = white
+                card.forms, Modifier.clip(CircleShape).background(white.copy(alpha = 0.22f)).padding(horizontal = 16.dp, vertical = 6.dp),
+                style = MaterialTheme.typography.titleMedium, color = white, textAlign = TextAlign.Center
             )
         }
-        if (card.example.isNotBlank()) {
-            val frame = RoundedCornerShape(20.dp)
-            Column(
-                Modifier.fillMaxWidth().clip(frame).background(white.copy(alpha = 0.16f)).padding(14.dp),
-                Arrangement.spacedBy(8.dp), Alignment.CenterHorizontally
-            ) {
-                Text(card.example, style = MaterialTheme.typography.bodyLarge, fontStyle = FontStyle.Italic, color = white, textAlign = TextAlign.Center)
-                if (speak != null) PronounceRow(card.example, speak, check)
+        if (card.example.isNotBlank() || card.exampleTr.isNotBlank()) {
+            Panel(0.16f) {
+                if (card.example.isNotBlank()) {
+                    Text(card.example, style = MaterialTheme.typography.bodyLarge, fontStyle = FontStyle.Italic, color = white, textAlign = TextAlign.Center)
+                    if (speak != null) PronounceRow(card.example, speak, check)
+                }
+                if (card.exampleTr.isNotBlank()) Text(card.exampleTr, style = MaterialTheme.typography.bodyMedium, color = white.copy(alpha = 0.85f), textAlign = TextAlign.Center)
             }
         }
+        if (card.note.isNotBlank()) Panel(0.1f) { Text("💡 " + card.note, style = MaterialTheme.typography.bodyMedium, color = white, textAlign = TextAlign.Center) }
     }
+}
+
+/** Светлая плашка на обороте карточки для группы связанных полей. */
+@Composable
+private fun Panel(alpha: Float, content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Color.White.copy(alpha = alpha)).padding(14.dp),
+        Arrangement.spacedBy(8.dp), Alignment.CenterHorizontally, content = content
+    )
 }
 
 /** Размер шрифта по длине текста: короткие слова крупно, длинные фразы мельче, чтобы не обрезались. */

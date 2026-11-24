@@ -146,6 +146,14 @@ class CastTest {
         assertEquals(emptyList<String>(), CourseCast.of(listOf(topic("c", listOf(page("plain"))))).map { it.id })
     }
 
+    @Test fun cardFieldsAreReadAndMissingOnesStayEmpty() {
+        val cards = TopicJson.parse("""{"id":"t","title":"T","tag":"en-US","cards":[
+            {"front":"go","back":"идти","pos":"глагол","ipa":"/ɡoʊ/","forms":"go — went — gone","example":"I go.","exampleTr":"Я иду.","note":"Объяснение"},
+            {"front":"cat","back":"кот"}]}""").cards
+        assertEquals(listOf("глагол", "/ɡoʊ/", "go — went — gone", "I go.", "Я иду.", "Объяснение"), with(cards[0]) { listOf(pos, ipa, forms, example, exampleTr, note) })
+        assertEquals(listOf("", "", "", "", "", ""), with(cards[1]) { listOf(pos, ipa, forms, example, exampleTr, note) })
+    }
+
     @Test fun quizWhoIsReadFromJsonAndUnknownIsDropped() {
         fun quiz(who: String) = TopicJson.parse("""{"id":"t","title":"T","tag":"en-US","quiz":[{"t":"listen","say":"Hi","a":"Hi","options":["Hi","Yo"],"who":"$who"}]}""").quiz.single().who
         assertEquals("john", quiz("john"))

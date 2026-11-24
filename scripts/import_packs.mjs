@@ -23,11 +23,12 @@ const arrows = s => s.replace(MARK, (_, m) => (m === '\\' ? '↘' : '↗'));
 function card(it) {
   const front = it.name.replace(MARK, '').replace(/\s+/g, ' ').trim();
   const c = { front, back: it.back.trim() };
-  const note = it.ipa ? ipa(it.ipa) : (it.explanation || '').trim();
-  if (note) c.ipa = note;
+  if (it.ipa) c.ipa = ipa(it.ipa);
   const marked = arrows(it.name).replace(/\s+/g, ' ').trim();
-  const example = (it.example || '').trim() || (it.hint || '').trim() || (marked !== front ? marked : '');
+  const example = (it.example || '').trim() || (marked !== front ? marked : '');
   if (example) c.example = example;
+  const note = [(it.explanation || '').trim(), (it.hint || '').trim()].filter(Boolean).join('\n');
+  if (note) c.note = note;
   return c;
 }
 

@@ -5,10 +5,17 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Одна карточка: лицо и оборот; транскрипция и пример необязательны. `say` — что произносит озвучка, если оно отличается от лица
- * (например, у буквы «A a» озвучка говорит «ay»); `mic` — предлагать ли проверку произношения (у названий букв распознавание ненадёжно).
+ * Одна карточка. У каждого поля своё место на экране, пустое поле не показывается вовсе.
+ * Лицо: `front` — слово или фраза на изучаемом языке, `pos` — часть речи, `ipa` — транскрипция.
+ * Оборот: `back` — перевод, `forms` — формы слова (go — went — gone), `example` — пример на изучаемом языке, `exampleTr` — его перевод, `note` — объяснение.
+ * Озвучиваются и проверяются микрофоном только `front` и `example` (изучаемый язык); перевод, объяснение и остальное — никогда.
+ * `say` — что произносит озвучка, если оно отличается от лица (у буквы «A a» озвучка говорит «ay»); `mic` — предлагать ли проверку произношения
+ * (у названий букв распознавание ненадёжно).
  */
-data class Card(val front: String, val back: String, val ipa: String, val example: String, val say: String = "", val mic: Boolean = true)
+data class Card(
+    val front: String, val back: String, val ipa: String, val example: String, val say: String = "", val mic: Boolean = true,
+    val pos: String = "", val forms: String = "", val exampleTr: String = "", val note: String = ""
+)
 
 /** Страница теории: заголовок (может быть пустым), значок-эмодзи в шапке и абзацы. Разметка абзацев — см. TheoryBlocks. */
 data class TheoryPage(val heading: String, val paragraphs: List<String>, val icon: String = "")
@@ -60,7 +67,7 @@ object TopicJson {
         val topic = Topic(
             id, o.optString("course"), o.optString("group"), o.optInt("n"), o.getString("title"), o.optString("tag"),
             o.optJSONArray("theory").objects().map { TheoryPage(it.optString("h"), it.optJSONArray("p").strings(), it.optString("i")) }.filter { it.paragraphs.isNotEmpty() },
-            o.optJSONArray("cards").objects().map { Card(it.getString("front"), it.getString("back"), it.optString("ipa"), it.optString("example"), it.optString("say"), it.optBoolean("mic", true)) },
+            o.optJSONArray("cards").objects().map { Card(it.getString("front"), it.getString("back"), it.optString("ipa"), it.optString("example"), it.optString("say"), it.optBoolean("mic", true), it.optString("pos"), it.optString("forms"), it.optString("exampleTr"), it.optString("note")) },
             o.optJSONArray("quiz").objects().mapNotNull(::quizItem),
             requires = o.optJSONArray("requires").strings().filter { safeId.matches(it) }
         )
