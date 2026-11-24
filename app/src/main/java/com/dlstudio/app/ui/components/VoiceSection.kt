@@ -62,9 +62,11 @@ fun VoiceSection(state: AppState, vm: AppViewModel) {
         LangStatus(state, vm, shown)
         CycleTile(s.voiceRate, listOf(s.rateSlow to RATES[0], s.rateNormal to RATES[1], s.rateFast to RATES[2]), state.speech.rate, vm::setSpeechRate)
         if (langs.size > 1) PickerTile(s.voiceLanguage, languageName(lang, shown), langs.map { PickItem(it, languageName(it, shown), selected = it == lang) }, { picked = it })
-        VoicePicker(s.voiceLabel, s.voiceAutoHint, lang, lang, { true }, shown, state, vm)
-        VoicePicker(s.voiceFemaleLabel, s.genderAutoHint, lang, "$lang:f", { it.gender != Gender.M }, shown, state, vm)
-        VoicePicker(s.voiceMaleLabel, s.genderAutoHint, lang, "$lang:m", { it.gender != Gender.F }, shown, state, vm)
+        Text(s.teachersTitle, Modifier.padding(start = 6.dp, top = 4.dp), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        TeacherHeader(Gender.F, s.teacherFName, s.teacherFInfo)
+        VoicePicker(s.teacherFName, lang, "$lang:f", Gender.F, shown, state, vm)
+        TeacherHeader(Gender.M, s.teacherMName, s.teacherMInfo)
+        VoicePicker(s.teacherMName, lang, "$lang:m", Gender.M, shown, state, vm)
         Text(s.voiceGenderHint, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         PackPicker(tags.filter { VoiceNames.language(it) == lang }, shown, state, vm)
     }
@@ -73,21 +75,21 @@ fun VoiceSection(state: AppState, vm: AppViewModel) {
 fun languageName(lang: String, shown: Locale) = Locale.forLanguageTag(lang).getDisplayLanguage(shown).replaceFirstChar { it.uppercase() }
 
 /**
- * Список голосов: «Авто» и голоса с именами по полу; `key` — «en» (основной) или «en:f» / «en:m» (голос женских и мужских реплик диалогов),
- * `show` отбирает голоса для списка (в женском нет заведомо мужских). Не скачанный голос скачивается через экран загрузки голосов самого движка.
+ * Голос преподавателя: «Авто» (самый качественный) и голоса своего пола с именами; `key` — «en:f» (учительница) или «en:m» (преподаватель).
+ * Не скачанный голос скачивается через экран загрузки голосов самого движка.
  */
 @Composable
-private fun VoicePicker(title: String, autoHint: String, lang: String, key: String, show: (VoiceChoice) -> Boolean, shown: Locale, state: AppState, vm: AppViewModel) {
+private fun VoicePicker(title: String, lang: String, key: String, gender: Int, shown: Locale, state: AppState, vm: AppViewModel) {
     val s = LocalStrings.current
     val speech = state.speech
-    val voices = remember(speech.voices, speech.chosen, lang, shown) { VoiceNames.choices(speech.voices, lang, shown.language == "ru", speech.chosen).filter(show) }
+    val voices = remember(speech.voices, lang, shown, gender) { VoiceNames.choices(speech.voices, lang, shown.language == "ru").filter { it.gender == gender } }
     val current = speech.chosen[key]
     val value = when {
         !speech.loaded -> s.voicesLoading
         else -> voices.firstOrNull { it.name == current }?.title ?: s.voiceAuto
     }
     val items = buildList {
-        add(PickItem(KEY_AUTO, s.voiceAuto, autoHint, selected = current == null))
+        add(PickItem(KEY_AUTO, s.voiceAuto, s.genderAutoHint, selected = current == null))
         voices.forEach { v ->
             val preview = v.takeIf { it.installed }?.let { voice -> { text: String -> vm.previewVoice(voice, text) } }
             add(PickItem(v.name, v.title, details(v), v.name == current, if (v.installed) "" else s.download, preview, sample(v)))
@@ -106,7 +108,7 @@ private fun VoicePicker(title: String, autoHint: String, lang: String, key: Stri
 @Composable
 private fun details(v: VoiceChoice): String {
     val s = LocalStrings.current
-    val gender = when (v.gender) { Gender.F -> s.genderFemale; Gender.M -> s.genderMale; else -> s.genderUnknown }
+    val gender = if (v.gender == Gender.F) s.genderFemale else s.genderMale
     return listOfNotNull(gender, v.region.ifBlank { null }, s.voiceHigh.takeIf { v.high }, s.voiceNetwork.takeIf { v.network }, s.voiceNotInstalled.takeIf { !v.installed }).joinToString(" · ")
 }
 

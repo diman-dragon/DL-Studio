@@ -43,6 +43,7 @@ import com.dlstudio.app.speech.Gender
 import com.dlstudio.app.speech.SpeakAs
 import com.dlstudio.app.ui.components.Markup
 import com.dlstudio.app.ui.components.SmallSpeaker
+import com.dlstudio.app.ui.components.TeacherAvatar
 import com.dlstudio.app.ui.theme.LocalAccent
 import com.dlstudio.app.ui.theme.LocalStrings
 import com.dlstudio.app.ui.theme.gradientColors
@@ -50,8 +51,6 @@ import java.io.File
 
 private val VOWEL_COLOR = Color(0xFFFF7A59)
 private val CONSONANT_COLOR = Color(0xFF4C8DFF)
-private val FEMALE_COLOR = Color(0xFFE5619B)
-private val MALE_COLOR = Color(0xFF3B82F6)
 private const val TILES_PER_ROW = 4
 private const val TILE_ALPHA = 0.2f
 
@@ -135,21 +134,12 @@ private fun SayRow(say: Block.Say, speak: SpeakAs?) {
         Modifier.fillMaxWidth().clip(shape).background(colors.primaryContainer).padding(start = 16.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
         Arrangement.spacedBy(10.dp), Alignment.CenterVertically
     ) {
-        if (say.role.gender != Gender.ANY) RoleBadge(say.role.gender)
+        if (say.role.gender != Gender.ANY) TeacherAvatar(say.role.gender, 44.dp)
         Column(Modifier.weight(1f), Arrangement.spacedBy(2.dp)) {
             Text(say.text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             if (say.note.isNotBlank()) Text(say.note, style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
         }
         if (speak != null) SmallSpeaker(say.say.ifBlank { say.text }, { text -> speak(text, say.role) }, size = 42.dp)
-    }
-}
-
-/** Значок героя диалога: женский или мужской голос. */
-@Composable
-private fun RoleBadge(gender: Int) {
-    val color = if (gender == Gender.F) FEMALE_COLOR else MALE_COLOR
-    Box(Modifier.size(32.dp).background(color.copy(alpha = 0.25f), CircleShape).border(1.dp, color, CircleShape), Alignment.Center) {
-        Text(if (gender == Gender.F) "♀" else "♂", color = color, fontSize = 18.sp, fontWeight = FontWeight.Bold)
     }
 }
 

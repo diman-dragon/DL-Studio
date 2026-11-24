@@ -69,12 +69,12 @@ interface Strings {
     val cancel: String; val save: String
 
     val sectionVoice: String; val voiceIntro: String; val voiceRate: String; val rateSlow: String; val rateNormal: String; val rateFast: String
-    val voiceAuto: String; val voiceAutoHint: String; val voiceHigh: String; val voiceNetwork: String; val voiceNotInstalled: String
-    val voicesLoading: String; val voicesMore: String; val voiceLanguage: String; val voiceLabel: String; val packOn: String; val packOff: String
+    val voiceAuto: String; val voiceHigh: String; val voiceNetwork: String; val voiceNotInstalled: String
+    val voicesLoading: String; val voicesMore: String; val voiceLanguage: String; val packOn: String; val packOff: String
     val recogTitle: String; val recogHint: String
-    val voiceFemaleLabel: String; val voiceMaleLabel: String; val genderAutoHint: String; val voiceGenderHint: String
-    val genderFemale: String; val genderMale: String; val genderUnknown: String
-    val statusVoice: String; val statusRecog: String; val statusFemale: String; val statusMale: String; val statusNoLangs: String
+    val teachersTitle: String; val teacherFName: String; val teacherMName: String; val teacherFInfo: String; val teacherMInfo: String
+    val genderAutoHint: String; val voiceGenderHint: String; val genderFemale: String; val genderMale: String
+    val statusRecog: String; val statusNoLangs: String
     val downloadNeeded: String; val allReady: String; val offerTitle: String; val later: String
     fun offerText(languages: String): String
     val packInstalled: String; val packAvailable: String; val packDownloading: String; val packUnsupported: String; val packUnknown: String

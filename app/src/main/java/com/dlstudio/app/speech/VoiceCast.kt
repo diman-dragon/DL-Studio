@@ -1,37 +1,45 @@
 package com.dlstudio.app.speech
 
-/** Пол голоса. Android не сообщает его прямо, поэтому он берётся из имени голоса, из признаков движка и из выбора пользователя. */
+/**
+ * Пол голоса. Android не сообщает его в объекте Voice, поэтому пол берётся только из явных признаков: слов `female` / `male` в названии голоса
+ * и из известных идентификаторов голосов Google (`en-us-x-sfg-local` → «sfg»). Голос, у которого пол явно не указан, в приложении не используется.
+ */
 object Gender {
     const val ANY = 0
     const val F = 1
     const val M = 2
 
-    /** По служебному имени и признакам голоса: «female» — женский, «male» — мужской, иначе неизвестно. */
+    /** Идентификаторы голосов Google с известным полом. Неоднозначные (iom, rjs — у разных сборок разный пол) не включены. */
+    private val FEMALE = setOf("dfc", "ruf", "sfg", "iob", "tpc", "tpf", "gba", "gbc", "fis", "itf", "ita", "itb", "srf")
+    private val MALE = setOf("dmc", "rud", "iol", "tpd", "gbb", "gbd", "itc", "itd")
+    private val MALE_WORD = Regex("(?<![a-z])male")
+
+    /** По служебному имени и признакам голоса; ANY — пол не указан. */
     fun of(name: String, features: Set<String> = emptySet()): Int {
         val all = (listOf(name) + features).joinToString(" ").lowercase()
+        val parts = name.lowercase().split("-")
+        val code = parts.getOrNull(3)?.substringBefore('#')?.takeIf { parts.getOrNull(2) == "x" }
         return when {
-            "female" in all -> F
-            MALE.containsMatchIn(all) -> M
+            "female" in all || code in FEMALE -> F
+            MALE_WORD.containsMatchIn(all) || code in MALE -> M
             else -> ANY
         }
     }
-
-    private val MALE = Regex("(?<![a-z])male")
 }
 
-/** Роль в диалоге: пол (`Gender`) и номер голоса внутри пола (0 — первый, 1 — второй…). Без пола — просто «другой голос». */
+/** Роль в диалоге: пол (`Gender`) и номер голоса внутри пола (0 — первый, 1 — второй…). Роль без пола: первая — женщина, вторая — мужчина, дальше по очереди. */
 data class Role(val gender: Int = Gender.ANY, val n: Int = 0)
 
-/** Установленный голос движка как кандидат на роль: пол, нужна ли сеть, совпадает ли регион, качество. */
+/** Установленный голос с известным полом как кандидат на роль: нужна ли сеть, совпадает ли регион, качество. */
 data class Cand(val name: String, val gender: Int, val network: Boolean, val sameRegion: Boolean, val quality: Int)
 
 /** Что произнести: служебное имя голоса (null — голос по умолчанию) и высота тона. */
 data class Cast(val voice: String?, val pitch: Float = 1f)
 
 /**
- * Подбор голоса под роль. Роль с полом получает голос этого пола: сначала выбранный в настройках, потом основной (если он того же пола),
- * затем лучшие по качеству. Если голосов этого пола нет, играет основной голос со сдвигом тона — мужская реплика не прозвучит ярко женским голосом.
- * Роль без пола: номер 0 — основной голос, остальные — другие установленные голоса, сначала противоположного пола.
+ * Подбор голоса под роль. Первая учительница и первый преподаватель — голоса, выбранные в настройках (`explicit`: пол → имя), иначе самые качественные
+ * голоса своего пола. Следующие герои — следующие по качеству голоса того же пола. Если голосов этого пола нет, играет голос по умолчанию
+ * со сдвигом тона: мужская реплика не прозвучит ярко женским голосом.
  */
 object VoiceCast {
     private const val PITCH_F = 1.3f
@@ -43,33 +51,22 @@ object VoiceCast {
     private const val PITCH_MIN = 0.5f
     private const val PITCH_MAX = 2f
 
-    private fun rank(list: List<Cand>) = list.sortedWith(compareBy({ it.network }, { !it.sameRegion }, { -it.quality }, { it.name }))
+    /** Лучшие первыми: качество, потом офлайн, потом совпадение региона, потом имя. */
+    fun rank(list: List<Cand>) = list.sortedWith(compareBy({ -it.quality }, { it.network }, { !it.sameRegion }, { it.name }))
 
-    /** `explicit` — голоса, назначенные в настройках на пол (пол → имя); назначенный голос считается голосом этого пола. */
-    fun pick(cands: List<Cand>, role: Role, base: String?, explicit: Map<Int, String>): Cast {
-        val known = cands.map { c -> c.copy(gender = explicit.entries.firstOrNull { it.value == c.name }?.key ?: c.gender) }
-        return if (role.gender == Gender.ANY) Cast(anyVoice(known, role.n, base)) else byGender(known, role, base, explicit)
-    }
-
-    private fun byGender(known: List<Cand>, role: Role, base: String?, explicit: Map<Int, String>): Cast {
-        val ranked = rank(known.filter { it.gender == role.gender }).map { it.name }
-        val first = listOfNotNull(explicit[role.gender], base).distinct().filter { it in ranked }
+    fun pick(cands: List<Cand>, role: Role, explicit: Map<Int, String>): Cast {
+        val gender = if (role.gender != Gender.ANY) role.gender else if (role.n % 2 == 0) Gender.F else Gender.M
+        val n = if (role.gender != Gender.ANY) role.n else role.n / 2
+        val ranked = rank(cands.filter { it.gender == gender }).map { it.name }
+        val first = listOfNotNull(explicit[gender]).filter { it in ranked }
         val pool = first + ranked.filter { it !in first }
-        val female = role.gender == Gender.F
+        val female = gender == Gender.F
         if (pool.isEmpty()) {
-            val shifted = if (female) PITCH_F + STEP_F * role.n else PITCH_M - STEP_M * role.n
-            return Cast(base, shifted.coerceIn(PITCH_MIN, PITCH_MAX))
+            val shifted = if (female) PITCH_F + STEP_F * n else PITCH_M - STEP_M * n
+            return Cast(null, shifted.coerceIn(PITCH_MIN, PITCH_MAX))
         }
-        val round = role.n / pool.size
+        val round = n / pool.size
         val pitch = if (female) 1f + ROUND_F * round else 1f - ROUND_M * round
-        return Cast(pool[role.n % pool.size], pitch.coerceIn(PITCH_MIN, PITCH_MAX))
-    }
-
-    private fun anyVoice(known: List<Cand>, n: Int, base: String?): String? {
-        if (n <= 0) return base
-        val baseGender = known.firstOrNull { it.name == base }?.gender ?: Gender.ANY
-        val others = known.filter { it.name != base }
-        val ordered = rank(others.filter { baseGender != Gender.ANY && it.gender != baseGender && it.gender != Gender.ANY }) + rank(others.filter { baseGender == Gender.ANY || it.gender == baseGender || it.gender == Gender.ANY })
-        return if (ordered.isEmpty()) null else ordered[(n - 1) % ordered.size].name
+        return Cast(pool[n % pool.size], pitch.coerceIn(PITCH_MIN, PITCH_MAX))
     }
 }

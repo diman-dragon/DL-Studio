@@ -39,10 +39,9 @@ class Speaker(private val context: Context) {
         val locale = Locale.forLanguageTag(tag)
         prepare(e, locale)
         val lang = VoiceNames.language(tag)
-        val base = chosen[lang] ?: defaults[locale.language]
         val explicit = listOfNotNull(chosen["$lang:f"]?.let { Gender.F to it }, chosen["$lang:m"]?.let { Gender.M to it }).toMap()
-        val cast = VoiceCast.pick(installed(e, locale), role, base, explicit)
-        applyVoice(e, cast.voice, locale)
+        val cast = VoiceCast.pick(installed(e, locale), role, explicit)
+        applyVoice(e, cast.voice ?: defaults[locale.language], locale)
         e.setPitch(cast.pitch)
         e.setSpeechRate(rate)
         e.speak(text, TextToSpeech.QUEUE_FLUSH, null, "dl")
@@ -58,6 +57,7 @@ class Speaker(private val context: Context) {
     private fun installed(e: TextToSpeech, locale: Locale): List<Cand> = runCatching { e.voices }.getOrNull().orEmpty()
         .filter { it.locale.language == locale.language && TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features.orEmpty() }
         .map { Cand(it.name, Gender.of(it.name, it.features.orEmpty()), it.isNetworkConnectionRequired, it.locale.country == locale.country, it.quality) }
+        .filter { it.gender != Gender.ANY }
 
     /** Пробное воспроизведение конкретного голоса из списка настроек (выбор при этом не меняется). */
     fun preview(text: String, voice: String, tag: String) = whenReady {

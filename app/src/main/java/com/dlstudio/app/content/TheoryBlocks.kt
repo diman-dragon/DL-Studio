@@ -67,10 +67,6 @@ object TheoryBlocks {
         return Role(gender, if (digit.isNotEmpty()) digit.toInt() - 1 else if (gender == Gender.ANY) UNSET else 0)
     }
 
-    /** Какие полы озвучивают реплики в абзацах (для проверки, хватает ли голосов): подмножество {Gender.F, Gender.M}. */
-    fun genders(paragraphs: List<String>): Set<Int> =
-        paragraphs.mapNotNull { MARK.find(it.trim())?.let(::role)?.gender }.filter { it != Gender.ANY }.toSet()
-
     /** Две-четыре фразы подряд без явной роли звучат разными голосами; длинные ряды (слова списком) — одним. */
     private fun voices(blocks: List<Block>): List<Block> {
         val out = ArrayList<Block>(blocks)

@@ -19,23 +19,22 @@ import java.util.Locale
 /** Языки установленных тем и чего им не хватает (голоса, пакеты распознавания). */
 @Composable
 private fun rememberNeeds(state: AppState): List<LangNeed> =
-    remember(state.topics, state.speech.voices, state.speech.packs, state.speech.chosen) { Needs.of(state.topics, state.speech.voices, state.speech.packs, state.speech.chosen) }
+    remember(state.topics, state.speech.voices, state.speech.packs) { Needs.of(state.topics, state.speech.voices, state.speech.packs) }
 
 private fun mark(ok: Boolean) = if (ok) "✓" else "✗"
 
-/** Строка состояния языка: голос, распознавание, а также женский и мужской голос — если диалогов в темах они нужны, а голоса нет. */
+/** Строка состояния языка: голос учительницы, голос преподавателя, распознавание. */
 private fun statusLine(s: Strings, need: LangNeed, packs: Map<String, PackState>): String {
     val states = need.tags.map { packs[it] ?: PackState.UNKNOWN }
     return listOfNotNull(
-        "${mark(!need.voiceMissing)} ${s.statusVoice}",
+        "${mark(!need.lackFemale)} ${s.teacherFName}",
+        "${mark(!need.lackMale)} ${s.teacherMName}",
         when {
             states.all { it == PackState.INSTALLED } -> "✓ ${s.statusRecog}"
             need.packs.isNotEmpty() -> "✗ ${s.statusRecog}"
             states.any { it == PackState.DOWNLOADING } -> "… ${s.statusRecog}"
             else -> null
-        },
-        "✗ ${s.statusFemale}".takeIf { need.lackFemale },
-        "✗ ${s.statusMale}".takeIf { need.lackMale }
+        }
     ).joinToString("   ")
 }
 
