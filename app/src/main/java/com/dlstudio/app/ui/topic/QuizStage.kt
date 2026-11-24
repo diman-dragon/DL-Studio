@@ -1,7 +1,9 @@
 package com.dlstudio.app.ui.topic
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -23,15 +26,20 @@ import com.dlstudio.app.content.QuizItem
 import com.dlstudio.app.content.QuizKind
 import com.dlstudio.app.i18n.Strings
 import com.dlstudio.app.speech.Check
+import com.dlstudio.app.speech.Gender
 import com.dlstudio.app.speech.Speak
 import com.dlstudio.app.ui.components.GradientButton
+import com.dlstudio.app.ui.components.Mood
 import com.dlstudio.app.ui.components.ProgressBar
+import com.dlstudio.app.ui.components.TeacherAvatar
 import com.dlstudio.app.ui.theme.LocalStrings
+
+private const val PASS_PERCENT = 60
 
 /**
  * Практика: вопросы по порядку, виды — выбор из четырёх, «на слух», произнести вслух, мешок слов, вписать, соединить пары.
  * Верный ответ даёт XP (один раз за вопрос), неверный показывает правильный. Вопросы, которым нужны озвучка и микрофон,
- * показываются только в темах с языком озвучки. В конце — результат и «Пройти снова». Этап считается пройденным, когда верно решено 60% вопросов (`done` приходит снаружи).
+ * показываются только в темах с языком озвучки. Преподаватели радуются верному ответу и огорчаются неверному (мисс Грейс и мистер Лео по очереди). В конце — результат с мисс Грейс и «Пройти снова». Этап считается пройденным, когда верно решено 60% вопросов (`done` приходит снаружи).
  */
 @Composable
 fun QuizStage(items: List<QuizItem>, done: Boolean, speak: Speak?, check: Check?, onAnswer: (Int, Boolean) -> Unit, modifier: Modifier = Modifier) {
@@ -42,7 +50,9 @@ fun QuizStage(items: List<QuizItem>, done: Boolean, speak: Speak?, check: Check?
     var result by remember(pos) { mutableStateOf<Boolean?>(null) }
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), Arrangement.spacedBy(16.dp)) {
         if (pos >= order.size) {
-            Text(s.quizResult(correct, order.size), Modifier.fillMaxWidth().padding(top = 24.dp), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
+            val good = correct * 100 >= order.size * PASS_PERCENT
+            Box(Modifier.fillMaxWidth().padding(top = 16.dp), Alignment.Center) { TeacherAvatar(Gender.F, 140.dp, mood = if (good) Mood.HAPPY else Mood.SAD) }
+            Text(s.quizResult(correct, order.size), Modifier.fillMaxWidth(), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
             if (done) Text(s.stageDone, Modifier.fillMaxWidth(), MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
             GradientButton(s.retry, { pos = 0; correct = 0 })
         } else {
@@ -59,7 +69,10 @@ fun QuizStage(items: List<QuizItem>, done: Boolean, speak: Speak?, check: Check?
                 }
             }
             result?.let { ok ->
-                Text(verdict(s, item, ok), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    TeacherAvatar(if (pos % 2 == 0) Gender.F else Gender.M, 64.dp, mood = if (ok) Mood.HAPPY else Mood.SAD)
+                    Text(verdict(s, item, ok), Modifier.weight(1f), MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleMedium)
+                }
                 GradientButton(if (pos == order.lastIndex) s.seeResult else s.next, { pos += 1 })
             }
         }

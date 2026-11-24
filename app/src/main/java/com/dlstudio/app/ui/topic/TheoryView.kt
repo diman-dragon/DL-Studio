@@ -54,9 +54,9 @@ private val CONSONANT_COLOR = Color(0xFF4C8DFF)
 private const val TILES_PER_ROW = 4
 private const val TILE_ALPHA = 0.2f
 
-/** Карточка теории: яркая шапка со значком и заголовком, под ней блоки страницы (текст, выноски, фразы с озвучкой, таблицы, плитки-буквы). */
+/** Карточка теории: яркая шапка со значком, заголовком и преподавателем (`teacher` — Gender.F или Gender.M, оживает, когда говорит), под ней блоки страницы (текст, выноски, фразы с озвучкой, таблицы, плитки-буквы). */
 @Composable
-fun TheoryCard(page: TheoryPage, speak: SpeakAs?, mediaDir: File?, modifier: Modifier = Modifier) {
+fun TheoryCard(page: TheoryPage, speak: SpeakAs?, mediaDir: File?, teacher: Int, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(28.dp)
     val blocks = remember(page) { TheoryBlocks.parse(page.paragraphs) }
@@ -64,13 +64,13 @@ fun TheoryCard(page: TheoryPage, speak: SpeakAs?, mediaDir: File?, modifier: Mod
         modifier.fillMaxWidth().shadow(14.dp, shape, ambientColor = colors.primary, spotColor = colors.primary).clip(shape)
             .background(colors.surfaceVariant).border(1.dp, colors.primary.copy(alpha = 0.35f), shape)
     ) {
-        if (page.heading.isNotBlank() || page.icon.isNotBlank()) CardHeader(page)
+        if (page.heading.isNotBlank() || page.icon.isNotBlank()) CardHeader(page, teacher)
         Column(Modifier.fillMaxWidth().padding(18.dp), Arrangement.spacedBy(14.dp)) { blocks.forEach { BlockView(it, speak, mediaDir) } }
     }
 }
 
 @Composable
-private fun CardHeader(page: TheoryPage) {
+private fun CardHeader(page: TheoryPage, teacher: Int) {
     Row(
         Modifier.fillMaxWidth().background(Brush.linearGradient(LocalAccent.current.gradientColors())).padding(horizontal = 18.dp, vertical = 16.dp),
         Arrangement.spacedBy(14.dp), Alignment.CenterVertically
@@ -81,6 +81,7 @@ private fun CardHeader(page: TheoryPage) {
             }
         }
         Text(page.heading, Modifier.weight(1f), Color.White, style = MaterialTheme.typography.headlineSmall)
+        TeacherAvatar(teacher, 60.dp)
     }
 }
 
@@ -134,7 +135,7 @@ private fun SayRow(say: Block.Say, speak: SpeakAs?) {
         Modifier.fillMaxWidth().clip(shape).background(colors.primaryContainer).padding(start = 16.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
         Arrangement.spacedBy(10.dp), Alignment.CenterVertically
     ) {
-        if (say.role.gender != Gender.ANY) TeacherAvatar(say.role.gender, 44.dp)
+        if (say.role.gender != Gender.ANY) TeacherAvatar(say.role.gender, 48.dp, text = say.say.ifBlank { say.text })
         Column(Modifier.weight(1f), Arrangement.spacedBy(2.dp)) {
             Text(say.text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             if (say.note.isNotBlank()) Text(say.note, style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)

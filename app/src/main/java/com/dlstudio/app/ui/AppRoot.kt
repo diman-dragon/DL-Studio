@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dlstudio.app.ui.components.LocalSpeaking
 import com.dlstudio.app.i18n.stringsFor
 import com.dlstudio.app.settings.ThemeMode
 import com.dlstudio.app.ui.theme.DlTheme
@@ -13,7 +14,8 @@ import com.dlstudio.app.ui.theme.LocalStrings
 @Composable
 fun AppRoot(vm: AppViewModel) {
     val state by vm.state.collectAsStateWithLifecycle()
-    CompositionLocalProvider(LocalStrings provides stringsFor(state.lang)) {
+    val speaking by vm.speaking.collectAsStateWithLifecycle()
+    CompositionLocalProvider(LocalStrings provides stringsFor(state.lang), LocalSpeaking provides speaking) {
         DlTheme(state.theme == ThemeMode.DARK, state.accent) { AppScaffold(state, vm) }
     }
 }

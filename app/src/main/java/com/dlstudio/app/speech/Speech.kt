@@ -1,18 +1,30 @@
 package com.dlstudio.app.speech
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.util.Locale
+
+private const val SAFETY_MS = 3000L
+private const val SAFETY_PER_CHAR_MS = 120L
 
 /** Озвучить текст языком темы (BCP 47, например en-US). */
 typealias Speak = (String) -> Unit
+
+/** Кто сейчас говорит: пол героя (Gender.F или Gender.M) и произносимый текст. По нему аватары преподавателей двигают ртом. */
+data class Speaking(val gender: Int, val text: String)
 
 /** Озвучка в роли: пол и номер голоса героя диалога (см. Role); основной голос — роль по умолчанию. */
 typealias SpeakAs = (String, Role) -> Unit
 
 /**
  * Один встроенный движок синтеза речи Android на приложение: создаётся при первой озвучке, а не при каждом входе на экран.
- * `chosen` — выбранные голоса: язык («en») — основной, «en:f» и «en:m» — женский и мужской голос диалогов; `rate` — скорость речи; пусто — голос по умолчанию.
+ * `chosen` — выбранные голоса: «en:f» — голос учительницы, «en:m» — голос преподавателя; `rate` — скорость речи; пусто — лучший голос своего пола.
+ * `speaking` — кто и что говорит сейчас (null — тишина).
  */
 class Speaker(private val context: Context) {
     private var tts: TextToSpeech? = null
@@ -21,6 +33,30 @@ class Speaker(private val context: Context) {
     private val defaults = HashMap<String, String?>()
     var chosen: Map<String, String> = emptyMap()
     var rate: Float = 1f
+    private val talk = MutableStateFlow<Speaking?>(null)
+    val speaking: StateFlow<Speaking?> = talk
+    private var current = ""
+    private var counter = 0
+    private val handler = Handler(Looper.getMainLooper())
+    private val listener = object : UtteranceProgressListener() {
+        override fun onStart(utteranceId: String?) {}
+        override fun onDone(utteranceId: String?) = finish(utteranceId)
+        @Deprecated("Deprecated in Java")
+        override fun onError(utteranceId: String?) = finish(utteranceId)
+        override fun onStop(utteranceId: String?, interrupted: Boolean) = finish(utteranceId)
+    }
+
+    private fun finish(id: String?) { if (id == current) talk.value = null }
+
+    /** Произносит текст и отмечает, кто говорит; на случай, если движок не сообщит об окончании, отметка снимается по таймеру. */
+    private fun say(e: TextToSpeech, text: String, gender: Int) {
+        current = "dl${++counter}"
+        val id = current
+        e.setOnUtteranceProgressListener(listener)
+        talk.value = Speaking(gender, text)
+        e.speak(text, TextToSpeech.QUEUE_FLUSH, null, id)
+        handler.postDelayed({ finish(id) }, SAFETY_MS + text.length * SAFETY_PER_CHAR_MS)
+    }
 
     private fun ensureEngine(): TextToSpeech = tts ?: TextToSpeech(context.applicationContext) { code ->
         ready = code == TextToSpeech.SUCCESS
@@ -44,7 +80,7 @@ class Speaker(private val context: Context) {
         applyVoice(e, cast.voice ?: defaults[locale.language], locale)
         e.setPitch(cast.pitch)
         e.setSpeechRate(rate)
-        e.speak(text, TextToSpeech.QUEUE_FLUSH, null, "dl")
+        say(e, text, role.speaker())
     }
 
     /** Язык ставится всегда; голос по умолчанию для языка запоминается до первой смены голоса, чтобы к нему можно было вернуться. */
@@ -66,7 +102,7 @@ class Speaker(private val context: Context) {
         applyVoice(e, voice, Locale.forLanguageTag(tag))
         e.setPitch(1f)
         e.setSpeechRate(rate)
-        e.speak(text, TextToSpeech.QUEUE_FLUSH, null, "dl")
+        say(e, text, Gender.of(voice))
     }
 
     /** Ставит голос, если он есть у движка и подходит по языку; иначе остаётся голос по умолчанию для языка. */
@@ -88,7 +124,7 @@ class Speaker(private val context: Context) {
     fun engine(): String? = runCatching { tts?.defaultEngine }.getOrNull()
 
     /** Прервать озвучку (перед записью микрофона, чтобы динамик не попал в запись). */
-    fun stop() { tts?.stop() }
+    fun stop() { tts?.stop(); talk.value = null }
 
     fun shutdown() { tts?.stop(); tts?.shutdown(); tts = null; ready = false; queued.clear(); defaults.clear() }
 }

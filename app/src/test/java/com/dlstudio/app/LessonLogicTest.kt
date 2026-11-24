@@ -102,6 +102,15 @@ class LessonLogicTest {
         assertEquals(listOf("f1", "m1", "f2"), (0..2).map { VoiceCast.pick(all, Role(Gender.ANY, it), emptyMap()).voice })
     }
 
+    @Test fun speakerOfRoleIsTeacherByGenderOrTurn() {
+        assertEquals(Gender.F, Role().speaker())
+        assertEquals(Gender.M, Role(Gender.ANY, 1).speaker())
+        assertEquals(Gender.F, Role(Gender.ANY, 2).speaker())
+        assertEquals(1, Role(Gender.ANY, 3).index())
+        assertEquals(Gender.M, Role(Gender.M, 1).speaker())
+        assertEquals(1, Role(Gender.M, 1).index())
+    }
+
     @Test fun needsFindLanguageAndMissingPieces() {
         val topic = Topic("t", "c", "g", 1, "T", "en-US", listOf(TheoryPage("", listOf("~f Hi"))), emptyList(), emptyList())
         val voices = listOf(RawVoice("v#female_1", "en-US", 400, false, true, Gender.F), RawVoice("v#male_1", "en-US", 400, false, false, Gender.M))

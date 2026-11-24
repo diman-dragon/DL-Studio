@@ -130,6 +130,8 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun clearGain() = mutable.update { it.copy(gain = null) }
 
+    val speaking = speaker.speaking
+
     fun speak(text: String, tag: String, role: Role = Role()) = speaker.speak(text, tag, role)
 
     private fun updateSpeech(change: (SpeechUi) -> SpeechUi) = mutable.update { it.copy(speech = change(it.speech)) }

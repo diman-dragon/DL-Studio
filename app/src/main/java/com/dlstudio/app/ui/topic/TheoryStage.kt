@@ -16,6 +16,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.content.TheoryPage
+import com.dlstudio.app.speech.Gender
 import com.dlstudio.app.speech.SpeakAs
 import com.dlstudio.app.ui.components.GradientButton
 import com.dlstudio.app.ui.components.OutlineButton
@@ -38,7 +39,7 @@ fun TheoryStage(pages: List<TheoryPage>, speak: SpeakAs?, mediaDir: File?, onFin
         PageDots(pages.size, pager.currentPage, Modifier.fillMaxWidth().padding(vertical = 10.dp))
         HorizontalPager(pager, Modifier.weight(1f), pageSpacing = 8.dp) { index ->
             Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp)) {
-                TheoryCard(pages[index], speak, mediaDir)
+                TheoryCard(pages[index], speak, mediaDir, if (index % 2 == 0) Gender.F else Gender.M)
             }
         }
         Row(Modifier.padding(16.dp), Arrangement.spacedBy(12.dp)) {

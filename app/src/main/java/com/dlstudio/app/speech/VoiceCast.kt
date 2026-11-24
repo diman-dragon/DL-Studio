@@ -28,7 +28,13 @@ object Gender {
 }
 
 /** Роль в диалоге: пол (`Gender`) и номер голоса внутри пола (0 — первый, 1 — второй…). Роль без пола: первая — женщина, вторая — мужчина, дальше по очереди. */
-data class Role(val gender: Int = Gender.ANY, val n: Int = 0)
+data class Role(val gender: Int = Gender.ANY, val n: Int = 0) {
+    /** Кто говорит: пол героя; у роли без пола чётные номера — учительница, нечётные — преподаватель. */
+    fun speaker(): Int = if (gender != Gender.ANY) gender else if (n % 2 == 0) Gender.F else Gender.M
+
+    /** Номер голоса внутри пола. */
+    fun index(): Int = if (gender != Gender.ANY) n else n / 2
+}
 
 /** Установленный голос с известным полом как кандидат на роль: нужна ли сеть, совпадает ли регион, качество. */
 data class Cand(val name: String, val gender: Int, val network: Boolean, val sameRegion: Boolean, val quality: Int)
@@ -55,8 +61,8 @@ object VoiceCast {
     fun rank(list: List<Cand>) = list.sortedWith(compareBy({ -it.quality }, { it.network }, { !it.sameRegion }, { it.name }))
 
     fun pick(cands: List<Cand>, role: Role, explicit: Map<Int, String>): Cast {
-        val gender = if (role.gender != Gender.ANY) role.gender else if (role.n % 2 == 0) Gender.F else Gender.M
-        val n = if (role.gender != Gender.ANY) role.n else role.n / 2
+        val gender = role.speaker()
+        val n = role.index()
         val ranked = rank(cands.filter { it.gender == gender }).map { it.name }
         val first = listOfNotNull(explicit[gender]).filter { it in ranked }
         val pool = first + ranked.filter { it !in first }

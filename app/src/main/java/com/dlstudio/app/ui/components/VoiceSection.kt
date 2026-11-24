@@ -19,6 +19,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.speech.Gender
 import com.dlstudio.app.speech.PackState
+import com.dlstudio.app.speech.Role
 import com.dlstudio.app.speech.VoiceChoice
 import com.dlstudio.app.speech.VoiceNames
 import com.dlstudio.app.ui.AppState
@@ -63,13 +64,21 @@ fun VoiceSection(state: AppState, vm: AppViewModel) {
         CycleTile(s.voiceRate, listOf(s.rateSlow to RATES[0], s.rateNormal to RATES[1], s.rateFast to RATES[2]), state.speech.rate, vm::setSpeechRate)
         if (langs.size > 1) PickerTile(s.voiceLanguage, languageName(lang, shown), langs.map { PickItem(it, languageName(it, shown), selected = it == lang) }, { picked = it })
         Text(s.teachersTitle, Modifier.padding(start = 6.dp, top = 4.dp), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
-        TeacherHeader(Gender.F, s.teacherFName, s.teacherFInfo)
+        TeacherHeader(Gender.F, s.teacherFName, s.teacherFInfo) { greet(Gender.F, lang, tags, vm) }
         VoicePicker(s.teacherFName, lang, "$lang:f", Gender.F, shown, state, vm)
-        TeacherHeader(Gender.M, s.teacherMName, s.teacherMInfo)
+        TeacherHeader(Gender.M, s.teacherMName, s.teacherMInfo) { greet(Gender.M, lang, tags, vm) }
         VoicePicker(s.teacherMName, lang, "$lang:m", Gender.M, shown, state, vm)
         Text(s.voiceGenderHint, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         PackPicker(tags.filter { VoiceNames.language(it) == lang }, shown, state, vm)
     }
+}
+
+/** Преподаватель здоровается на языке тем своим голосом (по нажатию на его аватар). */
+private fun greet(gender: Int, lang: String, tags: List<String>, vm: AppViewModel) {
+    val tag = tags.firstOrNull { VoiceNames.language(it) == lang } ?: return
+    val name = if (gender == Gender.F) "Miss Grace" else "Mr. Leo"
+    val text = if (lang == "ru") "Здравствуйте! Меня зовут ${if (gender == Gender.F) "мисс Грейс" else "мистер Лео"}." else "Hello! My name is $name."
+    vm.speak(text, tag, Role(gender))
 }
 
 fun languageName(lang: String, shown: Locale) = Locale.forLanguageTag(lang).getDisplayLanguage(shown).replaceFirstChar { it.uppercase() }
