@@ -12,6 +12,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -26,15 +27,16 @@ import java.io.File
 
 /**
  * Теория: страницы-карточки со свайпом и точками-индикатором; на последней странице кнопка «Готово» отмечает этап пройденным.
- * Если у темы есть язык озвучки (`speak`), у фраз и плиток-букв появляется озвучка (реплики диалога — разными голосами); `mediaDir` — папка картинок, звука и видео темы.
+ * Если у темы есть язык озвучки (`speak`), у фраз и плиток-букв появляется озвучка (реплики диалога — разными голосами); `mediaDir` — папка картинок, звука и видео темы; `onPage` — просмотрена страница (для статистики).
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TheoryStage(pages: List<TheoryPage>, speak: SpeakAs?, mediaDir: File?, onFinish: () -> Unit, modifier: Modifier = Modifier) {
+fun TheoryStage(pages: List<TheoryPage>, speak: SpeakAs?, mediaDir: File?, onPage: () -> Unit, onFinish: () -> Unit, modifier: Modifier = Modifier) {
     val s = LocalStrings.current
     val pager = rememberPagerState { pages.size }
     val scope = rememberCoroutineScope()
     val last = pager.currentPage == pages.lastIndex
+    LaunchedEffect(pager.currentPage) { onPage() }
     Column(modifier.fillMaxSize()) {
         PageDots(pages.size, pager.currentPage, Modifier.fillMaxWidth().padding(vertical = 10.dp))
         HorizontalPager(pager, Modifier.weight(1f), pageSpacing = 8.dp) { index ->

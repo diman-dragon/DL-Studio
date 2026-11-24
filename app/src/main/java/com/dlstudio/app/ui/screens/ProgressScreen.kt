@@ -11,6 +11,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -25,20 +29,27 @@ import com.dlstudio.app.ui.components.Pill
 import com.dlstudio.app.ui.components.ProgressBar
 import com.dlstudio.app.ui.components.Ring
 import com.dlstudio.app.ui.components.ScreenHeader
+import com.dlstudio.app.ui.components.SegmentedTabs
 import com.dlstudio.app.ui.components.SettingCard
 import com.dlstudio.app.ui.components.SettingsSection
 import com.dlstudio.app.ui.theme.LocalStrings
 
-/** Прогресс: уровень и XP, серия дней, пройденные темы и «печати» групп (по одной на группу курса). */
+/** Прогресс: две вкладки — «Обзор» (уровень и XP, серия дней, пройденные темы и «печати» групп) и «Статистика» (см. StatsContent). */
 @Composable
 fun ProgressScreen(state: AppState) {
     val s = LocalStrings.current
     val colors = MaterialTheme.colorScheme
+    var tab by rememberSaveable { mutableStateOf(0) }
     val xp = state.progress.xp
     val done = state.topics.count { Xp.complete(it, state.progress.topics[it.id] ?: TopicProgress()) }
     val seals = state.topics.groupBy { it.course to it.group }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), Arrangement.spacedBy(12.dp)) {
         ScreenHeader(s.tabProgress)
+        SegmentedTabs(listOf(s.tabOverview, s.tabStats), tab, { tab = it })
+        if (tab == 1) {
+            StatsContent(state)
+            return@Column
+        }
         Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(10.dp), Alignment.CenterHorizontally) {
             Ring(Xp.intoLevel(xp) / Xp.LEVEL.toFloat(), 168.dp, 14.dp) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {

@@ -91,20 +91,21 @@ private fun WordChip(text: String, ghost: Boolean, enabled: Boolean, onClick: ()
 private enum class PairMark { IDLE, PICKED, DONE, WRONG }
 
 /**
- * «Соедини пары»: две колонки. Нажмите слева, затем справа — пара закрепится, если подошла. Допускается одна ошибка (если пар не меньше четырёх).
+ * «Соедини пары»: две колонки. Нажмите любой вариант — слева или справа, затем его пару с другой стороны: пара закрепится, если подошла. Допускается одна ошибка (если пар не меньше четырёх).
  */
 @Composable
 fun MatchQuestion(item: QuizItem, onDone: (Boolean) -> Unit) {
     val s = LocalStrings.current
     val right = remember(item) { Answers.shuffledRight(item) }
-    var chosen by remember(item) { mutableStateOf<Int?>(null) }
+    var pickedLeft by remember(item) { mutableStateOf<Int?>(null) }
+    var pickedRight by remember(item) { mutableStateOf<Int?>(null) }
     var leftDone by remember(item) { mutableStateOf(setOf<Int>()) }
     var rightDone by remember(item) { mutableStateOf(setOf<Int>()) }
-    var wrong by remember(item) { mutableStateOf<Int?>(null) }
+    var wrong by remember(item) { mutableStateOf<Pair<Int, Int>?>(null) }
     var mistakes by remember(item) { mutableStateOf(0) }
 
-    fun tapRight(j: Int) {
-        val i = chosen ?: return
+    /** Проверяет пару «слева i, справа j»; начинать можно с любой стороны. */
+    fun check(i: Int, j: Int) {
         if (item.pairs[i].second == right[j]) {
             leftDone = leftDone + i
             rightDone = rightDone + j
@@ -112,9 +113,22 @@ fun MatchQuestion(item: QuizItem, onDone: (Boolean) -> Unit) {
             if (leftDone.size == item.pairs.size) onDone(Answers.matchOk(item.pairs.size, mistakes))
         } else {
             mistakes += 1
-            wrong = j
+            wrong = i to j
         }
-        chosen = null
+        pickedLeft = null
+        pickedRight = null
+    }
+
+    fun tapLeft(i: Int) {
+        wrong = null
+        val j = pickedRight
+        if (j != null) check(i, j) else pickedLeft = if (pickedLeft == i) null else i
+    }
+
+    fun tapRight(j: Int) {
+        wrong = null
+        val i = pickedLeft
+        if (i != null) check(i, j) else pickedRight = if (pickedRight == j) null else j
     }
 
     Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(14.dp)) {
@@ -125,14 +139,14 @@ fun MatchQuestion(item: QuizItem, onDone: (Boolean) -> Unit) {
         Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(12.dp)) {
             Column(Modifier.weight(1f), Arrangement.spacedBy(10.dp)) {
                 item.pairs.forEachIndexed { i, pair ->
-                    val mark = when { i in leftDone -> PairMark.DONE; chosen == i -> PairMark.PICKED; else -> PairMark.IDLE }
-                    PairChip(pair.first, mark) { if (i !in leftDone) { chosen = i; wrong = null } }
+                    val mark = when { i in leftDone -> PairMark.DONE; wrong?.first == i -> PairMark.WRONG; pickedLeft == i -> PairMark.PICKED; else -> PairMark.IDLE }
+                    PairChip(pair.first, mark) { tapLeft(i) }
                 }
             }
             Column(Modifier.weight(1f), Arrangement.spacedBy(10.dp)) {
                 right.forEachIndexed { j, text ->
-                    val mark = when { j in rightDone -> PairMark.DONE; wrong == j -> PairMark.WRONG; else -> PairMark.IDLE }
-                    PairChip(text, mark) { if (j !in rightDone) tapRight(j) }
+                    val mark = when { j in rightDone -> PairMark.DONE; wrong?.second == j -> PairMark.WRONG; pickedRight == j -> PairMark.PICKED; else -> PairMark.IDLE }
+                    PairChip(text, mark) { tapRight(j) }
                 }
             }
         }

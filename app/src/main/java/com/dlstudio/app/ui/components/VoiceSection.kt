@@ -5,17 +5,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import com.dlstudio.app.settings.AppLang
 import com.dlstudio.app.speech.Gender
 import com.dlstudio.app.speech.PackState
@@ -47,12 +43,7 @@ fun VoiceSection(state: AppState, vm: AppViewModel) {
     val tags = remember(state.topics) { state.topics.map { it.tag }.filter { it.isNotBlank() }.distinct() }
     val langs = remember(tags) { tags.map { VoiceNames.language(it) }.distinct() }
     var picked by rememberSaveable { mutableStateOf("") }
-    val owner = LocalLifecycleOwner.current
-    DisposableEffect(owner, tags) {
-        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME && tags.isNotEmpty()) vm.loadVoices(tags) }
-        owner.lifecycle.addObserver(observer)
-        onDispose { owner.lifecycle.removeObserver(observer) }
-    }
+    LoadVoicesOnResume(tags, vm)
     SettingsSection(s.sectionVoice) {
         Text(s.voiceIntro, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (langs.isEmpty()) {

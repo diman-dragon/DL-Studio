@@ -39,6 +39,7 @@ fun PronounceRow(text: String, speak: Speak, check: Check?, modifier: Modifier =
             if (check != null) MicButton(text, mine.phase == Phase.LISTENING, check)
         }
         PronounceResult(mine)
+        if (mine.phase == Phase.NO_PACK && check != null) GradientButton(LocalStrings.current.downloadPack, check.downloadPack)
     }
 }
 

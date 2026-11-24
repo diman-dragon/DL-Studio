@@ -3,10 +3,19 @@ package com.dlstudio.app.ui.components
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import com.dlstudio.app.content.Topic
 import com.dlstudio.app.i18n.Strings
 import com.dlstudio.app.speech.LangNeed
 import com.dlstudio.app.speech.Needs
@@ -51,6 +60,7 @@ fun LangStatus(state: AppState, vm: AppViewModel, shown: Locale) {
         SettingCard(gap = 3.dp) {
             Text(languageName(need.lang, shown), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             Text(statusLine(s, need, state.speech.packs), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+            Text(s.voiceCounts(need.installed, need.known), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
     val pending = needs.filter { it.pending }
@@ -74,5 +84,34 @@ fun NeedsOffer(state: AppState, vm: AppViewModel, shown: Locale) {
     DlModal.Shell(s.offerTitle, onDismiss = vm::clearOffer) {
         Text(s.offerText(pending.joinToString(", ") { languageName(it.lang, shown) }), style = MaterialTheme.typography.bodyLarge)
         DlModal.Actions(s.later, s.download, vm::clearOffer, { vm.downloadNeeded(pending); vm.clearOffer() })
+    }
+}
+
+/** Перечитывает голоса и пакеты языков `tags` при каждом возвращении в приложение (например, после загрузки голоса в системе). */
+@Composable
+fun LoadVoicesOnResume(tags: List<String>, vm: AppViewModel) {
+    val owner = LocalLifecycleOwner.current
+    DisposableEffect(owner, tags) {
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME && tags.isNotEmpty()) vm.loadVoices(tags) }
+        owner.lifecycle.addObserver(observer)
+        onDispose { owner.lifecycle.removeObserver(observer) }
+    }
+}
+
+/**
+ * Открыв тему, предлагает сразу скачать то, чего её языку не хватает (голос учительницы или преподавателя, пакет распознавания), и скачивает по согласию
+ * прямо с этого экрана. Спрашивает один раз за открытие темы; пока состояние пакетов не проверено, молчит.
+ */
+@Composable
+fun TopicNeeds(topic: Topic, state: AppState, vm: AppViewModel, shown: Locale) {
+    if (topic.tag.isBlank()) return
+    LoadVoicesOnResume(listOf(topic.tag), vm)
+    var asked by rememberSaveable(topic.id) { mutableStateOf(false) }
+    val s = LocalStrings.current
+    val pending = remember(topic, state.speech.voices, state.speech.packs) { Needs.of(listOf(topic), state.speech.voices, state.speech.packs).filter { it.pending } }
+    if (asked || !state.speech.loaded || topic.tag !in state.speech.packs || pending.isEmpty()) return
+    DlModal.Shell(s.offerTitle, onDismiss = { asked = true }) {
+        Text(s.offerText(pending.joinToString(", ") { languageName(it.lang, shown) }), style = MaterialTheme.typography.bodyLarge)
+        DlModal.Actions(s.later, s.download, { asked = true }, { vm.downloadNeeded(pending); asked = true })
     }
 }

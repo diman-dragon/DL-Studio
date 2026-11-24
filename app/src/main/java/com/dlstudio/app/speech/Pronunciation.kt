@@ -11,8 +11,8 @@ enum class Grade { GREAT, GOOD, RETRY }
 /** Состояние проверки: для какой фразы (`text`), что услышали (`heard`) и сколько процентов совпало (`score`). */
 data class Pronounce(val text: String = "", val phase: Phase = Phase.IDLE, val heard: String = "", val score: Int = 0)
 
-/** Проверка произношения, как её видит экран: состояние и действия (начать слушать, отменить, нет доступа к микрофону). */
-class Check(val state: Pronounce, val start: (String) -> Unit, val cancel: () -> Unit, val denied: (String) -> Unit)
+/** Проверка произношения, как её видит экран: состояние и действия (начать слушать, отменить, нет доступа к микрофону, скачать пакет распознавания языка темы). */
+class Check(val state: Pronounce, val start: (String) -> Unit, val cancel: () -> Unit, val denied: (String) -> Unit, val downloadPack: () -> Unit)
 
 /** Сравнение сказанного с фразой: чистая логика, без Android. Оценивается то, что распознал системный движок речи. */
 object Pronunciation {

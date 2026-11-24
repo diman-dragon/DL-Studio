@@ -8,6 +8,7 @@ import com.dlstudio.app.content.Topic
 import com.dlstudio.app.content.TopicStore
 import com.dlstudio.app.data.Prefs
 import com.dlstudio.app.progress.Progress
+import com.dlstudio.app.progress.Stats
 import com.dlstudio.app.progress.ProgressJson
 import com.dlstudio.app.progress.Reward
 import com.dlstudio.app.progress.Week
@@ -118,12 +119,25 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun finishTheory(topic: Topic) = reward(Xp.theory(mutable.value.progress, topic, Xp.dayNumber()))
-    fun seeCard(topic: Topic, index: Int) = reward(Xp.card(mutable.value.progress, topic, index, Xp.dayNumber()))
-    fun answer(topic: Topic, index: Int, correct: Boolean) = reward(Xp.answer(mutable.value.progress, topic, index, correct, Xp.dayNumber()))
-    /** Сброс прогресса: этапы тем и серия обнуляются, XP (и уровень) и дневная история XP сохраняются. Установленные темы и настройки остаются. */
+    fun seeCard(topic: Topic, index: Int) { count { it.cardSeen(Xp.dayNumber()) }; reward(Xp.card(mutable.value.progress, topic, index, Xp.dayNumber())) }
+    fun answer(topic: Topic, index: Int, correct: Boolean) {
+        count { it.answered(topic.quiz[index].kind.name, topic.id, correct, Xp.dayNumber()) }
+        reward(Xp.answer(mutable.value.progress, topic, index, correct, Xp.dayNumber()))
+    }
+
+    /** Просмотрена страница теории (в статистику; очков не даёт). */
+    fun seePage() = count { it.pageSeen() }
+
+    /** Меняет статистику и сразу сохраняет. */
+    private fun count(change: (Stats) -> Stats) {
+        val progress = mutable.value.progress.let { it.copy(stats = change(it.stats)) }
+        prefs.progressJson = ProgressJson.encode(progress)
+        mutable.update { it.copy(progress = progress) }
+    }
+    /** Сброс прогресса: этапы тем и серия обнуляются, XP (и уровень), дневная история XP и статистика сохраняются. Установленные темы и настройки остаются. */
     fun resetProgress() {
         val old = mutable.value.progress
-        val kept = Progress(xp = old.xp, history = old.history)
+        val kept = Progress(xp = old.xp, history = old.history, stats = old.stats)
         prefs.progressJson = ProgressJson.encode(kept)
         mutable.update { it.copy(progress = kept, gain = null) }
     }
@@ -132,7 +146,7 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
 
     val speaking = speaker.speaking
 
-    fun speak(text: String, tag: String, role: Role = Role()) = speaker.speak(text, tag, role)
+    fun speak(text: String, tag: String, role: Role = Role()) { count { it.listened() }; speaker.speak(text, tag, role) }
 
     private fun updateSpeech(change: (SpeechUi) -> SpeechUi) = mutable.update { it.copy(speech = change(it.speech)) }
 
@@ -193,7 +207,11 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
         mutable.update { it.copy(pronounce = Pronounce(text, Phase.LISTENING)) }
         listener.start(
             tag,
-            { heard -> mutable.update { it.copy(pronounce = Pronounce(text, Phase.DONE, heard.first(), Pronunciation.score(text, heard))) } },
+            { heard ->
+                val score = Pronunciation.score(text, heard)
+                count { it.pronounced(score, Pronunciation.grade(score), Xp.dayNumber()) }
+                mutable.update { it.copy(pronounce = Pronounce(text, Phase.DONE, heard.first(), score)) }
+            },
             { phase -> mutable.update { it.copy(pronounce = Pronounce(text, phase)) } }
         )
     }

@@ -10,11 +10,11 @@ data class TopicProgress(val theory: Boolean = false, val seen: Set<Int> = empty
 
 /**
  * Очки опыта, серия дней и прогресс по темам (по `id` темы). `bestStreak` — самая длинная серия за всё время,
- * `history` — сколько XP набрано в каждый из последних дней (номер дня → XP): из него рисуются цель дня и неделя.
+ * `history` — сколько XP набрано в каждый из последних дней (номер дня → XP): из него рисуются цель дня и неделя, `stats` — статистика действий (см. Stats).
  */
 data class Progress(
     val xp: Int = 0, val streak: Int = 0, val lastDay: Long = 0, val topics: Map<String, TopicProgress> = emptyMap(),
-    val bestStreak: Int = 0, val history: Map<Long, Int> = emptyMap()
+    val bestStreak: Int = 0, val history: Map<Long, Int> = emptyMap(), val stats: Stats = Stats()
 )
 
 /** Результат действия: новый прогресс, сколько очков получено и закончилась ли этим тема. */
@@ -83,6 +83,7 @@ object ProgressJson {
 
     fun encode(p: Progress): String = JSONObject()
         .put("xp", p.xp).put("streak", p.streak).put("day", p.lastDay).put("bs", p.bestStreak)
+        .put("st", StatsJson.encode(p.stats))
         .put("h", JSONObject().also { all -> p.history.forEach { (day, xp) -> all.put(day.toString(), xp) } })
         .put("topics", JSONObject().also { all ->
             p.topics.forEach { (id, t) ->
@@ -97,6 +98,6 @@ object ProgressJson {
         Progress(o.getInt("xp"), o.getInt("streak"), o.getLong("day"), all.keys().asSequence().associateWith { id ->
             val t = all.getJSONObject(id)
             TopicProgress(t.getBoolean("t"), t.getJSONArray("k").ints(), t.getJSONArray("q").ints(), t.getBoolean("b"))
-        }, maxOf(o.optInt("bs", 0), o.getInt("streak")), history)
+        }, maxOf(o.optInt("bs", 0), o.getInt("streak")), history, StatsJson.decode(o.optJSONObject("st")))
     }.getOrDefault(Progress())
 }

@@ -39,8 +39,20 @@ object SpeechPacks {
     /** Открывает настройки голосового ввода, где на старых Android скачиваются офлайн-пакеты распознавания. */
     fun openRecognitionSettings(context: Context): Boolean = open(context, Intent(Settings.ACTION_VOICE_INPUT_SETTINGS), Intent(Settings.ACTION_SETTINGS))
 
-    /** Умеет ли это устройство проверять и скачивать офлайн-пакеты распознавания само (Android 13+ и встроенное распознавание на устройстве). */
-    fun canManage(context: Context): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && SpeechRecognizer.isOnDeviceRecognitionAvailable(context)
+    /**
+     * Умеет ли это устройство проверять и скачивать офлайн-пакеты распознавания само: Android 13+ и распознавание на устройстве
+     * либо обычная служба распознавания (например, от Google), которая отвечает на запрос о пакетах.
+     */
+    fun canManage(context: Context): Boolean =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && (SpeechRecognizer.isOnDeviceRecognitionAvailable(context) || SpeechRecognizer.isRecognitionAvailable(context))
+
+    /** Распознаватель для запросов о пакетах: на устройстве, если есть, иначе обычная служба. */
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun recognizer(context: Context): SpeechRecognizer? = when {
+        SpeechRecognizer.isOnDeviceRecognitionAvailable(context) -> SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
+        SpeechRecognizer.isRecognitionAvailable(context) -> SpeechRecognizer.createSpeechRecognizer(context)
+        else -> null
+    }
 
     private fun intentFor(tag: String) = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -48,14 +60,13 @@ object SpeechPacks {
 
     /** Узнаёт, скачан ли пакет языка `tag`. Вызывать с главного потока; результат придёт туда же. */
     fun check(context: Context, tag: String, onResult: (PackState) -> Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && SpeechRecognizer.isOnDeviceRecognitionAvailable(context)) checkOnDevice(context, tag, onResult)
-        else onResult(PackState.UNSUPPORTED)
+        if (canManage(context)) checkOnDevice(context, tag, onResult) else onResult(PackState.UNSUPPORTED)
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun checkOnDevice(context: Context, tag: String, onResult: (PackState) -> Unit) {
-        val engine = SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
-        engine.checkRecognitionSupport(intentFor(tag), ContextCompat.getMainExecutor(context), object : RecognitionSupportCallback {
+        val engine = recognizer(context) ?: return onResult(PackState.UNSUPPORTED)
+        val asked = runCatching { engine.checkRecognitionSupport(intentFor(tag), ContextCompat.getMainExecutor(context), object : RecognitionSupportCallback {
             override fun onSupportResult(recognitionSupport: RecognitionSupport) {
                 fun has(list: List<String>) = list.any { it.replace('_', '-').equals(tag, ignoreCase = true) || VoiceNames.language(it) == VoiceNames.language(tag) }
                 onResult(
@@ -70,18 +81,18 @@ object SpeechPacks {
             }
 
             override fun onError(error: Int) { onResult(PackState.UNKNOWN); engine.destroy() }
-        })
+        }) }
+        if (asked.isFailure) { onResult(PackState.UNKNOWN); engine.destroy() }
     }
 
     /** Просит систему скачать пакет распознавания языка `tag` (Android 13+); ход загрузки показывает сама система. На старых Android открывает настройки голосового ввода. */
     fun download(context: Context, tag: String) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && SpeechRecognizer.isOnDeviceRecognitionAvailable(context)) downloadOnDevice(context, tag)
-        else openRecognitionSettings(context)
+        if (canManage(context)) downloadOnDevice(context, tag) else openRecognitionSettings(context)
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun downloadOnDevice(context: Context, tag: String) {
-        val engine = SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
+        val engine = recognizer(context) ?: return
         runCatching { engine.triggerModelDownload(intentFor(tag)) }
         Handler(Looper.getMainLooper()).postDelayed({ engine.destroy() }, DESTROY_DELAY_MS)   // загрузку ведёт система, но закрывать клиента сразу не стоит
     }

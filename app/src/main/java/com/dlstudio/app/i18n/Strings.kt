@@ -80,4 +80,10 @@ interface Strings {
     val packInstalled: String; val packAvailable: String; val packDownloading: String; val packUnsupported: String; val packUnknown: String
 
     val aboutTitle: String; val aboutText: String; val aboutCopyright: String
+    val tabOverview: String; val tabStats: String; val downloadPack: String; fun voiceCounts(installed: Int, known: Int): String
+    val statsEmpty: String; val statsRight: String; val statsWrong: String; val statsAccuracy: String; val statsCards: String; val statsPages: String
+    val statsListens: String; val statsAnswers: String; val statsXpDays: String; val statsAnswerDays: String; val statsCardDays: String
+    val statsByKind: String; val statsByTopic: String; val statsPron: String; val statsTries: String; val statsAvg: String; val statsBest: String
+    val statsGreat: String; val statsGood: String; val statsRetry: String
+    val kindChoice: String; val kindListen: String; val kindSpeak: String; val kindBank: String; val kindFill: String; val kindMatch: String
 }
