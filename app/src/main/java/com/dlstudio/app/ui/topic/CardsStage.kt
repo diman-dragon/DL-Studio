@@ -68,13 +68,13 @@ private const val VERY_LONG_TEXT = 32
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CardsStage(cards: List<Card>, seen: Set<Int>, speak: Speak?, check: Check?, onSeen: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun CardsStage(cards: List<Card>, seen: Set<Int>, startCard: Int, speak: Speak?, check: Check?, onSeen: (Int) -> Unit, onAt: (Int) -> Unit, modifier: Modifier = Modifier) {
     val s = LocalStrings.current
-    val pager = rememberPagerState { cards.size }
+    val pager = rememberPagerState(startCard.coerceIn(0, cards.lastIndex)) { cards.size }
     val scope = rememberCoroutineScope()
     val flipped = remember { mutableStateMapOf<Int, Boolean>() }
     val at = pager.currentPage
-    LaunchedEffect(at) { check?.cancel?.invoke() }
+    LaunchedEffect(at) { check?.cancel?.invoke(); onAt(at) }
     Column(modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp), Arrangement.spacedBy(12.dp)) {
         CounterChip(s.cardCounter(at + 1, cards.size, seen.size))
         ProgressBar(seen.size / cards.size.toFloat())

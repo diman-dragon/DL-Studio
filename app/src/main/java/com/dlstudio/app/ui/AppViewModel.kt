@@ -9,6 +9,8 @@ import com.dlstudio.app.content.TopicStore
 import com.dlstudio.app.data.Prefs
 import com.dlstudio.app.progress.Progress
 import com.dlstudio.app.progress.Stats
+import com.dlstudio.app.progress.Place
+import com.dlstudio.app.progress.PlaceJson
 import com.dlstudio.app.progress.ProgressJson
 import com.dlstudio.app.progress.Reward
 import com.dlstudio.app.progress.Week
@@ -130,6 +132,20 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     /** Просмотрена страница теории (в статистику; очков не даёт). */
     fun seePage() = count { it.pageSeen() }
 
+    private var places: Map<String, Place> = PlaceJson.decode(prefs.placesJson)
+
+    /** Где остановились в теме прошлый раз (этап, страница, карточка, вопрос, прокрутка). */
+    fun place(topicId: String): Place = places[topicId] ?: Place()
+
+    /** Запоминает место в теме; сразу сохраняется. */
+    fun keepPlace(topicId: String, change: (Place) -> Place) {
+        val now = place(topicId)
+        val next = change(now)
+        if (next == now) return
+        places = places + (topicId to next)
+        prefs.placesJson = PlaceJson.encode(places)
+    }
+
     /** Меняет статистику и сразу сохраняет. */
     private fun count(change: (Stats) -> Stats) {
         val progress = mutable.value.progress.let { it.copy(stats = change(it.stats)) }
@@ -141,6 +157,7 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
         val old = mutable.value.progress
         val kept = Progress(xp = old.xp, history = old.history, stats = old.stats)
         prefs.progressJson = ProgressJson.encode(kept)
+        places = emptyMap(); prefs.placesJson = null
         mutable.update { it.copy(progress = kept, gain = null) }
     }
 

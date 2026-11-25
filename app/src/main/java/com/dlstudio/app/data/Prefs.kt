@@ -60,6 +60,10 @@ class Prefs(context: Context) {
         get() = sp.getString("lastTopic", "").orEmpty()
         set(value) = sp.putPref("lastTopic", value)
 
+    var placesJson: String?
+        get() = sp.getString("places", null)
+        set(value) = sp.putPref("places", value)
+
     var progressJson: String?
         get() = sp.getString("progress", null)
         set(value) = sp.putPref("progress", value)

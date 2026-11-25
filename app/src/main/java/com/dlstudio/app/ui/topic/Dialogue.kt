@@ -1,5 +1,6 @@
 package com.dlstudio.app.ui.topic
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -7,11 +8,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +50,7 @@ class Talk(val say: SpeakAs, val all: SpeakAll, val stop: () -> Unit, val tag: S
 fun lineId(page: Int, block: Int) = "t$page.$block"
 
 /** Реплика: у персонажа с отметкой — его портрет и имя; озвучивается голосом этого персонажа, пока звучит — строка подсвечена цветом персонажа. */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SayRow(say: Block.Say, line: String, talk: Talk) {
     val s = LocalStrings.current
@@ -53,8 +59,10 @@ fun SayRow(say: Block.Say, line: String, talk: Talk) {
     val tint = Color(profile.tint)
     val live = isSpeaking(LocalSpeaking.current, profile.id, line)
     val shape = RoundedCornerShape(18.dp)
+    val focus = remember { BringIntoViewRequester() }
+    LaunchedEffect(live) { if (live) focus.bringIntoView() }
     Row(
-        Modifier.fillMaxWidth().clip(shape).background(if (live) tint.copy(alpha = 0.28f) else colors.primaryContainer)
+        Modifier.fillMaxWidth().bringIntoViewRequester(focus).clip(shape).background(if (live) tint.copy(alpha = 0.28f) else colors.primaryContainer)
             .border(if (live) 2.dp else 0.dp, if (live) tint else Color.Transparent, shape).padding(start = 12.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
         Arrangement.spacedBy(10.dp), Alignment.CenterVertically
     ) {
@@ -68,16 +76,16 @@ fun SayRow(say: Block.Say, line: String, talk: Talk) {
     }
 }
 
-/** Над диалогом из нескольких реплик: участники и кнопка «Слушать диалог» — реплики звучат подряд, каждая голосом своего персонажа. */
+/** Над диалогом или списком: участники (если есть) и кнопка «Слушать диалог» / «Воспроизвести все» — реплики звучат подряд, каждая голосом своего персонажа; во время звучания строка в фокусе. */
 @Composable
-fun DialogueBar(ids: List<String>, items: List<Utter>, talk: Talk) {
+fun DialogueBar(ids: List<String>, items: List<Utter>, talk: Talk, label: String = LocalStrings.current.dialogueListen) {
     val s = LocalStrings.current
     val line = LocalSpeaking.current?.line
     val playing = line != null && items.any { it.line == line }
     Row(Modifier.fillMaxWidth(), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) { ids.forEach { CharacterAvatar(it, 36.dp) } }
         Box(Modifier.weight(1f)) {
-            if (playing) OutlineButton(s.dialogueStop, talk.stop) else GradientButton(s.dialogueListen, { talk.all(items) })
+            if (playing) OutlineButton(s.dialogueStop, talk.stop) else GradientButton(label, { talk.all(items) })
         }
     }
 }

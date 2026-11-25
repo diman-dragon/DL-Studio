@@ -89,14 +89,14 @@ fun TheoryCard(page: TheoryPage, pageIndex: Int, talk: Talk, mediaDir: File?, mo
     }
 }
 
-/** Кнопка диалога перед подряд идущими репликами, если в них говорят хотя бы двое разных. */
+/** Кнопка перед подряд идущими репликами: «Слушать диалог», если говорят хотя бы двое, иначе (список слов и выражений) — «Воспроизвести все». */
 @Composable
 private fun DialogueOf(blocks: List<Block>, start: Int, pageIndex: Int, talk: Talk) {
     val run = blocks.drop(start).takeWhile { it is Block.Say }.filterIsInstance<Block.Say>()
     val ids = run.map { Characters.of(it.who).id }.distinct()
-    if (ids.size < 2) return
+    if (run.size < 2) return
     val items = run.mapIndexed { j, say -> Utter(say.say.ifBlank { say.text }, say.who, lineId(pageIndex, start + j)) }
-    DialogueBar(ids, items, talk)
+    if (ids.size < 2) DialogueBar(emptyList(), items, talk, LocalStrings.current.listenAll) else DialogueBar(ids, items, talk)
 }
 
 @Composable
@@ -135,7 +135,10 @@ private fun BlockView(block: Block, line: String, talk: Talk, mediaDir: File?) {
         is Block.Callout -> CalloutBox(block.kind, block.text)
         is Block.Say -> SayRow(block, line, talk)
         is Block.Table -> TableView(block.rows)
-        is Block.Tiles -> TileGrid(block.tiles, if (talk.voiced) { { text: String -> talk.say(text, null, null) } } else null)
+        is Block.Tiles -> Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            if (talk.voiced && block.tiles.size > 1) DialogueBar(emptyList(), block.tiles.mapIndexed { j, t -> Utter(t.say.ifBlank { t.big }, null, "$line.$j") }, talk, LocalStrings.current.listenAll)
+            TileGrid(block.tiles, if (talk.voiced) { { text: String -> talk.say(text, null, null) } } else null)
+        }
         is Block.Media -> MediaView(block, mediaDir)
     }
 }

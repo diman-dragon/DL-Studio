@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,8 +54,13 @@ fun TopicScreen(topic: Topic, state: AppState, vm: AppViewModel, onBack: () -> U
         Stage.CARDS.takeIf { topic.cards.isNotEmpty() },
         Stage.QUIZ.takeIf { topic.quiz.isNotEmpty() }
     )
-    var picked by rememberSaveable(topic.id) { mutableStateOf(0) }
+    val firstOpen = stages.indexOfFirst {
+        when (it) { Stage.THEORY -> !Xp.theoryDone(topic, progress); Stage.CARDS -> !Xp.cardsDone(topic, progress); Stage.QUIZ -> !Xp.quizDone(topic, progress) }
+    }.coerceAtLeast(0)
+    val place = remember(topic.id) { vm.place(topic.id) }
+    var picked by rememberSaveable(topic.id) { mutableStateOf(if (place.stage in stages.indices) place.stage else firstOpen) }
     val index = picked.coerceIn(0, stages.lastIndex)
+    LaunchedEffect(index) { vm.keepPlace(topic.id) { it.copy(stage = index) } }
     val speak: Speak? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> { text: String -> vm.speak(text, tag) } }
     val speakAs: SpeakAs? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> { text: String, who: String?, line: String? -> vm.speak(text, tag, who, line) } }
     val silent: SpeakAs = { _, _, _ -> }
@@ -85,9 +91,9 @@ fun TopicScreen(topic: Topic, state: AppState, vm: AppViewModel, onBack: () -> U
         if (topic.tag.isNotBlank()) SpeechProblemBar(problem, vm::downloadVoice)
         val content = Modifier.weight(1f)
         when (stages[index]) {
-            Stage.THEORY -> TheoryStage(topic.theory, talk, vm.mediaDir(topic.id), vm::seePage, { vm.finishTheory(topic); if (index < stages.lastIndex) picked = index + 1 }, content)
-            Stage.CARDS -> CardsStage(topic.cards, progress.seen, speak, check, { vm.seeCard(topic, it) }, content)
-            Stage.QUIZ -> QuizStage(topic.quiz, Xp.quizDone(topic, progress), speakAs, check, { i, ok -> vm.answer(topic, i, ok) }, content)
+            Stage.THEORY -> TheoryStage(topic.theory, vm.place(topic.id).page, vm.place(topic.id).pageScroll, talk, vm.mediaDir(topic.id), vm::seePage, { p, at -> vm.keepPlace(topic.id) { it.copy(page = p, pageScroll = at) } }, { vm.finishTheory(topic); if (index < stages.lastIndex) picked = index + 1 }, content)
+            Stage.CARDS -> CardsStage(topic.cards, progress.seen, vm.place(topic.id).card.takeIf { it >= 0 } ?: Xp.startCard(topic, progress), speak, check, { vm.seeCard(topic, it) }, { c -> vm.keepPlace(topic.id) { it.copy(card = c) } }, content)
+            Stage.QUIZ -> QuizStage(topic.quiz, Xp.quizDone(topic, progress), progress.quizOk, vm.place(topic.id).question, vm.place(topic.id).questionScroll, speakAs, check, { i, ok -> vm.answer(topic, i, ok) }, { q, at -> vm.keepPlace(topic.id) { it.copy(question = q, questionScroll = at) } }, content)
         }
     }
 }

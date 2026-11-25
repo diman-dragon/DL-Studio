@@ -40,6 +40,12 @@ object Xp {
     /** Серия на сегодня: если вчера не занимались, она уже оборвалась. */
     fun currentStreak(p: Progress, today: Long) = if (p.lastDay >= today - 1) p.streak else 0
 
+    /** С какой карточки продолжить: первая, ответ которой ещё не открывали (если все открыты — первая). */
+    fun startCard(t: Topic, p: TopicProgress) = t.cards.indices.firstOrNull { it !in p.seen } ?: 0
+
+    /** С какого вопроса продолжить среди показываемых (`order` — номера вопросов): первый, не решённый верно (если все решены — первый). */
+    fun startQuestion(order: List<Int>, p: TopicProgress) = order.indexOfFirst { it !in p.quizOk }.coerceAtLeast(0)
+
     fun theoryDone(t: Topic, p: TopicProgress) = t.theory.isEmpty() || p.theory
     fun cardsDone(t: Topic, p: TopicProgress) = t.cards.isEmpty() || p.seen.size >= t.cards.size
     fun quizDone(t: Topic, p: TopicProgress) = t.quiz.isEmpty() || p.quizOk.size >= passMark(t.quiz.size)

@@ -56,6 +56,10 @@ interface Strings {
     fun levelTitle(level: Int): String
     fun xpToNext(xp: Int): String
     fun streakDays(n: Int): String
+    fun soundSkipped(n: Int): String
+    fun soundLeft(n: Int): String
+    fun onlyOpen(n: Int): String
+    val again: String
     fun topicsDone(done: Int, total: Int): String
     val xpRulesTitle: String; val xpRules: String; val sealsTitle: String
 
@@ -87,7 +91,7 @@ interface Strings {
     fun castTitle(course: String): String
     val castText: String; val castStart: String
     fun meetTitle(name: String): String
-    val dialogueListen: String; val dialogueStop: String
+    val dialogueListen: String; val listenAll: String; val dialogueStop: String
     val problemNoEngine: String; val problemNoLanguage: String; val problemOk: String
     val downloadNeeded: String; val allReady: String; val offerTitle: String; val later: String
     fun offerText(languages: String): String

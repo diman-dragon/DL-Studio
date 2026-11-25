@@ -14,6 +14,11 @@ import com.dlstudio.app.speech.Gender
 import com.dlstudio.app.speech.How
 import com.dlstudio.app.speech.RawVoice
 import com.dlstudio.app.speech.VoiceCast
+import com.dlstudio.app.content.Card
+import com.dlstudio.app.progress.Place
+import com.dlstudio.app.progress.PlaceJson
+import com.dlstudio.app.progress.TopicProgress
+import com.dlstudio.app.progress.Xp
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
@@ -194,5 +199,17 @@ class CastTest {
         assertTrue(!item(QuizKind.FILL, "Hi", "Fill the gap").needsSound)
         assertTrue(!item(QuizKind.CHOICE).needsSound)
         assertTrue(!item(QuizKind.MATCH).needsSound)
+    }
+
+    @Test fun resumePointsToFirstUnfinished() {
+        val topic = Topic("t", "", "", 1, "T", "", List(3) { TheoryPage("h$it", emptyList()) }, List(4) { Card("f$it", "b$it", "", "") }, emptyList())
+        assertEquals(2, Xp.startCard(topic, TopicProgress(seen = setOf(0, 1, 3))))
+        assertEquals(0, Xp.startCard(topic, TopicProgress(seen = setOf(0, 1, 2, 3))))
+        assertEquals(1, Xp.startQuestion(listOf(0, 2, 3), TopicProgress(quizOk = setOf(0, 3))))
+        assertEquals(0, Xp.startQuestion(listOf(0, 2), TopicProgress(quizOk = setOf(0, 2))))
+        val here = Place(1, 2, 340, 3, 5, 120)
+        assertEquals(mapOf("t" to here), PlaceJson.decode(PlaceJson.encode(mapOf("t" to here))))
+        assertEquals(emptyMap<String, Place>(), PlaceJson.decode("{oops"))
+        assertEquals(emptyMap<String, Place>(), PlaceJson.decode(null))
     }
 }
