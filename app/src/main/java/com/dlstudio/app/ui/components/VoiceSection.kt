@@ -1,5 +1,7 @@
 package com.dlstudio.app.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -49,12 +51,18 @@ fun VoiceSection(state: AppState, vm: AppViewModel) {
         Text(s.voiceIntro, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (langs.isEmpty()) {
             Text(s.statusNoLangs, Modifier.padding(horizontal = 6.dp), style = MaterialTheme.typography.bodyMedium)
-            return@SettingsSection
-        }
+        } else VoiceBody(langs, tags, picked, { picked = it }, shown, state, vm)
+    }
+}
+
+@Composable
+private fun VoiceBody(langs: List<String>, tags: List<String>, picked: String, onPick: (String) -> Unit, shown: Locale, state: AppState, vm: AppViewModel) {
+    val s = LocalStrings.current
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         val lang = picked.takeIf { it in langs } ?: langs.first()
         LangStatus(state, vm, shown)
         CycleTile(s.voiceRate, listOf(s.rateSlow to RATES[0], s.rateNormal to RATES[1], s.rateFast to RATES[2]), state.speech.rate, vm::setSpeechRate)
-        if (langs.size > 1) PickerTile(s.voiceLanguage, languageName(lang, shown), langs.map { PickItem(it, languageName(it, shown), selected = it == lang) }, { picked = it })
+        if (langs.size > 1) PickerTile(s.voiceLanguage, languageName(lang, shown), langs.map { PickItem(it, languageName(it, shown), selected = it == lang) }, onPick)
         Text(s.charactersTitle, Modifier.padding(start = 6.dp, top = 4.dp), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
         val speech = state.speech
         val tag = tags.first { VoiceNames.language(it) == lang }

@@ -38,7 +38,6 @@ import com.dlstudio.app.ui.theme.LocalStrings
 @Composable
 fun ProgressScreen(state: AppState) {
     val s = LocalStrings.current
-    val colors = MaterialTheme.colorScheme
     var tab by rememberSaveable { mutableStateOf(0) }
     val xp = state.progress.xp
     val done = state.topics.count { Xp.complete(it, state.progress.topics[it.id] ?: TopicProgress()) }
@@ -46,10 +45,16 @@ fun ProgressScreen(state: AppState) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), Arrangement.spacedBy(12.dp)) {
         ScreenHeader(s.tabProgress)
         SegmentedTabs(listOf(s.tabOverview, s.tabStats), tab, { tab = it })
-        if (tab == 1) {
-            StatsContent(state)
-            return@Column
-        }
+        if (tab == 1) StatsContent(state) else Overview(state, xp, done, seals)
+    }
+}
+
+/** Вкладка «Обзор»; вынесена отдельно, чтобы не делать ранний `return` внутри Compose-лямбды. */
+@Composable
+private fun Overview(state: AppState, xp: Int, done: Int, seals: Map<Pair<String, String>, List<Topic>>) {
+    val s = LocalStrings.current
+    val colors = MaterialTheme.colorScheme
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(10.dp), Alignment.CenterHorizontally) {
             Ring(Xp.intoLevel(xp) / Xp.LEVEL.toFloat(), 168.dp, 14.dp) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
