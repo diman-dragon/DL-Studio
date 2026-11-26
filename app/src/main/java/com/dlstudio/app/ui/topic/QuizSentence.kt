@@ -52,7 +52,7 @@ fun GapQuestion(item: QuizItem, onDone: (Boolean) -> Unit) {
     val open = result == null
     Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(14.dp)) {
         QuestionShell(kindIcon(item.kind), s.quizKind(item.kind, false)) {
-            FlowRow(Modifier.fillMaxWidth(), Arrangement.spacedBy(6.dp), Arrangement.spacedBy(10.dp), Alignment.CenterVertically) {
+            FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 parts.forEachIndexed { i, part ->
                     part.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }.forEach { Text(it, style = MaterialTheme.typography.headlineSmall) }
                     if (i < slots.size) {
