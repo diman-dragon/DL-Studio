@@ -60,6 +60,14 @@ class Prefs(context: Context) {
         get() = sp.getString("lastTopic", "").orEmpty()
         set(value) = sp.putPref("lastTopic", value)
 
+    /** Отчёт о последнем падении (пусто — падения не было или его уже показали). */
+    var crashReport: String?
+        get() = sp.getString("crash", null)
+        set(value) = sp.putPref("crash", value)
+
+    /** Сохраняет отчёт синхронно: процесс уже падает, отложенная запись не успеет. */
+    fun saveCrashNow(report: String) { sp.edit().putString("crash", report).commit() }
+
     var placesJson: String?
         get() = sp.getString("places", null)
         set(value) = sp.putPref("places", value)

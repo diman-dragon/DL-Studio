@@ -39,5 +39,6 @@ data class AppState(
     val pronounce: Pronounce = Pronounce(),
     val speech: SpeechUi = SpeechUi(),
     val met: Set<String> = emptySet(),
-    val introduced: Set<String> = emptySet()
+    val introduced: Set<String> = emptySet(),
+    val crash: String? = null
 )

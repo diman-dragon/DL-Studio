@@ -22,7 +22,7 @@ data class TheoryPage(val heading: String, val paragraphs: List<String>, val ico
 
 /** Вид вопроса практики. В json — поле `t`: choice (по умолчанию), listen, speak, bank, fill, match. */
 enum class QuizKind(val tag: String) {
-    CHOICE("choice"), LISTEN("listen"), SPEAK("speak"), BANK("bank"), FILL("fill"), MATCH("match");
+    CHOICE("choice"), LISTEN("listen"), SPEAK("speak"), BANK("bank"), FILL("fill"), MATCH("match"), GAP("gap"), FIND("find");
 
     /** Нужны ли озвучка и микрофон: такие вопросы показываются только в темах с языком озвучки. */
     val needsVoice: Boolean get() = this == LISTEN || this == SPEAK
@@ -32,7 +32,7 @@ enum class QuizKind(val tag: String) {
 
 /**
  * Вопрос практики. Поля зависят от вида: `answer` — верный вариант (choice, listen), фраза для произнесения (speak),
- * верный порядок слов через пробел (bank) или верный ввод (fill); `options` — варианты (choice, listen) или лишние слова в мешке (bank);
+ * верный порядок слов через пробел (bank), верный ввод (fill), слова для пропусков `___` через пробел или `|` (gap) или слово с ошибкой, как оно написано в вопросе (find; верное написание — в `hint`); `options` — варианты (choice, listen) или лишние слова в мешке (bank, gap);
  * `say` — что озвучить (listen, speak, fill-диктант); `alt` — другие верные вводы (fill); `pairs` — пары для соединения (match); `hint` — подсказка;
  * `who` — ID персонажа, чьим голосом звучит `say` (в json поле `who`; пусто или неизвестный ID — мисс Грейс).
  */
@@ -94,6 +94,8 @@ object TopicJson {
             QuizKind.BANK -> Answers.tokens(answer).size >= 2
             QuizKind.FILL -> answer.isNotBlank()
             QuizKind.MATCH -> pairs.size in 2..MAX_PAIRS
+            QuizKind.GAP -> Answers.gapParts(item).size > 1 && Answers.gapWords(answer).size == Answers.gapParts(item).size - 1
+            QuizKind.FIND -> Answers.findIndex(item) >= 0
         }
         return item.takeIf { ok }
     }

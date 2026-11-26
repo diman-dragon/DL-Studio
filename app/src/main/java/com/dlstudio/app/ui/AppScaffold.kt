@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.dlstudio.app.progress.Place
 import com.dlstudio.app.ui.components.BottomTabs
 import com.dlstudio.app.ui.components.Confetti
 import com.dlstudio.app.ui.components.GainToast
@@ -76,7 +77,7 @@ fun AppScaffold(state: AppState, vm: AppViewModel) {
                 ) { padding ->
                     HorizontalPager(pager, Modifier.fillMaxSize().padding(padding)) { page ->
                         when (page) {
-                            0 -> StartScreen(state, open, { toSettings() })
+                            0 -> StartScreen(state, open, { id -> vm.keepPlace(id) { it.copy(stage = Place.PRACTICE) }; open(id) }, { toSettings() })
                             1 -> MapScreen(state, open, { toSettings() })
                             2 -> ProgressScreen(state)
                             else -> SettingsScreen(state, vm)

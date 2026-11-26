@@ -26,6 +26,7 @@ import com.dlstudio.app.R
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dlstudio.app.content.CourseCast
 import com.dlstudio.app.content.Topic
+import com.dlstudio.app.progress.Place
 import com.dlstudio.app.progress.TopicProgress
 import com.dlstudio.app.progress.Xp
 import com.dlstudio.app.settings.AppLang
@@ -58,7 +59,7 @@ fun TopicScreen(topic: Topic, state: AppState, vm: AppViewModel, onBack: () -> U
         when (it) { Stage.THEORY -> !Xp.theoryDone(topic, progress); Stage.CARDS -> !Xp.cardsDone(topic, progress); Stage.QUIZ -> !Xp.quizDone(topic, progress) }
     }.coerceAtLeast(0)
     val place = remember(topic.id) { vm.place(topic.id) }
-    var picked by rememberSaveable(topic.id) { mutableStateOf(if (place.stage in stages.indices) place.stage else firstOpen) }
+    var picked by rememberSaveable(topic.id) { mutableStateOf(when { place.stage == Place.PRACTICE -> stages.lastIndex; place.stage in stages.indices -> place.stage; else -> firstOpen }) }
     val index = picked.coerceIn(0, stages.lastIndex)
     LaunchedEffect(index) { vm.keepPlace(topic.id) { it.copy(stage = index) } }
     val speak: Speak? = topic.tag.takeIf { it.isNotBlank() }?.let { tag -> { text: String -> vm.speak(text, tag) } }
@@ -93,7 +94,7 @@ fun TopicScreen(topic: Topic, state: AppState, vm: AppViewModel, onBack: () -> U
         when (stages[index]) {
             Stage.THEORY -> TheoryStage(topic.theory, vm.place(topic.id).page, vm.place(topic.id).pageScroll, talk, vm.mediaDir(topic.id), vm::seePage, { p, at -> vm.keepPlace(topic.id) { it.copy(page = p, pageScroll = at) } }, { vm.finishTheory(topic); if (index < stages.lastIndex) picked = index + 1 }, content)
             Stage.CARDS -> CardsStage(topic.cards, progress.seen, vm.place(topic.id).card.takeIf { it >= 0 } ?: Xp.startCard(topic, progress), speak, check, { vm.seeCard(topic, it) }, { c -> vm.keepPlace(topic.id) { it.copy(card = c) } }, content)
-            Stage.QUIZ -> QuizStage(topic.quiz, Xp.quizDone(topic, progress), progress.quizOk, vm.place(topic.id).question, vm.place(topic.id).questionScroll, speakAs, check, { i, ok -> vm.answer(topic, i, ok) }, { q, at -> vm.keepPlace(topic.id) { it.copy(question = q, questionScroll = at) } }, content)
+            Stage.QUIZ -> QuizStage(topic.quiz, Xp.quizDone(topic, progress), progress.quizOk, progress.miss, vm.place(topic.id).question, vm.place(topic.id).questionScroll, speakAs, check, { i, ok -> vm.answer(topic, i, ok) }, { q, at -> vm.keepPlace(topic.id) { it.copy(question = q, questionScroll = at) } }, content)
         }
     }
 }

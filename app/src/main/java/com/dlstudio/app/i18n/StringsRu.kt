@@ -110,8 +110,10 @@ object StringsRu : Strings {
     override fun quizKind(kind: QuizKind, dictation: Boolean) = when {
         dictation -> "Диктант"
         kind == QuizKind.CHOICE -> "Выбери ответ"; kind == QuizKind.LISTEN -> "Послушай и выбери"; kind == QuizKind.SPEAK -> "Скажи вслух"
-        kind == QuizKind.BANK -> "Собери фразу"; kind == QuizKind.FILL -> "Впиши ответ"; else -> "Соедини пары"
+        kind == QuizKind.BANK -> "Собери фразу"; kind == QuizKind.FILL -> "Впиши ответ"; kind == QuizKind.GAP -> "Вставь слова"; kind == QuizKind.FIND -> "Найди ошибку"; else -> "Соедини пары"
     }
+    override fun findWrong(word: String, fix: String) = "Ошибка в слове «$word»" + if (fix.isBlank()) "" else ". $fix"
+    override val findPrompt = "Нажмите на слово с ошибкой"
     override fun resultHeadline(good: Boolean) = if (good) "Отличный результат!" else "Можно лучше — ещё раз?"
     override val retry = "Пройти снова"; override val stageDone = "Этап пройден"; override val topicDone = "Тема пройдена!"; override val seeResult = "Результат"
 
@@ -130,6 +132,17 @@ object StringsRu : Strings {
     override val sectionLook = "Внешний вид"; override val settingTheme = "Тема"; override val settingLanguage = "Язык приложения"; override val settingAccent = "Акцентный цвет"
     override fun themeName(mode: ThemeMode) = if (mode == ThemeMode.DARK) "Тёмная (AMOLED)" else "Светлая"
 
+    override val reviewTitle = "Повторение"
+    override fun reviewCounts(wrong: Int, sound: Int) = listOfNotNull("ошибок: $wrong".takeIf { wrong > 0 }, "🔊 пропущено: $sound".takeIf { sound > 0 }).joinToString(" · ")
+    override fun reviewMore(n: Int) = "и ещё тем: $n"
+    override val sectionBackup = "Резервная копия"; override val backupSave = "Сохранить прогресс"; override val backupLoad = "Загрузить прогресс"
+    override val backupHint = "Файл с серией, XP, пройденными этапами и статистикой — его можно перенести на другой телефон."
+    override val backupSaved = "Прогресс сохранён в файл."; override val backupFailed = "Не удалось сохранить файл."
+    override val backupRestored = "Прогресс загружен."; override val backupBad = "Этот файл не похож на копию прогресса DL Studio."
+    override val backupQuestion = "Загрузить прогресс из файла? Текущий прогресс будет заменён."
+    override val crashTitle = "Прошлый раз приложение упало"
+    override val crashHint = "Скопируйте текст ошибки и пришлите разработчику — по нему можно найти причину."
+    override val copy = "Скопировать"; override val close = "Закрыть"
     override val sectionData = "Данные"; override val resetProgress = "Сбросить прогресс"
     override val resetProgressHint = "Обнулит серию дней и пройденные этапы. XP, уровень и темы останутся."
     override val resetQuestion = "Сбросить прогресс? Пройденные этапы и серия удалятся, вернуть их будет нельзя. XP и уровень сохранятся."; override val reset = "Сбросить"
@@ -207,5 +220,5 @@ object StringsRu : Strings {
     override val statsPron = "Произношение"; override val statsTries = "Попыток"; override val statsAvg = "Средняя оценка"; override val statsBest = "Лучшая оценка"
     override val statsGreat = "Отлично"; override val statsGood = "Хорошо"; override val statsRetry = "Ещё раз"
     override val kindChoice = "Выбор"; override val kindListen = "На слух"; override val kindSpeak = "Произнести"
-    override val kindBank = "Мешок слов"; override val kindFill = "Вписать"; override val kindMatch = "Пары"
+    override val kindGap = "Вставка слов"; override val kindFind = "Ошибка"; override val kindBank = "Мешок слов"; override val kindFill = "Вписать"; override val kindMatch = "Пары"
 }

@@ -1,6 +1,7 @@
 package com.dlstudio.app.ui.topic
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +48,9 @@ class Talk(val say: SpeakAs, val all: SpeakAll, val stop: () -> Unit, val tag: S
     val voiced: Boolean get() = tag.isNotBlank()
 }
 
+/** Прокрутка страницы теории: пока пользователь сам листает, экран не уезжает за звучащей репликой. */
+val LocalPageScroll = compositionLocalOf<ScrollState?> { null }
+
 /** Метка строки на экране: страница и номер блока. По ней оживает аватар именно этой реплики. */
 fun lineId(page: Int, block: Int) = "t$page.$block"
 
@@ -60,7 +65,8 @@ fun SayRow(say: Block.Say, line: String, talk: Talk) {
     val live = isSpeaking(LocalSpeaking.current, profile.id, line)
     val shape = RoundedCornerShape(18.dp)
     val focus = remember { BringIntoViewRequester() }
-    LaunchedEffect(live) { if (live) focus.bringIntoView() }
+    val scroll = LocalPageScroll.current
+    LaunchedEffect(live) { if (live && scroll?.isScrollInProgress != true) focus.bringIntoView() }
     Row(
         Modifier.fillMaxWidth().bringIntoViewRequester(focus).clip(shape).background(if (live) tint.copy(alpha = 0.28f) else colors.primaryContainer)
             .border(if (live) 2.dp else 0.dp, if (live) tint else Color.Transparent, shape).padding(start = 12.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),

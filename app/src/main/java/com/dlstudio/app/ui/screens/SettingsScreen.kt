@@ -17,6 +17,7 @@ import com.dlstudio.app.ui.AppState
 import com.dlstudio.app.ui.AppViewModel
 import com.dlstudio.app.ui.components.AboutCard
 import com.dlstudio.app.ui.components.AccentTile
+import com.dlstudio.app.ui.components.BackupSection
 import com.dlstudio.app.ui.components.CycleTile
 import com.dlstudio.app.ui.components.NeedsOffer
 import com.dlstudio.app.ui.components.ResetSection
@@ -51,6 +52,7 @@ fun SettingsScreen(state: AppState, vm: AppViewModel) {
         ThemesSection(state, vm) { picker.launch(arrayOf("*/*")) }
         VoiceSection(state, vm)
         NeedsOffer(state, vm, Locale.forLanguageTag(if (state.lang == AppLang.RU) "ru" else "en"))
+        BackupSection(vm::saveBackup, vm::restoreBackup)
         ResetSection(vm::resetProgress)
         AboutCard()
     }

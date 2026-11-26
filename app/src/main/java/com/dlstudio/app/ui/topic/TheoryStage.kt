@@ -12,6 +12,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
@@ -51,7 +52,7 @@ fun TheoryStage(pages: List<TheoryPage>, startPage: Int, startScroll: Int, talk:
         HorizontalPager(pager, Modifier.weight(1f), pageSpacing = 8.dp) { index ->
             val scroll = remember(index) { ScrollState(if (index == startPage) startScroll else 0).also { scrolls[index] = it } }
             Column(Modifier.fillMaxSize().verticalScroll(scroll).padding(horizontal = 16.dp, vertical = 8.dp)) {
-                TheoryCard(pages[index], index, talk, mediaDir)
+                CompositionLocalProvider(LocalPageScroll provides scroll) { TheoryCard(pages[index], index, talk, mediaDir) }
             }
         }
         Row(Modifier.padding(16.dp), Arrangement.spacedBy(12.dp)) {

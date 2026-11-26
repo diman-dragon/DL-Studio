@@ -5,8 +5,8 @@ import java.util.TimeZone
 import org.json.JSONArray
 import org.json.JSONObject
 
-/** Что сделано в теме: прочитана ли теория, какие карточки пользователь перевернул (увидел ответ), какие вопросы практики решены верно, выдан ли бонус за тему. */
-data class TopicProgress(val theory: Boolean = false, val seen: Set<Int> = emptySet(), val quizOk: Set<Int> = emptySet(), val bonus: Boolean = false)
+/** Что сделано в теме: прочитана ли теория, какие карточки пользователь перевернул (увидел ответ), какие вопросы практики решены верно, выдан ли бонус за тему, на каких вопросах ошибались и не исправились (`miss`). */
+data class TopicProgress(val theory: Boolean = false, val seen: Set<Int> = emptySet(), val quizOk: Set<Int> = emptySet(), val bonus: Boolean = false, val miss: Set<Int> = emptySet())
 
 /**
  * Очки опыта, серия дней и прогресс по темам (по `id` темы). `bestStreak` — самая длинная серия за всё время,
@@ -56,8 +56,11 @@ object Xp {
 
     fun theory(p: Progress, t: Topic, today: Long) = award(p, t, today, THEORY) { it.copy(theory = true) }
     fun card(p: Progress, t: Topic, index: Int, today: Long) = award(p, t, today, CARD) { it.copy(seen = it.seen + index) }
-    fun answer(p: Progress, t: Topic, index: Int, correct: Boolean, today: Long) =
-        award(p, t, today, ANSWER) { if (correct) it.copy(quizOk = it.quizOk + index) else it }
+    fun answer(p: Progress, t: Topic, index: Int, correct: Boolean, today: Long): Reward {
+        if (correct) return award(p, t, today, ANSWER) { it.copy(quizOk = it.quizOk + index, miss = it.miss - index) }
+        val before = p.topics[t.id] ?: TopicProgress()
+        return Reward(p.copy(topics = p.topics + (t.id to before.copy(miss = before.miss + index))), 0, false)
+    }
 
     private fun award(p: Progress, t: Topic, today: Long, base: Int, change: (TopicProgress) -> TopicProgress): Reward {
         val before = p.topics[t.id] ?: TopicProgress()
@@ -93,7 +96,7 @@ object ProgressJson {
         .put("h", JSONObject().also { all -> p.history.forEach { (day, xp) -> all.put(day.toString(), xp) } })
         .put("topics", JSONObject().also { all ->
             p.topics.forEach { (id, t) ->
-                all.put(id, JSONObject().put("t", t.theory).put("k", JSONArray(t.seen.sorted())).put("q", JSONArray(t.quizOk.sorted())).put("b", t.bonus))
+                all.put(id, JSONObject().put("t", t.theory).put("k", JSONArray(t.seen.sorted())).put("q", JSONArray(t.quizOk.sorted())).put("b", t.bonus).put("m", JSONArray(t.miss.sorted())))
             }
         }).toString()
 
@@ -103,7 +106,7 @@ object ProgressJson {
         val history = o.getJSONObject("h").let { h -> h.keys().asSequence().associate { it.toLong() to h.getInt(it) } }
         Progress(o.getInt("xp"), o.getInt("streak"), o.getLong("day"), all.keys().asSequence().associateWith { id ->
             val t = all.getJSONObject(id)
-            TopicProgress(t.getBoolean("t"), t.getJSONArray("k").ints(), t.getJSONArray("q").ints(), t.getBoolean("b"))
+            TopicProgress(t.getBoolean("t"), t.getJSONArray("k").ints(), t.getJSONArray("q").ints(), t.getBoolean("b"), t.optJSONArray("m")?.ints() ?: emptySet())
         }, o.getInt("bs"), history, StatsJson.decode(o.optJSONObject("st")))
     }.getOrDefault(Progress())
 }

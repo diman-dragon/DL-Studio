@@ -78,7 +78,7 @@ fun BankQuestion(item: QuizItem, onDone: (Boolean) -> Unit) {
 }
 
 @Composable
-private fun WordChip(text: String, ghost: Boolean, enabled: Boolean, onClick: () -> Unit) {
+internal fun WordChip(text: String, ghost: Boolean, enabled: Boolean, onClick: () -> Unit) {
     val colors = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(14.dp)
     Box(

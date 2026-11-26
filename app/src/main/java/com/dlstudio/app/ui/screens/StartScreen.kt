@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.dlstudio.app.progress.Achievements
 import com.dlstudio.app.progress.Motivation
 import com.dlstudio.app.progress.Resume
+import com.dlstudio.app.progress.Review
 import com.dlstudio.app.progress.TopicProgress
 import com.dlstudio.app.progress.Week
 import com.dlstudio.app.progress.Xp
@@ -33,6 +34,7 @@ import com.dlstudio.app.ui.components.PathCard
 import com.dlstudio.app.ui.components.Quest
 import com.dlstudio.app.ui.components.QuestsCard
 import com.dlstudio.app.ui.components.RankCard
+import com.dlstudio.app.ui.components.ReviewCard
 import com.dlstudio.app.ui.components.Reveal
 import com.dlstudio.app.ui.components.SettingCard
 import com.dlstudio.app.ui.components.StatsRow
@@ -47,13 +49,14 @@ import java.util.Calendar
  * Всё считается из действий пользователя.
  */
 @Composable
-fun StartScreen(state: AppState, onOpen: (String) -> Unit, onSettings: () -> Unit) {
+fun StartScreen(state: AppState, onOpen: (String) -> Unit, onPractice: (String) -> Unit, onSettings: () -> Unit) {
     val s = LocalStrings.current
     val p = state.progress
     val today = Xp.dayNumber()
     val streak = Xp.currentStreak(p, today)
     val todayXp = Week.todayXp(p, today)
     val next = Resume.next(state.topics, p.topics, state.lastTopic)
+    val review = Review.items(state.topics, p.topics)
     val lessons = Resume.lessons(state.topics)
     val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
     var shift by rememberSaveable { mutableStateOf(0) }
@@ -81,6 +84,7 @@ fun StartScreen(state: AppState, onOpen: (String) -> Unit, onSettings: () -> Uni
                 state.topics.isEmpty() -> GradientButton(s.openSettings, onSettings)
             }
         }
+        if (review.isNotEmpty()) Reveal(4) { ReviewCard(review, onPractice) }
         Reveal(4) { QuestsCard(quests) }
         Reveal(5) { WeekCard(Week.xpByDay(p, today), state.dailyGoal, Week.weekday(today)) }
         if (lessons.isNotEmpty()) Reveal(6) {

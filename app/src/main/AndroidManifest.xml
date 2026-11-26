@@ -7,6 +7,7 @@
         <intent><action android:name="android.speech.RecognitionService" /></intent>
     </queries>
     <application
+        android:name=".DlApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"

@@ -37,6 +37,8 @@ fun kindIcon(kind: QuizKind, dictation: Boolean = false): String = when {
     kind == QuizKind.SPEAK -> "🎤"
     kind == QuizKind.BANK -> "🧩"
     kind == QuizKind.FILL -> "✍️"
+    kind == QuizKind.GAP -> "🧱"
+    kind == QuizKind.FIND -> "🔎"
     else -> "🔗"
 }
 

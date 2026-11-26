@@ -40,6 +40,8 @@ private fun kindName(s: Strings, kind: String) = when (kind) {
     QuizKind.SPEAK.name -> s.kindSpeak
     QuizKind.BANK.name -> s.kindBank
     QuizKind.FILL.name -> s.kindFill
+    QuizKind.GAP.name -> s.kindGap
+    QuizKind.FIND.name -> s.kindFind
     else -> s.kindMatch
 }
 

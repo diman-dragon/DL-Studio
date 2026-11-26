@@ -56,4 +56,37 @@ object Answers {
 
     /** Достаточно ли чисто соединены пары: допускается одна ошибка, если пар не меньше четырёх. */
     fun matchOk(pairCount: Int, mistakes: Int): Boolean = mistakes <= if (pairCount >= 4) 1 else 0
+
+    /** Как в вопросе «вставь слова» отмечено место пропуска. */
+    const val BLANK = "___"
+
+    /** Предложение, разрезанное по пропускам: частей на одну больше, чем пропусков. */
+    fun gapParts(item: QuizItem): List<String> = item.question.split(BLANK)
+
+    /** Слова для пропусков по порядку: через `|`, а если его нет — через пробел. */
+    fun gapWords(answer: String): List<String> =
+        if ('|' in answer) answer.split('|').map { it.trim() }.filter { it.isNotEmpty() } else tokens(answer)
+
+    /** Слова под пропуски и лишние слова вперемешку; порядок для одного вопроса один и тот же и не равен верному, если слова разные. */
+    fun gapBag(item: QuizItem): List<String> {
+        val right = gapWords(item.answer)
+        val mixed = (right + item.options).shuffled(Random(item.answer.hashCode() xor item.question.hashCode()))
+        return if (mixed == right && right.toSet().size > 1) mixed.reversed() else mixed
+    }
+
+    /** Верно ли заполнены все пропуски (слова по порядку пропусков). */
+    fun gapOk(item: QuizItem, placed: List<String>): Boolean = placed.map(::normalize) == gapWords(item.answer).map(::normalize)
+
+    /** Предложение с вставленными верными словами. */
+    fun gapFilled(item: QuizItem): String {
+        val words = gapWords(item.answer)
+        val parts = gapParts(item)
+        return parts.indices.joinToString("") { i -> parts[i] + if (i < parts.size - 1) words.getOrElse(i) { "" } else "" }
+    }
+
+    /** Слова вопроса «найди ошибку» (предложение режется по пробелам). */
+    fun findWords(item: QuizItem): List<String> = tokens(item.question)
+
+    /** Номер слова с ошибкой в предложении или -1, если такого слова нет. */
+    fun findIndex(item: QuizItem): Int = findWords(item).indexOfFirst { normalize(it) == normalize(item.answer) }
 }

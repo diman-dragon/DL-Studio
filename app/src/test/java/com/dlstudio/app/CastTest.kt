@@ -212,4 +212,19 @@ class CastTest {
         assertEquals(emptyMap<String, Place>(), PlaceJson.decode("{oops"))
         assertEquals(emptyMap<String, Place>(), PlaceJson.decode(null))
     }
+
+    @Test fun gapAndFindQuestions() {
+        val gap = QuizItem("Io ___ a Roma e tu ___ a Mosca.", "abito | abiti", listOf("abita", "abitano"), QuizKind.GAP)
+        assertEquals(listOf("Io ", " a Roma e tu ", " a Mosca."), Answers.gapParts(gap))
+        assertEquals(listOf("abito", "abiti"), Answers.gapWords(gap.answer))
+        assertEquals(listOf("abito", "abiti"), Answers.gapWords("abito abiti"))
+        assertEquals(setOf("abito", "abiti", "abita", "abitano"), Answers.gapBag(gap).toSet())
+        assertEquals(Answers.gapBag(gap), Answers.gapBag(gap))
+        assertTrue(Answers.gapOk(gap, listOf("Abito", "abiti")))
+        assertTrue(!Answers.gapOk(gap, listOf("abiti", "abito")))
+        assertEquals("Io abito a Roma e tu abiti a Mosca.", Answers.gapFilled(gap))
+        val find = QuizItem("Carlo e Nicola colleziona francobolli.", "colleziona", emptyList(), QuizKind.FIND, hint = "Правильно: collezionano")
+        assertEquals(3, Answers.findIndex(find))
+        assertEquals(-1, Answers.findIndex(find.copy(answer = "nulla")))
+    }
 }

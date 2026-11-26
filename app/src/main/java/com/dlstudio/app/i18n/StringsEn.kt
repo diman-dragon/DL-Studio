@@ -109,8 +109,10 @@ object StringsEn : Strings {
     override fun quizKind(kind: QuizKind, dictation: Boolean) = when {
         dictation -> "Dictation"
         kind == QuizKind.CHOICE -> "Pick the answer"; kind == QuizKind.LISTEN -> "Listen and pick"; kind == QuizKind.SPEAK -> "Say it aloud"
-        kind == QuizKind.BANK -> "Build the phrase"; kind == QuizKind.FILL -> "Type the answer"; else -> "Match the pairs"
+        kind == QuizKind.BANK -> "Build the phrase"; kind == QuizKind.FILL -> "Type the answer"; kind == QuizKind.GAP -> "Fill the gaps"; kind == QuizKind.FIND -> "Spot the mistake"; else -> "Match the pairs"
     }
+    override fun findWrong(word: String, fix: String) = "The mistake is in “$word”" + if (fix.isBlank()) "" else ". $fix"
+    override val findPrompt = "Tap the word with the mistake"
     override fun resultHeadline(good: Boolean) = if (good) "Great result!" else "Room to grow — try again?"
     override fun quizResult(ok: Int, total: Int) = "$ok of $total correct"
     override val retry = "Try again"; override val stageDone = "Stage complete"; override val topicDone = "Topic complete!"; override val seeResult = "Result"
@@ -130,6 +132,17 @@ object StringsEn : Strings {
     override val sectionLook = "Appearance"; override val settingTheme = "Theme"; override val settingLanguage = "App language"; override val settingAccent = "Accent color"
     override fun themeName(mode: ThemeMode) = if (mode == ThemeMode.DARK) "Dark (AMOLED)" else "Light"
 
+    override val reviewTitle = "Review"
+    override fun reviewCounts(wrong: Int, sound: Int) = listOfNotNull("mistakes: $wrong".takeIf { wrong > 0 }, "🔊 skipped: $sound".takeIf { sound > 0 }).joinToString(" · ")
+    override fun reviewMore(n: Int) = "and $n more topics"
+    override val sectionBackup = "Backup"; override val backupSave = "Save progress"; override val backupLoad = "Load progress"
+    override val backupHint = "A file with your streak, XP, completed stages and statistics — move it to another phone."
+    override val backupSaved = "Progress saved to a file."; override val backupFailed = "Couldn’t save the file."
+    override val backupRestored = "Progress loaded."; override val backupBad = "This file doesn’t look like a DL Studio progress backup."
+    override val backupQuestion = "Load progress from the file? Your current progress will be replaced."
+    override val crashTitle = "The app crashed last time"
+    override val crashHint = "Copy the error text and send it to the developer — it points to the cause."
+    override val copy = "Copy"; override val close = "Close"
     override val sectionData = "Data"; override val resetProgress = "Reset progress"
     override val resetProgressHint = "Clears your streak and completed stages. XP, level and topics stay."
     override val resetQuestion = "Reset progress? Completed stages and your streak will be deleted and can’t be restored. XP and level are kept."; override val reset = "Reset"
@@ -207,5 +220,5 @@ object StringsEn : Strings {
     override val statsPron = "Pronunciation"; override val statsTries = "Attempts"; override val statsAvg = "Average score"; override val statsBest = "Best score"
     override val statsGreat = "Great"; override val statsGood = "Good"; override val statsRetry = "Try again"
     override val kindChoice = "Choice"; override val kindListen = "Listening"; override val kindSpeak = "Speaking"
-    override val kindBank = "Word bank"; override val kindFill = "Fill in"; override val kindMatch = "Pairs"
+    override val kindGap = "Gaps"; override val kindFind = "Mistake"; override val kindBank = "Word bank"; override val kindFill = "Fill in"; override val kindMatch = "Pairs"
 }

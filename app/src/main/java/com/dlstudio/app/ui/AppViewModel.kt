@@ -9,6 +9,7 @@ import com.dlstudio.app.content.TopicStore
 import com.dlstudio.app.data.Prefs
 import com.dlstudio.app.progress.Progress
 import com.dlstudio.app.progress.Stats
+import com.dlstudio.app.progress.Backup
 import com.dlstudio.app.progress.Place
 import com.dlstudio.app.progress.PlaceJson
 import com.dlstudio.app.progress.ProgressJson
@@ -43,7 +44,7 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     private val store = TopicStore(app)
     private val speaker = Speaker(app)
     private val listener = Listener(app)
-    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, ProgressJson.decode(prefs.progressJson), prefs.dailyGoal, lastTopic = prefs.lastTopic, speech = SpeechUi(chosen = prefs.voices, rate = prefs.speechRate, auto = prefs.castAuto), met = prefs.met, introduced = prefs.introduced))
+    private val mutable = MutableStateFlow(AppState(prefs.theme, prefs.lang, prefs.accent, ProgressJson.decode(prefs.progressJson), prefs.dailyGoal, lastTopic = prefs.lastTopic, speech = SpeechUi(chosen = prefs.voices, rate = prefs.speechRate, auto = prefs.castAuto), met = prefs.met, introduced = prefs.introduced, crash = prefs.crashReport))
     val state: StateFlow<AppState> = mutable.asStateFlow()
 
     init {
@@ -113,8 +114,9 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     private fun reward(r: Reward) {
-        if (r.gained == 0) return
+        if (r.progress == mutable.value.progress) return
         prefs.progressJson = ProgressJson.encode(r.progress)
+        if (r.gained == 0) { mutable.update { it.copy(progress = r.progress) }; return }
         val today = Xp.dayNumber()
         mutable.update {
             val goal = Week.crossedGoal(it.progress, r.progress, today, it.dailyGoal)
@@ -152,6 +154,21 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
         prefs.progressJson = ProgressJson.encode(progress)
         mutable.update { it.copy(progress = progress) }
     }
+    /** Сохраняет резервную копию прогресса в выбранный файл; `true`, если записалось. */
+    fun saveBackup(uri: Uri): Boolean = runCatching {
+        app.contentResolver.openOutputStream(uri, "wt")!!.use { it.write(Backup.encode(mutable.value.progress, places).toByteArray()) }
+    }.isSuccess
+
+    /** Восстанавливает прогресс из файла копии (текущий заменяется); `false`, если файл не подходит. */
+    fun restoreBackup(uri: Uri): Boolean {
+        val text = runCatching { app.contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) } }.getOrNull()
+        val backup = Backup.decode(text) ?: return false
+        prefs.progressJson = ProgressJson.encode(backup.progress)
+        places = backup.places; prefs.placesJson = PlaceJson.encode(places)
+        mutable.update { it.copy(progress = backup.progress, gain = null) }
+        return true
+    }
+
     /** Сброс прогресса: этапы тем и серия обнуляются, XP (и уровень), дневная история XP и статистика сохраняются. Установленные темы и настройки остаются. */
     fun resetProgress() {
         val old = mutable.value.progress
@@ -160,6 +177,9 @@ class AppViewModel(private val app: Application) : AndroidViewModel(app) {
         places = emptyMap(); prefs.placesJson = null
         mutable.update { it.copy(progress = kept, gain = null) }
     }
+
+    /** Отчёт о падении показан и закрыт: больше не показывать. */
+    fun dismissCrash() { prefs.crashReport = null; mutable.update { it.copy(crash = null) } }
 
     fun clearGain() = mutable.update { it.copy(gain = null) }
 

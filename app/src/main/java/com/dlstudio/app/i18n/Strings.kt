@@ -47,6 +47,8 @@ interface Strings {
     fun quizKind(kind: QuizKind, dictation: Boolean): String
     fun resultHeadline(good: Boolean): String
     fun wrongAnswer(answer: String): String
+    fun findWrong(word: String, fix: String): String
+    val findPrompt: String
     fun quizResult(ok: Int, total: Int): String
     val tileVowel: String; val tileConsonant: String
     val listenPrompt: String; val speakPrompt: String; val dictationPrompt: String; val quietOn: String; val quietOff: String; val typeAnswer: String; val check: String; val skip: String; val speakSkipped: String
@@ -75,6 +77,10 @@ interface Strings {
     fun removeManyQuestion(count: Int): String
     val noCourse: String; val mediaMissing: String
     val cancel: String; val save: String
+    val reviewTitle: String; fun reviewCounts(wrong: Int, sound: Int): String; fun reviewMore(n: Int): String
+    val sectionBackup: String; val backupSave: String; val backupLoad: String; val backupHint: String; val backupSaved: String; val backupFailed: String
+    val backupRestored: String; val backupBad: String; val backupQuestion: String
+    val crashTitle: String; val crashHint: String; val copy: String; val close: String
 
     val sectionVoice: String; val voiceIntro: String; val voiceRate: String; val rateSlow: String; val rateNormal: String; val rateFast: String
     val voiceAuto: String; val voiceHigh: String; val voiceNetwork: String; val voiceNotInstalled: String
@@ -103,5 +109,5 @@ interface Strings {
     val statsListens: String; val statsAnswers: String; val statsXpDays: String; val statsAnswerDays: String; val statsCardDays: String
     val statsByKind: String; val statsByTopic: String; val statsPron: String; val statsTries: String; val statsAvg: String; val statsBest: String
     val statsGreat: String; val statsGood: String; val statsRetry: String
-    val kindChoice: String; val kindListen: String; val kindSpeak: String; val kindBank: String; val kindFill: String; val kindMatch: String
+    val kindChoice: String; val kindListen: String; val kindSpeak: String; val kindBank: String; val kindFill: String; val kindMatch: String; val kindGap: String; val kindFind: String
 }

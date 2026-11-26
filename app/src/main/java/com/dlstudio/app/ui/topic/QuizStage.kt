@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dlstudio.app.content.QuizItem
+import com.dlstudio.app.content.Answers
 import com.dlstudio.app.content.QuizKind
 import com.dlstudio.app.i18n.Strings
 import com.dlstudio.app.speech.Characters
@@ -58,14 +59,14 @@ private const val PLACE_DELAY_MS = 400L
  */
 @Composable
 fun QuizStage(
-    items: List<QuizItem>, done: Boolean, solved: Set<Int>, startQuestion: Int, startScroll: Int, speak: SpeakAs?, check: Check?,
+    items: List<QuizItem>, done: Boolean, solved: Set<Int>, weak: Set<Int>, startQuestion: Int, startScroll: Int, speak: SpeakAs?, check: Check?,
     onAnswer: (Int, Boolean) -> Unit, onPlace: (Int, Int) -> Unit, modifier: Modifier = Modifier
 ) {
     val s = LocalStrings.current
     var quiet by rememberSaveable { mutableStateOf(false) }
     val sound = speak != null && !quiet
     val before = remember { solved }
-    val wasDone = remember { done }
+    val wasDone = remember { done || weak.isNotEmpty() }
     var all by rememberSaveable { mutableStateOf(false) }
     val full = remember(items, sound) { playable(items, sound) }
     val order = remember(items, sound, all) { if (wasDone && !all) full.filter { it !in before }.ifEmpty { full } else full }
@@ -153,6 +154,8 @@ private fun Question(item: QuizItem, speakAs: SpeakAs?, check: Check?, onDone: (
         QuizKind.BANK -> BankQuestion(item, onDone)
         QuizKind.FILL -> FillQuestion(item, speak, onDone)
         QuizKind.MATCH -> MatchQuestion(item, onDone)
+        QuizKind.GAP -> GapQuestion(item, onDone)
+        QuizKind.FIND -> FindQuestion(item, onDone)
     }
 }
 
@@ -161,5 +164,7 @@ private fun verdict(s: Strings, item: QuizItem, ok: Boolean): String = when {
     ok -> s.correct
     item.kind == QuizKind.SPEAK -> s.speakSkipped
     item.kind == QuizKind.MATCH -> s.matchWrong
+    item.kind == QuizKind.GAP -> s.wrongAnswer(Answers.gapFilled(item))
+    item.kind == QuizKind.FIND -> s.findWrong(item.answer, item.hint)
     else -> s.wrongAnswer(item.answer)
 }
